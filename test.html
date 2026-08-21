@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<div class="markdown-body"><h2>ESP-Hi：ESP32-C3 超低成本 AI 对话机器狗</h2>
+<div style="text-align:center">
+<a href="https://space.bilibili.com/3493296718482287" target="_blank" rel="nofollow">B 站视频</a> | <a href="https://gitee.com/esp-friends" target="_blank" rel="nofollow">源码仓库(持续更新中)</a> | 
+<a href="#3D-models" target="_blank">3D 模型</a> | 
+<a href="#qq-group" target="_blank">QQ 交流</a> | 
+<a href="#buy-group" target="_blank">购买方式</a> | 
+<a href="#do-it" target="_blank">复刻教程</a>
+</div>
+<img src="https://image.lceda.cn/pullimage/zD35e5dF9A3pLEtdsNtukDPNT9dksyg1MHftgc1d.png" alt="image.png" width="600" style="display:block;margin:0 auto" loading="lazy">
+<h2><strong>项目简介</strong></h2>
+<p><strong>ESP-Hi</strong> 是一款基于 ESP32-C3 的 <strong>超低成本 AI 对话机器狗</strong>。通过接入大语言模型（如小智 AI），可以实现<strong>智能对话</strong>功能；内置水银开关可以<strong>感知晃动</strong>，实现唤醒和动作控制；集成了一个 <strong>0.96 寸的彩屏</strong>，用于显示表情，机器狗已实现<strong>十数种</strong>动作。通过对 ESP32-C3 外设的充分挖掘，仅需最少的板级硬件即可实现拾音和发声，同步优化了软件，降低内存与 Flash 占用，在资源受限的情况下同时实现了<strong>唤醒词检测</strong>与多种外设驱动。</p>
+<h2>视频展示</h2>
+<p><a href="https://www.bilibili.com/video/BV1BHJtz6E2S/" rel="nofollow" target="_blank">超低成本也能体验大模型交互！ESP32-C3 AI 机器人</a></p>
+<h2><strong>版本更新记录</strong></h2>
+<ul>
+<li>V1.2 (2026 年 4 月 02 日) ：FPC2 换成了上接的封装，便于后盖开孔后连接外部设备。</li>
+<li>V1.1 (2025 年 5 月 21 日) ：移除了外部唤醒芯片相关电路，取消了默认拼板，水银开关修改为默认不上件，增加了一个拓展接口。</li>
+<li>V1.0（2025 年 5 月 19 日）：第一次开源版本。</li>
+</ul>
+<h3><strong>关于固件</strong></h3>
+<p>基础固件已打包在附件中，烧录地址为 <strong>0x00</strong>。</p>
+<p>烧录步骤如下：</p>
+<ol>
+<li><strong>按住设备顶部的 Boot 按钮</strong>。</li>
+<li><strong>上电设备</strong>，使 ESP32-C3 进入下载模式。</li>
+<li>烧录完成后，<strong>松开 Boot 按钮</strong>，重新上电即可运行程序。</li>
+</ol>
+<p>小智固件：</p>
+<p>请下载 <a href="https://github.com/78/xiaozhi-esp32" rel="nofollow" target="_blank">xiaozhi-esp32</a> 仓库，调用下面语句进行 ESP-HI 小智固件编译</p>
+<pre><code>python3 scripts/release.py esp-hi
+</code></pre>
+<h3>当前固件支持功能：</h3>
+<ul>
+<li><strong>唤醒词与按键唤醒</strong>：唤醒词 <em>Hi, 乐鑫</em></li>
+<li><strong>接入平台</strong>：小智</li>
+<li><strong>功能支持</strong>：灯光控制、机器狗控制、网页控制</li>
+</ul>
+<p>项目源码正在加紧整理中，开放时间请关注 <strong>ESP_Friends</strong> 动态，敬请期待！</p>
+<h2><strong>功能展示</strong></h2>
+<ul>
+<li><strong>大模型 AI 对话功能</strong></li>
+</ul>
+<p>ESP-Hi 可以通过接入大语言模型，实现对话聊天功能，<strong>支持唤醒词</strong>，借助板载的 0.96 寸小屏，支持<strong>显示表情</strong>，目前已对接：<a href="https://github.com/78/xiaozhi-esp32" rel="nofollow" target="_blank">小智AI</a>。<br>
+其它平台正在陆续适配中...<br>
+<img src="//image.lceda.cn/pullimage/UUfpkUGPwDRSeFMRZmpeOdKPGnMnnuYOoj9hUBaX.gif" alt="本地语音唤醒.gif" width="600" loading="lazy"><br>
+具体实现代码开源在<a href="https://gitee.com/esp-friends" rel="nofollow" target="_blank">ESP-Friends 仓库</a>中。</p>
+<ul>
+<li><strong>动作感知功能</strong></li>
+</ul>
+<p>ESP-Hi 这款 AI 玩具内置了一个水银开关，可以感知晃动的速率，从而实现唤醒/打断对话/执行动作等。<br>
+<img src="//image.lceda.cn/pullimage/IPa0fiFzxaxvKkyosW9zHbmhHNiPXh0utFwoOPeR.gif" alt="唤醒.gif" width="600" loading="lazy"></p>
+<ul>
+<li><strong>机械狗功能</strong></li>
+</ul>
+<p>ESP-Hi 通过 USB Type-C 接口连接舵机底座后，就可以变身为一个 AI 机械狗，在机械狗控制组件中已实现<strong>数十种动作</strong>，此外，机械狗底座集成了电池管理功能。<br>
+<img src="//image.lceda.cn/pullimage/GbWwoPI4ov2eL5aHhxPPlbM8crX6lMLKGpb5Ss71.gif" alt="狗.gif" width="600" loading="lazy"></p>
+<ul>
+<li><strong>网页控制</strong></li>
+</ul>
+<p>ESP-Hi 还支持通过网页控制 Servo Dog，可以在网页端远程遥控机械狗前进后退左转右转，以及 12 种预设动作。并支持了在网页端进行舵机调平。</p>
+<p>如何进入：</p>
+<ol>
+<li>首先将 ESP-HI 进行小智配网。</li>
+<li>手机/PC 连接到同一 Wi-Fi 下</li>
+<li>在游览器中访问 <strong><a href="http://esp-hi.local" rel="nofollow" target="_blank">http://esp-hi.local</a></strong> 或者 <strong>esp-hi.local</strong> 或者 <strong>ESP-HI 的 IP 地址</strong> 即可进入网页后台</li>
+</ol>
+<p>基础动作控制：</p>
+<ul>
+<li>按下按钮可以进行基础动作控制，随时可打断</li>
+<li>在空白区域按下并拖动可以控制狗子的前进，后退，左转，右转</li>
+</ul>
+<img src="//image.lceda.cn/oshwhub/pullImage/dfc0bebd27c340059685c2ade622385a.png" alt="基础动作控制.gif" width="600" loading="lazy">
+<p>舵机校准：</p>
+<ul>
+<li>舵机校准模式下，可以将机器狗的四条腿调平。请务必阅读校准说明。</li>
+</ul>
+<img src="//image.lceda.cn/oshwhub/pullImage/6c120e8d60944902a7f6cf4723fc1c4a.png" alt="舵机校准.gif" width="600" loading="lazy">
+<h2><strong><span id="user-content-3D-models">3D 结构设计</span></strong></h2>
+<p>&gt; <strong>所有的结构件文件都开源在附件中，欢迎下载复刻！！！</strong></p>
+<h4>ESP-Hi 本体 3D 结构</h4>
+<p>ESP-Hi 本体采用层叠式设计，本体由一块 ESP-Hi MainBoard PCB（<strong>板厚为 1.2mm</strong>）、两个 3D 打印结构件（一个外壳、一个遮光消噪结构件）、一块正面亚克力面板（厚度为 <strong>1mm</strong>）组成。<br>
+<img src="//image.lceda.cn/pullimage/rLMWY150YQrv9riN5JP5jLM9G95Cv2iOIvwv5821.png" alt="image.png" width="600" loading="lazy"></p>
+<h4>ESP-Hi 机器狗底座 3D 结构</h4>
+<p>ESP-Hi 机器狗底座部分由一块 ServoDogBoard PCB 板、4 个 3D 打印零件、一块 702040 500mAh 锂离子电池、4 个 180 度 SG92R 舵机组成，3D 结构爆炸视图如下：<br>
+<img src="//image.lceda.cn/pullimage/EfhdCNP3IEBiFeM3Dh5wRz0dl6SyJV3XwRbN3gte.png" alt="image.png" width="600" loading="lazy"></p>
+<h2><strong><span id="user-content-do-it">复刻教程</span></strong></h2>
+<p>在本体装配前请准备以下材料：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><strong>序号</strong></th><th><strong>描述</strong></th></tr></thead><tbody><tr><td><strong>1</strong></td><td>3D 打印零件</td></tr><tr><td><strong>2</strong></td><td>M2*4mm 自攻螺丝</td></tr><tr><td><strong>4</strong></td><td>ESP-Hi MainBoard</td></tr><tr><td><strong>5</strong></td><td>2014B 扬声器</td></tr><tr><td><strong>6</strong></td><td>打印面板</td></tr></tbody></table>
+<p>在机器狗底座装配前请准备以下材料：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><strong>序号</strong></th><th><strong>描述</strong></th></tr></thead><tbody><tr><td><strong>1</strong></td><td>3D 打印零件</td></tr><tr><td><strong>2</strong></td><td>4 个 180 度 SG92R 舵机</td></tr><tr><td><strong>4</strong></td><td>ServoDogBoard</td></tr><tr><td><strong>5</strong></td><td>702040 500mAh 锂离子电池</td></tr><tr><td><strong>6</strong></td><td>数颗 M2 螺丝和舵机自带螺丝包</td></tr></tbody></table>
+<p><strong>投板注意事项：</strong></p>
+<ol>
+<li>打板请选择板厚 <strong>1.2mm</strong></li>
+</ol>
+<h3>硬件装配</h3>
+<h4>ESP-Hi 本体装配</h4>
+<p>本体结构件较少，装配时先将扬声器固定在结构件上，然后将 PCB 固定到打印外壳上，注意天线与外壳的距离很近，装配时请<strong>先将左侧和顶部嵌入外壳</strong>中，然后利用3D打印外壳韧性将 USB 口放入外壳中。</p>
+<img src="//image.lceda.cn/pullimage/nhSxhoej65SwiIza2vrAMXzN9cr35Lp0FIL2yifa.png" alt="image.png" width="600" loading="lazy">
+<p>装配完成图：</p>
+<img src="//image.lceda.cn/pullimage/y6Ij7jifWkOfV8YGXwt9xRgzEYwyYrIAJKDz1zS3.png" alt="image.png" width="600" loading="lazy">
+<p>由于 PCB 和打印面板间还有较大的空隙，因此<strong>必须</strong>使用遮光消噪结构件来降低麦克风拾音噪声。</p>
+<p>显示屏需要粘贴在亚克力面板上，<strong>为避免徒手贴歪</strong>，在附件中提供了一个<strong>屏幕辅助粘贴治具</strong>，推荐先将屏幕固定到治具上，然后粘贴屏幕并取下。</p>
+<img src="//image.lceda.cn/pullimage/PPMC1WMKIrrfK35fjSfUefdmFfvIiXcm8op72Olk.png" alt="image.png" width="600" loading="lazy">
+<h4>机器狗底座装配</h4>
+<p>在装配前需要事先准备好所有 3D 打印件。<br>
+第一步：将 PCB 板、电池和四个舵机依次装入底部外壳中，装配后的效果图如下：<br>
+<img src="//image.lceda.cn/pullimage/jpXM1aizbPWNurVDmSIvECxQWcQD0bE1ZANc5Sv6.png" alt="image.png" width="600" loading="lazy"></p>
+<p>需要注意：装配舵机时，舵机的引脚顺序别接错了，请按照 PCB 板上的丝印标号进行插接，装配示意图如下：</p>
+<img src="//image.lceda.cn/pullimage/MJYPe6mLaOMQ5p5VOpYoKhZEm4pKMfR7ZXDKCFmZ.png" alt="image.png" width="600" loading="lazy">
+<p>第二步：装上 PCB 前盖板，效果如下：</p>
+<img src="//image.lceda.cn/pullimage/cLm7lR2NoItmvqAAnsgUuUWgR8rCWFsyiJE6bMqy.png" alt="image.png" width="600" loading="lazy">
+<p>第三步：装上外壳上盖。<br>
+第四步：将舵机配件包里最小的舵臂用最小的螺丝固定在 3D 打印腿上，效果如下：</p>
+<img src="//image.lceda.cn/pullimage/DWEDVwueD7KvrVjPdHvNeMYW3C1aSQd2yDnO2SBl.png" alt="image.png" width="600" loading="lazy">
+<p>第五步：也是最后一步，将腿装在舵机上，并用螺丝进行固定。</p>
+<h2><strong>硬件电路设计说明</strong></h2>
+<h3><strong>本体电路设计</strong></h3>
+<p>ESP-Hi 硬件部分主要包含电源管理、MCU、音频、显示和舵机机械狗五个部分，总体硬件框图如下：</p>
+<img src="//image.lceda.cn/pullimage/t7q0nzVPmi4VFdFmDZP1CSMv9Nos2MYa5Pkd0zac.png" alt="企业微信截图_1747031958388.png" width="600" loading="lazy">
+<h4><strong>供电方式</strong></h4>
+<p>ESP-Hi 使用 USB-Type-C 供电，使用 RT9013 将电压降低为 3.3 V 电压供 MCU 与音频使用。由于 ESP32-C3 Wi-Fi 发包时瞬态电流较高，可能会影响麦克风音频播放与拾音效果，因此推荐使用负载调整率尽可能低的 LDO 或者 DCDC 芯片。为了防止电源噪声引入麦克风端，需要添加额外低通滤波电路<strong>分离麦克风与 MCU 电源轨</strong>。</p>
+<img src="//image.lceda.cn/pullimage/42SpbP4VDzmzfhvjlXhg4goFDnDoE9jS7vApg8Qb.png" alt="image.png" width="600" loading="lazy">
+<h4><strong>音频</strong></h4>
+<p>ESP-Hi 拾音采用驻极体咪头作为拾音设备，使用跨阻抗放大器将驻极体麦克风的输出电流转换为输出电压，经过电阻偏置后送到 ESP32 的 ADC。由于 ESP32-C3 的电压采集范围约 0 ~ 1 V，放大倍数请根据所选用咪头实际的灵敏度调整 R18。</p>
+<img src="//image.lceda.cn/pullimage/wVnI1fWiY2GLS004VcFPcfgohDj5r5x5jbFKCVZc.png" alt="image.png" width="600" loading="lazy">
+<p>发声部分采用 I2S-PDM 信号直出，为了避免 Wi-Fi 传输对输出信号的干扰，采用差分的方式进行传输。经过 RC 滤波后经音频运放 NS4150B 放大输出，输出的放大倍数设定为 7.2 倍。</p>
+<img src="//image.lceda.cn/pullimage/GjYqBeetFZxiBSwxd2WGGn4GtddbUmZxW3iowO6Y.png" alt="image.png" width="600" loading="lazy">
+<h3><strong>机械狗底座电路设计</strong></h3>
+<p>舵机机械狗底座由四个舵机构成，同时集成了电池管理功能，舵机控制线通过 USB-C 直连到 ESP-Hi 本体。舵机由电池直接供电，底座对本体供电由电池电压泵升到 5 V，从而避免了舵机在执行动作时，电池电压波动对系统的影响。</p>
+<p>底座硬件框图如下：<br>
+<img src="//image.lceda.cn/pullimage/0tSAbglpTh0OtTcXvZeXoykQxsOhvxUaLs75dd3a.png" alt="image.png" width="600" loading="lazy"></p>
+<h4><strong>电池电压升压电路</strong></h4>
+<p>由于舵机直接由电池进行供电，为防止舵机工作时电压不稳定影响 ESP-Hi 本体的正常工作，需要将电池电压升压至 5V 后再供给 ESP-Hi 本体，升压电路如下：<br>
+<img src="https://image.lceda.cn/oshwhub/pullImage/2582eea6d3024dc1bfbcc4dab713d81f.png" alt="image.png" loading="lazy"></p>
+<h4><strong>电源开关电路</strong></h4>
+<p>舵机工作时电流较大，尤其是 4 个同时工作时，而额定工作电流大的拨动开关体积都偏大，无法满足机器狗的结构设计。因此，在本项目中采用小开关和一个 MOS 组合的开关电路，具体电路如下：<br>
+<img src="https://image.lceda.cn/oshwhub/pullImage/b99f1f53f1c34f31939724fe3b23406b.png" alt="image.png" loading="lazy"></p>
+<h2><strong>物料清单</strong></h2>
+<h4>ESP-Hi主体物料清单：</h4>
+<ul>
+<li><a href="https://item.taobao.com/item.htm?abbucket=9&amp;id=670427252886&amp;ns=1&amp;pisk=gynxES1zjQAceNOpgm8ljf-nKTvlGUD2ijkCj5Vc5bh-C7jM3oYaXfF-_S40cSjTXAhZsfHw3RNs1fFioUxn3xrafBq9xHDq533zjfUbGTtSUJWb1U4XixZG3BAHxhLfFldvtj4U8H-7pJZ_hPN1NLegd-1s1PsSF7yaCsw1cLp8Q7w1GSsfVgw4Qtss1R1SFJyGGRwb5T67p7N_flGsFLetZIYYwtwRX2sMFb7Rj9sFY0eYk5I0wGhrvM47OmP5fBMQH6PIh7I1XSWLHPH-nIIEEooK9JcDVihKCvu_ycCW95o-FmgsUsp7vY3o-r3JGGFom7zEckB6cYEYMyitahJqOYHs-znkdHrYcSgg0AXpiYnxixo-IO_7Do08JmEBYsNirvnTBcRw2XHsLVa-XsIzEDmKEu139RbXeLQN7rwP4Lg0j_Mea_28tKeA7Nz_U8FHeLQN7PwzeWvAMN7a585..&amp;priceTId=214783c817418697135887003e10bf&amp;spm=a21n57.1.hoverItem.11&amp;utparam=%7B%22aplus_abtest%22%3A%22e269b12afdaecbd0580894d59699ecdf%22%7D&amp;xxc=taobaoSearch" rel="nofollow" target="_blank">8欧1瓦2014B方形腔体喇叭</a></li>
+<li><a href="https://item.taobao.com/item.htm?app=chrome&amp;bxsign=scdqdE0yZUBo5P5JpgCy7493Q9vhOyZh9Rt-3rOtKOhpGUtMtNJUI55rNGFfnBFtBfA24s8hOs7RFLUvStAurr80zUX2S-4mmttcJYH0YxX3vT5LuJNr7H97zIRRv_suvda&amp;cpp=1&amp;id=607626486042&amp;price=0.19&amp;shareUniqueId=31388258506&amp;share_crt_v=1&amp;shareurl=true&amp;short_name=h.6ORfaVLW2XRy76g&amp;sourceType=item&amp;sp_tk=ekJGQlZWVklUeXk%3D&amp;spm=a2159r.13376460.0.0&amp;suid=560c1bd1-8212-4abf-b78b-0ca8b924c9a8&amp;tbSocialPopKey=shareItem&amp;tk=zBFBVVVITyy&amp;un=01f54f1f4deafe3e3911dc70f8aca8ac&amp;un_site=0&amp;ut_sk=1.ZU4ZrxCI4fADALEQ3sJsru%2FC_21646297_1745893855770.Copy.1&amp;wxsign=tbwPMvOoL73fQ3QHgXtcVwZgXe3RpEBT9EYOO1AIk0tIzFgU498ao-zHBrvRZVE2oD3RGYX03BiA_N2eyL1UVV7ASRTXJM1IIGkJReVNzThHXLjIcHcJpcfI284vMSJTI3i" rel="nofollow" target="_blank">4*1.5mm 麦克风</a></li>
+<li><a href="https://item.taobao.com/item.htm?abbucket=4&amp;detail_redpacket_pop=true&amp;id=611057315553" rel="nofollow" target="_blank">0.96寸 TFT 京东方插接式胶铁一体</a></li>
+</ul>
+<h4>ESP-Hi 舵狗物料清单：</h4>
+<h4>机器狗底座物料清单：</h4>
+<ul>
+<li><a href="https://item.taobao.com/item.htm?abbucket=3&amp;detail_redpacket_pop=true&amp;id=784361648217&amp;skuId=5354948692589" rel="nofollow" target="_blank">702040 聚合物锂电池</a></li>
+<li><a href="https://item.taobao.com/item.htm?app=chrome&amp;bxsign=scdhtjXFBOkY-kI2mHXOC6rVXvWmN_-afWGUrnMyyEWNGf6yvjJcSELvVhSpHljheNWeMV0S03TCHgemc0BSI_CdtFB7kLtgc8qmdVOMZZriRrkY8gaumBdfM656Cb-c0az&amp;cpp=1&amp;id=627738287401&amp;price=5&amp;shareUniqueId=31391579055&amp;share_crt_v=1&amp;shareurl=true&amp;short_name=h.6Onbai9IF5OzrZ2&amp;skuId=4793976793746&amp;sourceType=item&amp;sp_tk=NWJLZVZWaWxJVnQ%3D&amp;spm=a2159r.13376460.0.0&amp;suid=36D37363-4D5A-49EF-9ED3-FC4E019B6E74&amp;tbSocialPopKey=shareItem&amp;tk=5bKeVVilIVt&amp;un=4165945454d1a75803a1fcf2866a2128&amp;un_site=0&amp;ut_sk=1.WzmAH5ZfT28DAISy%2BwphAx48_21380790_1745909894278.Copy.1&amp;wxsign=tbw0-joyEuLYMw4_rftVaPjrWFeWJCXrKQwdxd6_RBLopNn7RPsXoJVgCYW1AXIUkH0i_TYnrDOflXRPG9-YktteSrEm6J7QwxX3zsWiyYqnc5Vr8p0DfxDgpdlpLl9t-af" rel="nofollow" target="_blank">180 度 SG92R 舵机</a></li>
+<li><a href="https://item.taobao.com/item.htm?abbucket=3&amp;detail_redpacket_pop=true&amp;id=820539422958" rel="nofollow" target="_blank">公头 Type-C 贴片插头 TC-005</a></li>
+<li>其他 PCB 物料自行搜索购买即可</li>
+</ul>
+<h2><strong>QQ 交流</strong></h2>
+<p>ESP_Friends 交流群：</p>
+<ul>
+<li>0 群（已满）：813935663</li>
+<li>1 群（已满）：1032430870</li>
+<li>2 群（已满）：939405364</li>
+<li>3 群（已满）：480486715</li>
+<li>4 群（已满）：807521569</li>
+<li>5 群：1054806943</li>
+</ul>
+<p>入群回答密码：ESP_Friends</p>
+<h2><strong><span id="user-content-buy-group">购买方式</span></strong></h2>
+<p>目前已经部分个人卖家售卖成品或散件，如果不想复刻，可在淘宝搜索“esp-hi”进行购买</p>
+<p><a href="https://item.taobao.com/item.htm?app=chrome&amp;bxsign=scdvmclVpm3AvnBMqeKsiG2Drvv3Xtxv-C9U71lKrbFz-QPEJl-9O2sXHm-YuYhNgl5Ee1w9HYlkElOrftbCe3lYR18m1N6d7E7kdeoR0rXRLs8jLR3fSGPwPg7KAWzeB8rUeMxj2QGi_ZOBcrs1rEqfQ&amp;cpp=1&amp;id=930373204967&amp;price=10-198&amp;shareUniqueId=31862693961&amp;share_crt_v=1&amp;shareurl=true&amp;short_name=h.6yvLbz70cSYyjZu&amp;sourceType=item&amp;sp_tk=dGQxblZvd3hLZ0k%3D&amp;spm=a2159r.13376460.0.0&amp;suid=52D48A91-5847-462B-9E9D-547C8136A226&amp;tbSocialPopKey=shareItem&amp;tk=td1nVowxKgI&amp;un=acab50cd1d15cd0de96b4da0bd79fbee&amp;un_site=0&amp;ut_sk=1.YU6i6fbe4QoDAEnCdXFwzVRU_21380790_1748926073381.Copy.1&amp;wxsign=tbwX5LUuqlIe3gpAssdCdaP8zJKR-ir_VyU2XKBC80K20QPBTzqGqDXisT1eF-v-yjzcsdimBvfNSoMtj9O3wPa4Tt1MTevvzuuuUAQzkBe0zak2Ew54iSruj_y_MdUNbddJo4ifL109cMYJDiLTJCCTw" rel="nofollow" target="_blank">集智AI ESP-HI</a></p>
+<p><a href="https://item.taobao.com/item.htm?ft=t&amp;id=928154821389" rel="nofollow" target="_blank">45 智造小店 ESP-HI</a></p>
+<h2><strong>已知问题</strong></h2>
+<p>1.当前麦克风的位置在打印件内，容易因空腔声音振荡导致音质变差，如果想取得最佳的拾音效果，麦克风推荐直接粘贴在前面板上，然后使用线连接到 PCB 上。<br>
+2.舵机底板USB CC1/CC2 线需要分别接一个 5.1K 电阻对地。否则使用 USB C-C 的线无法正常充电。</p>
+<p><strong>如果你在复刻之后发现有问题，欢迎评论指正！！！</strong></p></div>
+</html>
