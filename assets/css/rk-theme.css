@@ -59,7 +59,6 @@
   --rk-h:68px;
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
   --rk-body-bg:#16171a;
-  --rk-noise:url('/assets/images/noise.png?v=2');
   --rk-body-image:
     radial-gradient(78% 50% at 50% -12%, rgba(59,130,246,.16), transparent 70%),
     radial-gradient(66% 44% at 50% 0%, rgba(99,102,241,.09), transparent 72%),
@@ -119,7 +118,6 @@ html[data-theme="light"]{
   --rk-info-rgb:2 132 199;
   --rk-accent-2-rgb:124 58 237;
   --rk-body-bg:#e9eefb;
-  --rk-noise:none;
   --rk-body-image:
     radial-gradient(95% 80% at 6% -10%, rgba(96,165,250,.26), transparent 80%),
     radial-gradient(90% 70% at 96% 2%, rgba(167,139,250,.20), transparent 78%),
@@ -174,7 +172,6 @@ html[data-theme="light"]{
     --rk-info-rgb:2 132 199;
     --rk-accent-2-rgb:124 58 237;
     --rk-body-bg:#e9eefb;
-    --rk-noise:none;
     --rk-body-image:
       radial-gradient(95% 80% at 6% -10%, rgba(96,165,250,.26), transparent 80%),
       radial-gradient(90% 70% at 96% 2%, rgba(167,139,250,.20), transparent 78%),
@@ -195,8 +192,7 @@ html[data-theme="light"]{
    html body 特异性更高且不依赖加载顺序） ---- */
 html body{
   background-color:var(--rk-body-bg) !important;
-  background-image:var(--rk-noise),var(--rk-body-image) !important;
-  background-repeat:repeat,no-repeat,no-repeat,no-repeat;
+  background-image:var(--rk-body-image) !important;
   background-attachment:fixed;
 }
 html .bg-cardbg{ background-image:var(--rk-card-image) !important; }
