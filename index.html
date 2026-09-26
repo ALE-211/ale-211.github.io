@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="msvalidate.01" content="3C096849FE56F346D40B12914310D4D2" />
+    <title>RickC.TechBlog | 主页</title>
+<meta name="description" content="Rick Chou 的技术与游戏博客：嵌入式硬件项目、游戏服务器运维、资源下载。包含 MC 1.10.2 AoE 联机教程、CS:GO 128tick 开服、飞牛OS Tesla M40 驱动等实战记录。">
+<meta name="keywords" content="Rick Chou, 技术博客, 游戏服务器, Minecraft, CS:GO, 嵌入式, ESP32, 飞牛OS, Tesla M40">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | Rick Chou 的技术与游戏博客">
+<meta property="og:description" content="Rick Chou 的技术与游戏博客：嵌入式硬件项目、游戏服务器运维、资源下载。包含 MC 1.10.2 AoE 联机教程、CS:GO 128tick 开服、飞牛OS Tesla M40 驱动等实战记录。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        /* 全局字号放大 */
+        html { font-size: 17px; }
+
+        /* 正文字体：西文 Cascadia Mono → Consolas 回退，中文 微软雅黑 */
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+                radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+                radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+                linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%);
+            background-attachment: fixed;
+        }
+        .bg-cardbg {
+            background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                              linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+        }
+
+        /* 代码字体：Consolas 优先，中文回退微软雅黑 */
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+
+        /* 侧边栏滚动条 */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 页面区块标题 */
+        .section-title {
+            font-size: 1.65rem;
+            margin-bottom: 1.25rem;
+            padding-left: 0.875rem;
+            padding-bottom: 0.35rem;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        p, li { line-height: 1.85; }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+/* ===== RickC-ANIM 载入动画 ===== */
+#pageProgress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#3b82f6);z-index:9999;transition:width .18s ease,opacity .5s ease;box-shadow:0 0 8px rgba(59,130,246,.6)}
+#pageProgress.done{opacity:0;pointer-events:none}
+.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.25,.6,.3,1),transform .7s cubic-bezier(.25,.6,.3,1)}
+.rk-reveal.rk-in{opacity:1;transform:none}
+}
+header{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+/* ===== /RickC-ANIM ===== */
+</style>
+
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style><style>/* ===== RickC-NW 中文防竖排 ===== */
+.nav-link,.hd-nav a,.hd-actions a,.hd-mobile-menu a,.toolbar button,.md-toolbar button,.fmt-tab,#fmtMd,#fmtHtml,#btnImport,#btnExport,#btnVersions,.btn-g,.btn-p,.btn-d{white-space:nowrap}
+/* ===== /RickC-NW ===== */</style>
+
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+    <!-- 顶部快捷导航栏 -->
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <!-- 侧边栏 个人信息 -->
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-tag text-primary mr-2"></i>技术分享</p>
+                    <p><i class="fa fa-wrench text-primary mr-2"></i>服务器联机</p>
+                    <p><i class="fa fa-file-archive-o text-primary mr-2"></i>工具资源下载</p>
+                </div>
+            </div>
+
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-info-circle text-primary"></i>关于本站
+                </h3>
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    记录服务器联机、嵌入式开发与各类折腾经验的个人小站，欢迎来玩服务器。
+                </p>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <section class="lg:col-span-3 space-y-8">
+            <!-- Hero -->
+            <div class="bg-cardbg rounded-xl p-8 rk-reveal-target">
+                <h1 class="text-2xl md:text-4xl font-bold text-white mb-4 leading-snug">Hi，你足迹之下是 RiCh's Technology &amp; Gaming Blog</h1>
+                <p class="text-textlight leading-relaxed mb-4">
+                    这里是个新站，没什么东西，可以防止我哪天忘了当时怎么跑通的 (huh)，也便于分享，比如我的 <a href="./server/minecraft/index.html" class="text-primary hover:underline">mc 科技整合包服务器</a>，省得每次都要重新发教程传文件 Σ(っ °Д °;) っ
+                </p>
+                <p class="text-textlight leading-relaxed mb-4">
+                    另外，欢迎来玩服务器 😋 *★°*:.☆(￣▽￣)/$:*.°★*
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="./board/index.html" class="inline-block bg-primary text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fa fa-cogs mr-1"></i>进入开发
+                    </a>
+                    <a href="./download/index.html" class="inline-block bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fa fa-download mr-1"></i>资源下载
+                    </a>
+                </div>
+            </div>
+
+            <!-- 板块导航 -->
+            <div>
+                <h2 class="section-title text-white rk-reveal-target">站点板块</h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <a href="./board/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="text-3xl text-primary mb-3"><i class="fa fa-cogs"></i></div>
+                        <h3 class="text-lg font-bold text-white mb-2">开发</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">嵌入式硬件项目、电路设计与固件开发记录。</p>
+                        <p class="text-primary text-sm mt-4">进入板块 <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+                    <a href="./download/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="text-3xl text-primary mb-3"><i class="fa fa-download"></i></div>
+                        <h3 class="text-lg font-bold text-white mb-2">下载</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">固件、工具软件与项目相关资源打包下载。</p>
+                        <p class="text-primary text-sm mt-4">进入板块 <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+                    <a href="./server/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="text-3xl text-primary mb-3"><i class="fa fa-server"></i></div>
+                        <h3 class="text-lg font-bold text-white mb-2">服务器</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">服务器搭建、联机教程与运维经验分享。</p>
+                        <p class="text-primary text-sm mt-4">进入板块 <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 最新文章 -->
+            <div>
+                <h2 class="section-title text-white rk-reveal-target">最新文章</h2>
+                <div id="dynamicPosts" class="space-y-4"></div>
+                <div class="space-y-4 mt-4">
+                    <a href="./server/minecraft/index.html" class="bg-cardbg rounded-xl p-6 card-hover block relative">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                                <img src="./assets/images/mc/mc-logo.png" alt="Minecraft" class="w-full h-full object-contain">
+                            </div>
+                            <div>
+                                <span class="inline-block text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded mb-2">服务器 · 联机教程</span>
+                                <h3 class="text-lg font-bold text-white mb-2">本站 Minecraft 服务器联机指南（Age of Engineering）</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">包含 Java 安装、PCL2 启动器、整合包导入，以及 IPv6 直连与 Radmin VPN 组网的完整步骤</p>
+                            </div>
+                        </div>
+                        <span class="absolute bottom-2 right-3 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">
+                            <i class="fa fa-arrow-up mr-1"></i>置顶
+                        </span>
+                    </a>                    <a href="./404.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="./assets/images/demo/404-logo.png" alt="404 Demo" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="inline-block text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded mb-2">Demo · CSS 动画</span>
+                                <h3 class="text-lg font-bold text-white mb-2">404 Not Found 鸿蒙OS风味动画</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">Harmony OS 开机动画样式</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="./server/csgo-dedicated/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="./assets/images/csgo/csgo-logo.png" alt="CS:GO" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="inline-block text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded mb-2">服务器 · 开服教程</span>
+                                <h3 class="text-lg font-bold text-white mb-2">Windows CS:GO 128tick 开服教程</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">SteamCMD 装服务端、双栈 start.bat、server.cfg 完整配置、SourceMod 皮肤插件、128tick 卡顿排查</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="./board/nvidia-tesla-m40/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="./assets/images/nvidia/nvidia-logo.png" alt="NVIDIA" class="w-full h-full object-contain">
+                            </div>
+                            <div>
+                                <span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded mb-2">开发 · 服务器运维</span>
+                                <h3 class="text-lg font-bold text-white mb-2">飞牛OS 重装 Tesla M40 驱动（580 → 535）</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">飞牛定制内核内置 580 驱动卸不掉？GRUB 黑名单屏蔽 builtin 模块后手动装官方 535 run 包，还有全部避坑点</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="./server/csgo/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="./assets/images/csgo/csgo-logo.png" alt="CS:GO" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="inline-block text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded mb-2">服务器 · 联机教程</span>
+                                <h3 class="text-lg font-bold text-white mb-2">CS:GO 联机教程（legacy 版本 + 控制台 connect）</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">CS2 切 csgo_legacy 测试版、开控制台、connect ale211.eu.org:27015 连服</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="./board/hidog/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="flex items-start gap-4">
+                            <img src="./assets/images/hidog/zD35e5dF9A3pLEtdsNtukDPNT9dksyg1MHftgc1d.png" alt="Hi-Dog 产品展示" class="w-16 h-16 sm:w-28 sm:h-28 object-cover rounded-lg flex-shrink-0">
+                            <div>
+                                <span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">开发</span>
+                                <h3 class="text-lg font-bold text-white mb-2">Hi-Dog: ESP32-C3 AI 机器狗</h3>
+                                <p class="text-sm text-gray-400 leading-relaxed">基于 ESP32-C3 的 AI 对话机器狗，支持大模型对话、表情屏、网页遥控与舵机调平</p>
+                            </div>
+                        </div>
+                    </a>
+                    
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 回到顶部按钮 -->
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- 页脚 -->
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+// 顶栏（含账户区 / 写文章按钮）已由 /assets/js/rk-navbar.js 统一渲染；
+// 原先此处填充 userBadgeDesktop / writeBtnDesktop 的代码已随顶栏迁移失效，故移除。
+// ===== 首页最新文章：动态同步 =====
+(function(){
+    if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，跳过动态追加；写死的 6 张卡仍会显示 */
+    fetch('/blog/api_front.php?n=4', {cache: 'no-store'}).then(r => r.json()).then(d => {
+        if (!d.ok || !d.posts.length) return;
+        const box = document.getElementById('dynamicPosts');
+        if (!box) return;
+        // TASK-010-G: 收集页面已有链接去重（归一化 ./ 前缀与目录尾斜杠）
+        function normUrl(u){ u = String(u||''); if (u.indexOf('./')===0) u = u.slice(1); if (/\/$/.test(u)) u = u + 'index.html'; return u; }
+        const seen = {};
+        document.querySelectorAll('a[href]').forEach(a => { seen[normUrl(a.getAttribute('href'))] = 1; });
+        const sec = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
+        box.innerHTML = d.posts.map(p => {
+            const pin = p.pinned_home ? '<span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded ml-1"><i class="fa fa-arrow-up mr-1"></i>置顶</span>' : '';
+            const ex = p.excerpt ? p.excerpt : '（暂无摘要）';
+            const _url = p.url || '/blog/post.php?slug=' + encodeURIComponent(p.slug);
+            if (seen[normUrl(_url)]) return '';
+            return '<a href="' + _url + '" class="bg-cardbg rounded-xl p-6 card-hover block">' +
+                '<div class="flex items-start gap-4">' +
+                    (p.icon ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + p.icon + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
+                    '<div>' +
+                        '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">博客 · ' + (sec[p.section] || p.section) + '</span>' + pin +
+                        '<h3 class="text-lg font-bold text-white mb-2">' + esc2(p.title) + '</h3>' +
+                        '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
+                    '</div>' +
+                '</div>' +
+            '</a>';
+        }).join('');
+    }).catch(() => {});
+})();
+function esc2(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+
+// ========= 回到顶部 =========
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+})
+backTopBtn.addEventListener('click', ()=>{
+    window.scrollTo({top:0, behavior:'smooth'})
+})
+</script>
+
+<script>/* ===== RickC-ANIM 载入动画 ===== */
+(function(){if(window.__rkAnimLoaded)return;window.__rkAnimLoaded=true;var bar=document.createElement("div");bar.id="pageProgress";document.body.insertBefore(bar,document.body.firstChild);var p=0,done=false;var timer=setInterval(function(){if(done)return;p=Math.min(p+(100-p)*0.18+1.5,92);bar.style.width=p+"%";},120);function finish(){if(done)return;done=true;clearInterval(timer);bar.style.width="100%";setTimeout(function(){bar.classList.add("done");},350);setTimeout(function(){if(bar.parentNode)bar.parentNode.removeChild(bar);},1200);}if(document.readyState==="complete")finish();else window.addEventListener("load",finish);setTimeout(finish,4000);var SEL=".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]:not(.rk-reveal)";var els=function(){return Array.prototype.slice.call(document.querySelectorAll(SEL));};function reveal(){var list=els();if(!list.length)return;var idx=0;list.forEach(function(el){if(el.classList.contains("rk-in"))return;el.classList.add("rk-reveal");var r=el.getBoundingClientRect();if(r.top<window.innerHeight&&r.bottom>0){setTimeout(function(){el.classList.add("rk-in");},150+idx*120);idx++;}else{var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("rk-in");io.unobserve(en.target);}});},{rootMargin:"0px 0px -40px 0px",threshold:0.05});io.observe(el);}});}function start(){if(window.__rkStarted)return;window.__rkStarted=true;reveal();setTimeout(function(){els().forEach(function(el){el.classList.add("rk-in");});},5000);}if(document.readyState==="complete")setTimeout(start,150);else window.addEventListener("load",function(){setTimeout(start,150);});setTimeout(function(){start();},3000);if("MutationObserver" in window&&!window.__rkMo){window.__rkMo=new MutationObserver(function(muts){var need=false;muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if((n.matches&&n.matches(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]"))||(n.querySelectorAll&&n.querySelectorAll(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]").length))need=true;});});if(need)reveal();});window.__rkMo.observe(document.body,{childList:true,subtree:true});}})();
+/* ===== /RickC-ANIM ===== */
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+</body>
+</html>

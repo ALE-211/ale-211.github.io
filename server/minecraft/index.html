@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickC.TechBlog | Minecraft 1.10.2 联机教程</title>
+<link rel="canonical" href="https://ale211.eu.org/server/minecraft/index.html">
+<meta name="description" content="Minecraft 1.10.2 Age of Engineering 联机图文教程：装 Java、PCL2 启动器、导入整合包、IPv6 直连或 Radmin VPN 加网络 ALE_211。">
+<meta name="keywords" content="Minecraft 联机, AoE, Age of Engineering, RCMS 1.4, PCL2, Radmin VPN, IPv6, 1.10.2">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | Minecraft 1.10.2 联机教程">
+<meta property="og:description" content="Minecraft 1.10.2 Age of Engineering 联机图文教程：装 Java、PCL2 启动器、导入整合包、IPv6 直连或 Radmin VPN 加网络 ALE_211。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/server/minecraft/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../../../LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+            .toc-active {
+                @apply bg-primary/20 text-primary;
+            }
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        /* 全局字号放大 */
+        html { font-size: 17px; }
+
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+
+        /* 侧边栏滚动条 */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 标题层级强化（与 Hi-Dog 文章页一致） */
+        article h1 {
+            font-size: 2.25rem !important;
+            margin-bottom: 2rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.35);
+            letter-spacing: 0.02em;
+        }
+        article h2 {
+            font-size: 1.65rem !important;
+            margin-top: 3rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-left: 0.875rem !important;
+            padding-bottom: 0.35rem !important;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        article h3 {
+            font-size: 1.3rem !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-left: 0.625rem !important;
+            border-left: 3px solid rgba(59, 130, 246, 0.55);
+            font-weight: 700 !important;
+        }
+        article p, article li, article td, article th {
+            line-height: 1.85;
+        }
+
+        /* 下载按钮：绿色胶囊，与普通内链明确区分 */
+        .dl-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(34,197,94,0.12);
+            border: 1px solid rgba(34,197,94,0.5);
+            color: #4ade80;
+            border-radius: 9999px;
+            font-family: Consolas, "Microsoft YaHei", monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .dl-btn:hover {
+            background: #22c55e;
+            color: #fff;
+            border-color: #22c55e;
+        }
+        /* 下载卡片 */
+        .dl-card {
+            display: block;
+            background: rgba(34,197,94,0.06);
+            border: 1px solid rgba(34,197,94,0.25);
+            border-radius: 0.75rem;
+            padding: 0.9rem 1rem;
+            transition: all 0.2s;
+        }
+        .dl-card:hover {
+            background: rgba(34,197,94,0.14);
+            border-color: rgba(34,197,94,0.6);
+            transform: translateY(-2px);
+        }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+/* 文章页：手机上目录排到正文后面 */
+@media (max-width: 1023px) {
+    main.grid { display: flex !important; flex-direction: column !important; }
+    main aside { order: 2; width: 100%; }
+    main section { order: 1; width: 100%; }
+}
+/* ===== 全站统一渐变背景 ===== */
+body {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-attachment: fixed;
+}
+.bg-cardbg {
+    background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                      linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/server/minecraft/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+    <!-- 顶部快捷导航栏 -->
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <!-- 侧边栏 个人信息 -->
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-gamepad text-primary mr-2"></i>Minecraft 1.10.2</p>
+                    <p><i class="fa fa-steam text-primary mr-2"></i>CS:GO / CS2</p>
+                    <p><i class="fa fa-link text-primary mr-2"></i>联机教程</p>
+                </div>
+            </div>
+
+            <!-- 目录 -->
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-list-ul text-primary"></i>目录
+                </h3>
+                <ul id="leftTocList" class="space-y-2 text-sm">
+                    <!-- JS自动填充目录 -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <section class="lg:col-span-3 space-y-8">
+            <article class="bg-cardbg rounded-xl p-6">
+                <h1 class="text-3xl font-bold text-white mb-6">Minecraft 1.10.2 联机教程（Age of Engineering）</h1>
+
+                <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">服务器简介与准备工作</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    本服务器运行 <strong class="text-white">Minecraft 1.10.2</strong>，使用自制整合包 <strong class="text-white">Age of Engineering（RCMS 1.4）</strong>。所有人必须使用同一版本的整合包才能进服，否则会提示版本不符或 mod 缺失。
+                </p>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    整个联机流程共四步：<strong class="text-white">装 Java → 装 PCL2 启动器 → 导入整合包 → 按你的网络情况选一种方式连接</strong>。
+                </p>
+                <div class="mb-6">
+                    <p class="text-sm text-gray-400 mb-3"><i class="fa fa-download text-green-400 mr-2"></i>本教程用到的文件：</p>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <a class="dl-card" href="../../../assets/java/jre-8u411-windows-x64.exe">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-xl flex-shrink-0"><i class="fa fa-coffee"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-white font-bold text-sm truncate">jre-8u411-windows-x64.exe</div>
+                                    <div class="text-gray-400 text-xs">Java 8 · 65.6 MB · <strong class="text-white">运行环境</strong></div>
+                                </div>
+                                <i class="fa fa-download text-green-400 flex-shrink-0"></i>
+                            </div>
+                        </a>
+                        <a class="dl-card" href="../../../assets/launchers/Plain%20Craft%20Launcher%202.exe">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-xl flex-shrink-0"><i class="fa fa-play-circle"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-white font-bold text-sm truncate">Plain Craft Launcher 2.exe</div>
+                                    <div class="text-gray-400 text-xs">PCL2 启动器 · 5.5 MB · 可被替换</div>
+                                </div>
+                                <i class="fa fa-download text-green-400 flex-shrink-0"></i>
+                            </div>
+                        </a>
+                        <a class="dl-card" href="../../../assets/modpacks/Age%20of%20Engineering%20RCMS%201.4.zip">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-xl flex-shrink-0"><i class="fa fa-cube"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-white font-bold text-sm truncate">Age of Engineering RCMS 1.4.zip</div>
+                                    <div class="text-gray-400 text-xs">联机整合包 · 19.8 MB · <strong class="text-white">不要解压</strong></div>
+                                </div>
+                                <i class="fa fa-download text-green-400 flex-shrink-0"></i>
+                            </div>
+                        </a>
+                        <a class="dl-card" href="../../../assets/tools/Radmin_LAN_2.0.4899.9.exe">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-xl flex-shrink-0"><i class="fa fa-globe"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-white font-bold text-sm truncate">Radmin_LAN_2.0.4899.9.exe</div>
+                                    <div class="text-gray-400 text-xs">组网工具 · 47.1 MB · 无 IPv6 才需安装</div>
+                                </div>
+                                <i class="fa fa-download text-green-400 flex-shrink-0"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <h2 id="section2" class="text-xl font-bold text-white mt-10 mb-3">第一步：安装 Java 运行环境</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    Minecraft 1.10.2 基于 <strong class="text-white">Java 8</strong> 运行，联机前必须先装好。本站提供 64 位 Java 8 安装包，直接下载安装即可。
+                </p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>下载 <a class="dl-btn" href="../../../assets/java/jre-8u411-windows-x64.exe"><i class="fa fa-download"></i>jre-8u411-windows-x64.exe</a>，双击运行安装程序。</li>
+                    <li>按向导点「下一步」直到安装完成，<strong class="text-white">记住默认安装路径</strong>（通常是 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">C:\Program Files\Java\jre1.8.0_411</code>）。</li>
+                </ol>
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">配置环境变量（可选步骤）</h3>
+                <p class="text-textlight mb-3 leading-relaxed">安装完成后建议配置环境变量，方便启动器和系统找到 Java（步骤整理自 Microsoft Learn 与 Oracle 官方文档）：</p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>桌面右键「此电脑」→「属性」→ 左侧「高级系统设置」→ 弹窗右下角「环境变量」。</li>
+                    <li>在下方「系统变量」区域点「新建」：
+                        <ul class="list-disc list-inside mt-1 space-y-1">
+                            <li>变量名：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">JAVA_HOME</code>（全大写、带下划线）</li>
+                            <li>变量值：刚才的安装路径，例如 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">C:\Program Files\Java\jre1.8.0_411</code></li>
+                        </ul>
+                    </li>
+                    <li>在系统变量里找到 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">Path</code>，双击编辑，新增一条：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">%JAVA_HOME%\bin</code>。</li>
+                    <li>一路点「确定」关闭所有窗口。按 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">Win + R</code> 输入 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">cmd</code> 回车，执行 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">java -version</code></li>
+                    <li>显示 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">java version "1.8.0_411"</code> 类似字样即安装配置成功。</li>
+                </ol>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-4">
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>多数情况下 PCL2 启动器会<strong class="text-white">自动识别</strong>已安装的 Java 8，无需手动配置；只有启动器报错找不到 Java 时，再回来按上面步骤配置。</p>
+                </div>
+                <p class="text-gray-500 text-xs mb-6">步骤参考：<a href="https://learn.microsoft.com/en-us/windows/dev-environment/java" class="text-primary hover:underline" target="_blank">Microsoft Learn: Get started with Java on Windows</a> · <a href="https://cloud.tencent.com/developer/article/2559742" class="text-primary hover:underline" target="_blank">JDK 安装与环境变量配置教程</a></p>
+
+                <h2 id="section3" class="text-xl font-bold text-white mt-10 mb-3">第二步：下载并安装 PCL2 启动器</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    PCL2（Plain Craft Launcher 2）是免费的 Minecraft 启动器，绿色免安装，能管理整合包与 Java。
+                </p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>下载 <a class="dl-btn" href="../../../assets/launchers/Plain%20Craft%20Launcher%202.exe"><i class="fa fa-download"></i>Plain Craft Launcher 2.exe</a>，放到固定文件夹（例如 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">D:\MC\</code>），<strong class="text-white">不要放桌面或 C 盘临时目录</strong>。备用版本：<a class="dl-btn" href="../../../assets/launchers/PCL2_CE_x64.exe"><i class="fa fa-download"></i>PCL2_CE_x64.exe</a>。</li>
+                    <li>双击运行该 exe。首次启动按提示选择游戏目录（默认即可）。</li>
+                    <li>若启动器提示未找到 Java，指向上一步安装的 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">C:\Program Files\Java\jre1.8.0_411\bin\java.exe</code>。</li>
+                </ol>
+                <div class="mb-6 rounded-xl overflow-hidden">
+                    <img src="../../../assets/images/mc/mc-pcl2-main.png" alt="PCL2 启动器主界面" class="w-full h-auto rounded-lg">
+                    <p class="text-gray-400 text-xs text-center mt-2">PCL2 主界面</p>
+                </div>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">提示：</strong>若 Windows 弹出 SmartScreen 蓝色警告，点「更多信息」→「仍要运行」即可，绿色软件常见现象。</p>
+                </div>
+
+                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：导入 Age of Engineering 整合包</h2>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>下载 <a class="dl-btn" href="../../../assets/modpacks/Age%20of%20Engineering%20RCMS%201.4.zip"><i class="fa fa-download"></i>Age of Engineering RCMS 1.4.zip</a>。<strong class="text-white">保持 zip 原样，不要解压</strong>。</li>
+                    <li>打开 PCL2，左侧点「<strong class="text-white">下载</strong>」→ 上方选「<strong class="text-white">整合包</strong>」→「<strong class="text-white">导入本地整合包文件</strong>」。</li>
+                    <li>选中刚下载的 zip，PCL2 自动识别版本（1.10.2 + Forge）并下载游戏文件与全部 mod。</li>
+                    <li>下载完成后回到「开始游戏」页，左上角版本下拉选择 <strong class="text-white">Age of Engineering</strong>。</li>
+                    <li>首次启动会安装所有 mod、生成世界文件，进度条走完前不要关闭窗口。</li>
+                </ol>
+                <div class="mb-6 rounded-xl overflow-hidden">
+                    <img src="../../../assets/images/mc/mc-pcl2-import.png" alt="在 PCL2 中导入整合包" class="w-full h-auto rounded-lg">
+                    <p class="text-gray-400 text-xs text-center mt-2">在 PCL2 中导入本地整合包</p>
+                </div>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>整合包 mod 较多，建议在启动器设置里把游戏内存分配调到 <strong class="text-white">4098 MB ~ 6144 MB</strong>（4~6 GB），避免进游戏后卡顿崩溃。</p>
+                </div>
+
+                <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">第四步：连接服务器</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    先启动一次游戏进入主菜单。打开「多人游戏」，如果列表里已经有一台<strong class="text-white">显示绿色或黄色信号条</strong>的服务器，双击它即可直接加入，下面的步骤都不用看。
+                </p>
+                <p class="text-textlight mb-4 leading-relaxed">如果没有，先判断自己的网络是否支持 IPv6：浏览器打开 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">test-ipv6.com</code>，页面显示 10/10 或出现 IPv6 地址即表示支持。然后按下面两种方式之一连接。</p>
+
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">方式 A：网络支持 IPv6（推荐，延迟最低）</h3>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>进入游戏主菜单 →「多人游戏」→「添加服务器」。</li>
+                    <li>服务器地址填写：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ale211.eu.org</code>，名称随意。</li>
+                    <li>点「完成」，双击列表中刚添加的服务器即可进服。</li>
+                </ol>
+                <div class="mb-6 rounded-xl overflow-hidden">
+                    <img src="../../../assets/images/mc/mc-mp-add-server.png" alt="MC 添加服务器对话框" class="w-full h-auto rounded-lg">
+                    <p class="text-gray-400 text-xs text-center mt-2">添加服务器</p>
+                </div>
+
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">方式 B：不支持 IPv6，使用 Radmin VPN 组网</h3>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    如果你所在的网络（校园网、部分家庭宽带）没有 IPv6，就用 Radmin VPN 虚拟局域网联机。<strong class="text-white">你和开服的主机都要安装并加入同一个虚拟网络</strong>。
+                </p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>下载 <a class="dl-btn" href="../../../assets/tools/Radmin_LAN_2.0.4899.9.exe"><i class="fa fa-download"></i>Radmin_LAN_2.0.4899.9.exe</a>，双击运行安装向导。</li>
+                    <li>依次点 <strong class="text-white">Next → I Agree → Install</strong>。安装中若弹出「安装虚拟网卡驱动」提示，务必选「安装」。</li>
+                    <li>安装完成后启动 Radmin VPN，软件无需注册即可直接使用。</li>
+                    <li>主界面顶部点菜单 <strong class="text-white">Network（网络）→ Join existing network（加入现有网络）</strong>。</li>
+                    <li>弹窗填写：
+                        <ul class="list-disc list-inside mt-2 space-y-1">
+                            <li>网络名（Network name）：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>（注意大写）</li>
+                            <li>密码（Password）：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code></li>
+                        </ul>
+                    </li>
+                    <li>加入成功后，主界面列表里会出现主机（名字含 ALE_211），后面跟着形如 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.xx.xx.xx</code> 的虚拟 IP。</li>
+                    <li>回游戏「多人游戏」→「添加服务器」，地址填这个 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.xx.xx.xx</code> 的 IP，完成后双击进入。</li>
+                </ol>
+                <div class="mb-6 rounded-xl overflow-hidden">
+                    <img src="../../../assets/images/mc/mc-radmin-join.png" alt="Radmin VPN 加入现有网络对话框" class="w-full h-auto max-w-md mx-auto rounded-lg">
+                    <p class="text-gray-400 text-xs text-center mt-2">Radmin VPN 加入现有网络</p>
+                </div>
+                <div class="mb-6 rounded-xl overflow-hidden">
+                    <img src="../../../assets/images/mc/mc-radmin-ip.png" alt="Radmin VPN 列表中主机的虚拟 IP" class="w-full h-auto max-w-md mx-auto rounded-lg">
+                    <p class="text-gray-400 text-xs text-center mt-2">列表中复制主机虚拟 IP 填进 MC</p>
+                </div>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">注意：</strong>首次启动 Radmin VPN 时 Windows 防火墙可能弹窗，请勾选「专用网络」并允许访问；否则列表里看不到主机。</p>
+                </div>
+
+                <h2 id="section6" class="text-xl font-bold text-white mt-10 mb-3">常见问题 FAQ</h2>
+                <ol class="list-decimal list-inside text-textlight space-y-3 mb-6 pl-2">
+                    <li class="leading-relaxed"><strong class="text-white">进服提示「版本不符 / 缺少 Mod」</strong>：确认你导入的是 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">Age of Engineering RCMS 1.4</code>，不要用旧的 v1.3 或 CurseForge 原版 AoE。</li>
+                    <li class="leading-relaxed"><strong class="text-white">启动器报「找不到 Java」</strong>：回到第一步重新安装 Java 8，并确认安装路径无中文；在 PCL2 设置里手动指定 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">C:\Program Files\Java\jre1.8.0_411\bin\javaw.exe</code>。</li>
+                    <li class="leading-relaxed"><strong class="text-white">Radmin 列表里看不到主机</strong>：检查网络名是否大写 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>、密码 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code> 是否正确；退出 Radmin 重开；确认双方都在网络里。</li>
+                    <li class="leading-relaxed"><strong class="text-white">IPv6 方式也连不上</strong>：部分运营商分配了 IPv6 但封锁了出站端口，直接改用方式 B（Radmin VPN）即可。</li>
+                    <li class="leading-relaxed"><strong class="text-white">游戏启动后闪退 / 卡在加载</strong>：在 PCL2 里把内存分配调到 4~6 GB；mod 多的整合包第一次进世界需要较长加载时间。</li>
+                    <li class="leading-relaxed"><strong class="text-white">多人游戏列表里没有任何服务器</strong>：属正常现象，按上面步骤手动「添加服务器」填入地址即可。</li>
+                </ol>
+
+                <div class="border-t border-gray-700 pt-6 mt-8">
+                    <p class="text-gray-400 text-sm mb-2"><strong class="text-white">Rick Chou</strong> &nbsp;|&nbsp; ale211@foxmail.com</p>
+                    <p class="text-gray-500 text-xs">服务器：Minecraft 1.10.2 · Age of Engineering RCMS 1.4</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <!-- 回到顶部按钮 -->
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- 页脚 -->
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+// ========= 移动端菜单 =========
+fetch('/auth/status.php', {cache: 'no-store'}).then(r => r.json()).then(s => {
+    const d = document.getElementById('userBadgeDesktop');
+    const m = document.getElementById('userBadgeMobile');
+    if (!d || !m) return;
+        if (s.logged_in) { if (s.can_write) { var wd=document.getElementById("writeBtnDesktop"),wm=document.getElementById("writeBtnMobile"); if(wd)wd.classList.remove("hidden"); if(wm)wm.classList.remove("hidden"); } /* rk-canwrite */
+        const nm = s.display_name || s.username;
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 group" title="账户管理">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600 group-hover:border-primary transition-colors">' +
+            '<span class="text-gray-300 group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">你好，' + nm + '</span></a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 py-1">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-6 h-6 rounded-full object-cover border border-gray-600">' +
+            '<span class="text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-[12rem]">你好，' + nm + '</span></a>';
+    } else {
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary hover:underline mr-2"><i class="fa fa-sign-in mr-1"></i>登录</a>' +
+            '<a href="https://ale211.eu.org/auth/register.html" class="text-gray-400 hover:underline">注册</a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary">登录</a> · <a href="https://ale211.eu.org/auth/register.html" class="text-gray-400">注册</a>';
+    }
+    d.classList.remove('hidden');
+    m.classList.remove('hidden');
+}).catch(() => {});
+
+
+// ========= 回到顶部 =========
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+})
+backTopBtn.addEventListener('click', ()=>{
+    window.scrollTo({top:0, behavior:'smooth'})
+})
+
+// ========= 左侧侧边栏生成目录 + 滚动高亮 =========
+const leftTocList = document.getElementById('leftTocList');
+const headings = Array.from(document.querySelectorAll('h2[id]'));
+
+headings.forEach(h => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`;
+    a.textContent = h.innerText;
+    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
+    li.appendChild(a);
+    leftTocList.appendChild(li);
+})
+
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = leftTocList.querySelector(`a[href="#${id}"]`);
+        if(entry.isIntersecting){
+            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
+            link?.classList.add('toc-active');
+        }
+    })
+},{rootMargin:"-15% 0px -65% 0px"})
+headings.forEach(h=>observer.observe(h));
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>window.RK_SLUG='mc-server-guide';</script>
+<script src="/assets/js/rk-post-widgets.js"></script>
+</body>
+</html>

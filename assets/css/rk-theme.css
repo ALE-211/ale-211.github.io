@@ -1,0 +1,214 @@
+/* ============================================================
+   RickC-THEME —— 全站共享样式（唯一来源）
+   建立者：DeepSeek harness ｜ 2026-09-25
+   用途：顶栏、基础文字色、中文防竖排、响应式断点，全部收敛到本文件。
+
+   设计约定（改前必读）：
+   1) 顶栏一律使用 rk-* 类名，不要再用 hd-* / .nav-link —— 各页遗留的旧
+      内联样式块会因此自动失效（它们的选择器已不存在），这是刻意的：
+      避免"每页一份样式"再次漂移。
+   2) 本文件在 <head> 中最后加载，同优先级下覆盖各页内联 style。
+   3) 断点只有两个：900px（桌面↔汉堡）与顶栏字号档位。改一处必须同步
+      rk-navbar.js（它用 matchMedia('(max-width:899.98px)') 跟随）。
+   4) 【关键】顶栏内部一律用 em，基准字号由 header.rk-header 自己声明。
+      绝不要在这里用 rem —— 各页 html{font-size} 不同（主页 17px，
+      auth 等页是浏览器默认 16px），用 rem 会让顶栏整块比主页小 6%。
+      这就是"auth 页顶栏又小又窄"的真因，务必保持 em。
+   5) 不要写 prefers-reduced-motion 禁用规则（站长的铁律）。
+   ============================================================ */
+
+:root{
+  --rk-bg:#0f172a;
+  --rk-card:#1e293b;
+  --rk-primary:#3b82f6;
+  --rk-primary-hi:#60a5fa;
+  --rk-text:#cbd5e1;
+  --rk-text-dim:#94a3b8;
+  --rk-border:#334155;
+  --rk-h:68px;
+}
+
+/* ---- 全站根字号统一（对齐主页）----
+   真因：主页单独声明了 html{font-size:17px}（≤1023px→15px，≤639px→14px），
+   而 auth / blog / search 等页**没有声明** → 用浏览器默认 16px，
+   于是整页（文字宽度、内边距、控件尺寸）比主页小约 6%，看起来"被缩放了"。
+   此处统一到主页的档位。**要整体调大/调小全站，只改这三行。** */
+html{ font-size:17px; }
+@media (max-width:1023.98px){ html{ font-size:15px; } }
+@media (max-width:639.98px){  html{ font-size:14px; } }
+
+/* ---- 基础：不依赖 Tailwind 的文字色与底色 ----
+   历史 bug 根因：多个页面 <body> 漏了 text-textlight，而兜底只在 tw-fail 时生效，
+   于是"没自带 text-* 类的元素"全变黑色。这里改为无条件设置，问题从结构上消失。 */
+body{ color:var(--rk-text); background-color:var(--rk-bg); }
+a{ color:inherit; text-decoration:none; }
+
+/* ============================================================
+   顶栏
+   ============================================================ */
+header.rk-header{
+  /* 顶栏自己的字号基准：与各页 html{font-size} 解耦 */
+  font-size:17px;
+  position:sticky; top:0; z-index:50;
+  height:var(--rk-h); min-height:var(--rk-h); box-sizing:border-box;
+  background-color:var(--rk-card);
+  border-bottom:1px solid var(--rk-border);
+  box-shadow:0 4px 6px -1px rgba(0,0,0,.30);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+}
+@media (max-width:1023.98px){ header.rk-header{ font-size:15px; } }
+@media (max-width:639.98px){  header.rk-header{ font-size:14px; } }
+
+.rk-bar{
+  height:100%; max-width:1280px; margin:0 auto;
+  padding:0 1em;
+  display:flex; align-items:center; justify-content:space-between; gap:.75em;
+}
+
+/* logo */
+.rk-logo{
+  display:flex; align-items:center; gap:.5em; flex:0 0 auto;
+  font-size:1.5em; line-height:1; font-weight:700; color:var(--rk-primary);
+  white-space:nowrap;
+}
+.rk-logo img{ height:2em; width:auto; display:block; }
+
+/* 主导航 */
+.rk-nav{ display:flex; align-items:center; justify-content:center; gap:.25em; flex:1 1 auto; min-width:0; }
+.rk-nav a{
+  display:inline-flex; align-items:center; gap:.3em;
+  padding:.5em 1em; border-radius:.5em;
+  font-size:.95em; line-height:1.25em;
+  color:var(--rk-text);
+  white-space:nowrap; flex:0 0 auto;      /* 中文防竖排的关键 */
+  transition:background-color .3s, color .3s;
+}
+.rk-nav a:hover{ background:rgba(59,130,246,.18); color:var(--rk-primary-hi); }
+.rk-nav a.active{ background:rgba(59,130,246,.18); color:var(--rk-primary-hi); }
+.rk-nav a i{ flex:0 0 auto; }
+
+/* 搜索框 */
+.rk-search{
+  display:flex; align-items:stretch; flex:0 0 auto; width:11em;
+  background:var(--rk-bg); border:1px solid var(--rk-border); border-radius:.5em;
+  overflow:hidden;
+}
+.rk-search input{
+  flex:1 1 auto; min-width:0; box-sizing:border-box;
+  background:transparent; border:0; outline:none;
+  color:#fff; font-size:.82em; padding:.4em .7em;
+}
+.rk-search input::placeholder{ color:var(--rk-text-dim); }
+.rk-search button{
+  flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  min-width:2.4em; background:transparent; border:0; cursor:pointer;
+  color:var(--rk-text-dim); font-size:.85em;
+}
+.rk-search button:hover{ color:var(--rk-primary-hi); }
+
+/* 右侧账户区 */
+.rk-actions{ display:flex; align-items:center; justify-content:flex-end; gap:.75em; flex:0 0 auto; white-space:nowrap; }
+.rk-actions a, .rk-actions span{ white-space:nowrap; }
+.rk-write{
+  display:inline-flex; align-items:center; gap:.3em;
+  font-size:.75em; font-weight:600; line-height:1;
+  padding:.5em .8em; border-radius:.5em;
+  background:rgba(59,130,246,.15); color:var(--rk-primary);
+  white-space:nowrap; flex:0 0 auto;
+  transition:background-color .3s;
+}
+.rk-write:hover{ background:rgba(59,130,246,.25); }
+.rk-write.rk-hidden{ display:none !important; }
+
+.rk-user{ display:inline-flex; align-items:center; gap:.5em; color:var(--rk-text); white-space:nowrap; }
+.rk-user img{ width:2em; height:2em; border-radius:9999px; object-fit:cover; border:2px solid #4b5563; flex:0 0 auto; }
+.rk-user span{ display:inline-block; max-width:10em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rk-user:hover, .rk-user:hover span{ color:var(--rk-primary-hi); }
+.rk-login{ color:var(--rk-primary); }
+.rk-register{ color:var(--rk-text-dim); }
+.rk-login:hover,.rk-register:hover{ text-decoration:underline; }
+
+/* 汉堡按钮 */
+.rk-burger{
+  display:none; align-items:center; justify-content:center;
+  background:transparent; border:0; cursor:pointer;
+  color:var(--rk-text); font-size:1.25em; line-height:1;
+  padding:.45em .6em; border-radius:.5em;
+  transition:background-color .2s, color .2s;
+}
+.rk-burger:hover{ background:rgba(59,130,246,.16); color:var(--rk-primary-hi); }
+.rk-burger:active{ background:rgba(59,130,246,.26); }
+
+/* ============================================================
+   移动端下拉面板（美化）
+   ============================================================ */
+.rk-mobile{
+  display:none;
+  background:linear-gradient(180deg, var(--rk-card) 0%, #172033 100%);
+  border-top:1px solid var(--rk-border);
+  box-shadow:0 18px 34px -14px rgba(0,0,0,.7);
+  padding:.9em 1em 1.1em;
+  max-height:calc(100vh - var(--rk-h));
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.rk-mobile.open{ display:block !important; animation:rkDrop .18s ease-out both; }
+@keyframes rkDrop{ from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
+
+/* 面板内搜索框：整行、圆角独立 */
+.rk-mobile .rk-search{ width:100%; margin-bottom:.8em; border-radius:.6em; }
+.rk-mobile .rk-search input{ padding:.6em .8em; font-size:.9em; }
+.rk-mobile .rk-search button{ min-width:2.8em; }
+
+/* 账户行做成卡片 */
+.rk-mobile .rk-user{
+  display:flex; width:100%; box-sizing:border-box;
+  align-items:center; gap:.65em;
+  padding:.6em .8em; margin-bottom:.6em;
+  border-radius:.6em;
+  background:rgba(15,23,42,.65);
+  border:1px solid var(--rk-border);
+}
+.rk-mobile .rk-user img{ width:2.2em; height:2.2em; }
+.rk-mobile .rk-user span{ max-width:14em; }
+.rk-mobile .rk-write{ margin:0 0 .7em; padding:.55em .9em; }
+
+/* 导航项做成圆角胶囊 + 左侧高亮条 */
+.rk-nav-m{ display:block; }
+.rk-nav-m a{
+  display:flex; align-items:center; gap:.7em;
+  padding:.62em .8em; margin-bottom:.15em;
+  border-radius:.55em; position:relative;
+  color:var(--rk-text); white-space:nowrap;
+  transition:background-color .15s, color .15s;
+}
+.rk-nav-m a i{ width:1.2em; text-align:center; flex:0 0 auto; opacity:.9; }
+.rk-nav-m a:hover{ background:rgba(59,130,246,.14); color:var(--rk-primary-hi); }
+.rk-nav-m a.active{ background:rgba(59,130,246,.18); color:var(--rk-primary-hi); font-weight:600; }
+.rk-nav-m a.active::before{
+  content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:3px; height:1.15em; border-radius:0 3px 3px 0; background:var(--rk-primary);
+}
+.rk-mobile-sep{ height:1px; background:var(--rk-border); opacity:.7; margin:.7em 0; }
+
+/* ============================================================
+   响应式：唯一断点 900px（与 rk-navbar.js 保持一致）
+   比原来的 768px 更早切换，避免 768~900px 区间把导航挤成竖排。
+   ============================================================ */
+@media (max-width:899.98px){
+  .rk-nav, .rk-search, .rk-actions{ display:none !important; }
+  .rk-burger{ display:inline-flex !important; }
+}
+@media (min-width:900px){
+  .rk-mobile{ display:none !important; }
+}
+@media (max-width:400px){
+  .rk-logo span{ display:none; }        /* 极窄屏只留 logo 图标 */
+}
+
+/* 中文防竖排兜底：任何按钮/标签类元素都不逐字换行 */
+.rk-nowrap, .rk-nav a, .rk-actions a, .rk-write, .rk-burger, .rk-nav-m a, .rk-mobile a, .pill, .badge, .btn-g, .btn-p, .btn-d, .tbl th, .tbl td{ white-space:nowrap; }
+
+/* Tailwind 未加载时的兜底（保留旧机制，但不再承担基础文字色） */
+html.tw-fail header.rk-header{ background-color:var(--rk-card) !important; border-bottom:1px solid var(--rk-border) !important; }
+html.tw-fail .rk-search input{ color:#fff !important; }

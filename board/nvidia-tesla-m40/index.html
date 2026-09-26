@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickC.TechBlog | 飞牛OS 重装 Tesla M40 驱动（580→535）</title>
+<link rel="canonical" href="https://ale211.eu.org/board/nvidia-tesla-m40/index.html">
+<meta name="description" content="飞牛OS 定制内核内置 NVIDIA 580 驱动无法卸载？GRUB 黑名单屏蔽 builtin 模块后手动安装官方 535 run 包完整流程，附避坑指南。">
+<meta name="keywords" content="飞牛OS, Tesla M40, NVIDIA 驱动, GRUB, Linux, 服务器运维, 535, 580">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | 飞牛OS 重装 Tesla M40 驱动（580→535）">
+<meta property="og:description" content="飞牛OS 定制内核内置 NVIDIA 580 驱动无法卸载？GRUB 黑名单屏蔽 builtin 模块后手动安装官方 535 run 包完整流程，附避坑指南。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/board/nvidia-tesla-m40/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../../LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+            .toc-active {
+                @apply bg-primary/20 text-primary;
+            }
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        html { font-size: 17px; }
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        article h1 {
+            font-size: 2.25rem !important;
+            margin-bottom: 2rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.35);
+            letter-spacing: 0.02em;
+        }
+        article h2 {
+            font-size: 1.65rem !important;
+            margin-top: 3rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-left: 0.875rem !important;
+            padding-bottom: 0.35rem !important;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        article h3 {
+            font-size: 1.3rem !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-left: 0.625rem !important;
+            border-left: 3px solid rgba(59, 130, 246, 0.55);
+            font-weight: 700 !important;
+        }
+        article p, article li, article td, article th {
+            line-height: 1.85;
+        }
+
+        /* 命令代码块 */
+        .cmd-block {
+            background: #0b1220;
+            border: 1px solid rgba(59,130,246,0.35);
+            border-left: 4px solid #3b82f6;
+            border-radius: 0.5rem;
+            padding: 0.9rem 1.1rem;
+            font-family: Consolas, "Microsoft YaHei", monospace;
+            font-size: 0.92rem;
+            color: #4ade80;
+            overflow-x: auto;
+            margin: 0.75rem 0 1.25rem;
+            white-space: pre;
+            line-height: 1.7;
+        }
+        .cmd-block .cmt { color: #64748b; }
+        .cmd-block .ok  { color: #fbbf24; }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+/* 文章页：手机上目录排到正文后面 */
+@media (max-width: 1023px) {
+    main.grid { display: flex !important; flex-direction: column !important; }
+    main aside { order: 2; width: 100%; }
+    main section { order: 1; width: 100%; }
+}
+/* ===== 全站统一渐变背景 ===== */
+body {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-attachment: fixed;
+}
+.bg-cardbg {
+    background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                      linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/board/nvidia-tesla-m40/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-microchip text-primary mr-2"></i>ESXi / 服务器</p>
+                    <p><i class="fa fa-cloud text-primary mr-2"></i>飞牛OS / NAS</p>
+                    <p><i class="fa fa-hdd-o text-primary mr-2"></i>NVIDIA 驱动折腾</p>
+                </div>
+            </div>
+
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-list-ul text-primary"></i>目录
+                </h3>
+                <ul id="leftTocList" class="space-y-2 text-sm"></ul>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-3 space-y-8">
+            <article class="bg-cardbg rounded-xl p-6">
+                <h1 class="text-3xl font-bold text-white mb-6">飞牛OS 彻底重装 Tesla M40 驱动（580 → 535 降级）</h1>
+
+                <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">故障背景</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    机器是 <strong class="text-white">Dell R720 + NVIDIA Tesla M40</strong>，系统是 <strong class="text-white">飞牛OS</strong>（内核 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">6.18.18.c1032-trim</code>）。
+                </p>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    飞牛这个定制内核<strong class="text-white">把 NVIDIA 580.142 驱动硬编译进了内核镜像</strong>——不是 apt 装的、不是 dkms 管的、磁盘上也找不到对应的 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">.ko</code> 文件。这就导致一个会出现以下现象：
+                </p>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">lsmod | grep nvidia</code> 能看到模块加载着</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">nvidia-smi</code> 命令不存在</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">/dev/nvidia*</code> 设备文件一个都没有</li>
+                    <li>想装别的版本驱动？一装就冲突；想卸载？<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">apt purge</code>、<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">modprobe -r</code> 全部无效</li>
+                </ul>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">一句话总结：</strong>模块已加载但磁盘上找不到对应文件，用户态也未安装。需要通过<strong class="text-white">内核启动参数将其屏蔽</strong>，待系统干净后再手动安装官方 run 包。</p>
+                </div>
+
+                <h2 id="section2" class="text-xl font-bold text-white mt-10 mb-3">为什么不能直接卸载</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    普通 Ubuntu 上的 NVIDIA 驱动通过 apt 或 dkms 安装，可以正常卸载。但飞牛定制内核不同：
+                </p>
+                <div class="overflow-x-auto bg-cardbg rounded-xl mb-4">
+                    <table class="w-full text-sm text-textlight" style="table-layout: fixed;">
+                        <colgroup><col style="width: 25%"><col style="width: 37.5%"><col style="width: 37.5%"></colgroup>
+                        <thead>
+                            <tr class="bg-primary/20 text-white">
+                                <th class="px-4 py-2 text-left border border-gray-700">安装方式</th>
+                                <th class="px-4 py-2 text-left border border-gray-700">能不能卸</th>
+                                <th class="px-4 py-2 text-left border border-gray-700">怎么管</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-2 border border-gray-700">apt / dkms 外部模块</td>
+                                <td class="px-4 py-2 border border-gray-700">能</td>
+                                <td class="px-4 py-2 border border-gray-700">apt purge、dkms remove 就行</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2 border border-gray-700"><strong class="text-white">飞牛内置 builtin</strong></td>
+                                <td class="px-4 py-2 border border-gray-700"><strong class="text-red-400">不能</strong></td>
+                                <td class="px-4 py-2 border border-gray-700">编译进内核镜像（vmlinuz），只能通过 GRUB 启动参数屏蔽</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    正确的操作顺序是：<strong class="text-white">GRUB 黑名单屏蔽内置 580 → 重启 → 确认干净 → 装官方 run 版 535</strong>。
+                </p>
+
+                <h2 id="section3" class="text-xl font-bold text-white mt-10 mb-3">步骤 1：清掉用户态残留</h2>
+                <p class="text-textlight mb-3 leading-relaxed">先把系统里所有可能存在的 NVIDIA 用户态组件删干净。这一步删不掉内置驱动（内置的在镜像里），只是清掉后续可能干扰的东西：</p>
+                <pre class="cmd-block">apt purge -y 'nvidia-*' 'libnvidia-*'
+apt autoremove --purge -y
+/usr/bin/nvidia-uninstall 2>/dev/null
+modprobe -r nvidia-drm nvidia-modeset nvidia-uvm nvidia 2>/dev/null
+find /lib/modules/$(uname -r) -name "nvidia*.ko*" -delete
+rm -rf /usr/lib/x86_64-linux-gnu/nvidia*
+rm -rf /usr/lib/nvidia* /usr/lib32/nvidia*
+rm -rf /etc/modprobe.d/nvidia*.conf
+rm -rf /etc/X11/xorg.conf*
+rm -rf /usr/local/cuda*
+rm -f /lib/systemd/system/nvidia*.service
+depmod -a
+update-initramfs -u -k all</pre>
+
+                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">步骤 2：GRUB 黑名单屏蔽内置 580</h2>
+                <p class="text-textlight mb-3 leading-relaxed">通过 GRUB 启动参数屏蔽内置模块：</p>
+                <pre class="cmd-block">nano /etc/default/grub</pre>
+                <p class="text-textlight mb-3 leading-relaxed">找到 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">GRUB_CMDLINE_LINUX_DEFAULT</code> 那一行，在末尾追加（注意是追加，别覆盖原来的参数）：</p>
+                <pre class="cmd-block">modprobe.blacklist=nvidia,nvidia_modeset,nvidia_drm</pre>
+                <p class="text-textlight mb-3 leading-relaxed">保存退出，更新 GRUB：</p>
+                <pre class="cmd-block">update-grub
+<span class="cmt"># 如果 update-grub 报错或者没生效，用这条直接生成：</span>
+grub-mkconfig -o /boot/grub/grub.cfg</pre>
+
+                <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">步骤 3：重启并验证屏蔽成功</h2>
+                <pre class="cmd-block">reboot</pre>
+                <p class="text-textlight mb-3 leading-relaxed">重启完重新 SSH 上来，跑这条：</p>
+                <pre class="cmd-block">lsmod | grep nvidia</pre>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    <strong class="text-red-400">必须无任何输出</strong>。如果还能看到 nvidia / nvidia_modeset / nvidia_drm 模块，说明 GRUB 参数没生效，回去检查步骤 2 有没有写对。此步未通过请勿继续后续操作。
+                </p>
+
+                <h2 id="section6" class="text-xl font-bold text-white mt-10 mb-3">步骤 4：下载官方 Tesla 535 驱动</h2>
+                <p class="text-textlight mb-3 leading-relaxed">请使用 NVIDIA 官方 Tesla 驱动 <strong class="text-white">535.309.01</strong> 稳定版。飞牛应用中心或系统源提供的 580 版本与定制内核不兼容，请勿使用。</p>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-4">
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>NVIDIA 官方直链直接 wget 会返回 403，需要伪装 User-Agent 和 Referer，使用下面这条命令下载：</p>
+                </div>
+                <pre class="cmd-block">cd /tmp
+curl -L -o NVIDIA-Linux-x86_64-535.309.01.run \
+  -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome" \
+  -e "https://www.nvidia.cn/" \
+  "https://cn.download.nvidia.com/tesla/535.309.01/NVIDIA-Linux-x86_64-535.309.01.run"</pre>
+                <p class="text-textlight mb-3 leading-relaxed">下完确认一下大小，应该是 <strong class="text-white">327 MB</strong> 左右：</p>
+                <pre class="cmd-block">ls -lh /tmp/*.run
+<span class="cmt"># 期望看到：327M ... NVIDIA-Linux-x86_64-535.309.01.run</span></pre>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">注意：</strong><code class="bg-gray-700 px-1 py-0.5 rounded">/tmp</code> 目录重启后会被系统清空，请<strong class="text-white">下载完成后立即执行安装</strong>。</p>
+                </div>
+
+                <h2 id="section7" class="text-xl font-bold text-white mt-10 mb-3">步骤 5：安装驱动（服务器无桌面参数）</h2>
+                <pre class="cmd-block">chmod +x /tmp/NVIDIA-Linux-x86_64-535.309.01.run
+/tmp/NVIDIA-Linux-x86_64-535.309.01.run --no-dkms --no-x-check --no-opengl-files</pre>
+                <p class="text-textlight mb-3 leading-relaxed">三个参数的含义：</p>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">--no-dkms</code>：不要走 dkms，飞牛定制内核不兼容 dkms 管理</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">--no-x-check</code>：服务器没装桌面，跳过 X server 检查</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">--no-opengl-files</code>：不装 OpenGL 库，服务器用不到</li>
+                </ul>
+                <p class="text-textlight mb-3 leading-relaxed">安装过程中所有交互问题一律选 <strong class="text-white">No</strong>：不装 32 位兼容库、不更新 xorg.conf、不用 dkms。</p>
+
+                <h2 id="section8" class="text-xl font-bold text-white mt-10 mb-3">步骤 6：刷新缓存并验证</h2>
+                <pre class="cmd-block">depmod -a
+ldconfig
+nvidia-smi</pre>
+                <p class="text-textlight mb-4 leading-relaxed">成功的话 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">nvidia-smi</code> 应该输出类似：</p>
+                <pre class="cmd-block"><span class="ok">+-----------------------------------------------------------------------------+</span>
+| NVIDIA-SMI 535.309.01   Driver Version: 535.309.01   CUDA Version: 12.2  |
+|-------------------------------+----------------------+----------------------+
+| Tesla M40  On                 | 00000000:03:00.0 Off |                    0 |
+| 11520MiB / 11520 MiB  ...    |                    |      </span></pre>
+                <p class="text-textlight mb-6 leading-relaxed">看到 <strong class="text-white">Driver Version: 535.309.01</strong> 和 <strong class="text-white">Tesla M40 11520 MiB</strong> 即表示安装成功。</p>
+
+                <h2 id="section9" class="text-xl font-bold text-white mt-10 mb-3">常见问题与注意事项</h2>
+                <ol class="list-decimal list-inside text-textlight space-y-3 mb-6 pl-2">
+                    <li class="leading-relaxed"><strong class="text-white">/tmp 目录重启后清空</strong>：下载完 run 包后请先完成安装，再重启系统。</li>
+                    <li class="leading-relaxed"><strong class="text-white">modprobe -r 无法卸载内置模块</strong>：内置（builtin）模块不能通过 modprobe -r 卸载，会提示 "Module nvidia is in use" 或静默无效。</li>
+                    <li class="leading-relaxed"><strong class="text-white">飞牛应用中心更新会覆盖手动安装的驱动</strong>：装完 535 后，如果应用中心提示更新 NVIDIA 驱动，<strong class="text-white">请勿点击</strong>，否则会重新安装内置 580 版本。</li>
+                    <li class="leading-relaxed"><strong class="text-white">必须添加 --no-dkms 参数</strong>：不加该参数时安装器会尝试将模块加入 dkms 管理，与飞牛定制内核不兼容，导致安装后 nvidia-smi 无法运行。</li>
+                    <li class="leading-relaxed"><strong class="text-white">NVIDIA 直链 403</strong>：直接 curl 官方链接会被拒，必须带 UA 和 Referer，用步骤 4 那条完整命令。</li>
+                    <li class="leading-relaxed"><strong class="text-white">GRUB 参数务必验证生效</strong>：执行 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">update-grub</code> 后，请运行 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">lsmod | grep nvidia</code> 确认模块已屏蔽，再继续后续步骤。</li>
+                </ol>
+
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-check-circle text-primary mr-2"></i><strong class="text-white">最终状态：</strong>内核保留飞牛原厂 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">6.18.18.c1032-trim</code>，内置 580 永久黑名单，跑官方稳定版 535.309.01，Tesla M40 11520 MiB 满血，长期稳定运行。</p>
+                </div>
+
+                <div class="border-t border-gray-700 pt-6 mt-8">
+                    <p class="text-gray-400 text-sm mb-2"><strong class="text-white">Rick Chou</strong> &nbsp;|&nbsp; ale211@foxmail.com</p>
+                    <p class="text-gray-500 text-xs">飞牛OS 6.18.18.c1032-trim · Tesla M40 · Driver 535.309.01</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+fetch('/auth/status.php', {cache: 'no-store'}).then(r => r.json()).then(s => {
+    const d = document.getElementById('userBadgeDesktop');
+    const m = document.getElementById('userBadgeMobile');
+    if (!d || !m) return;
+        if (s.logged_in) { if (s.can_write) { var wd=document.getElementById("writeBtnDesktop"),wm=document.getElementById("writeBtnMobile"); if(wd)wd.classList.remove("hidden"); if(wm)wm.classList.remove("hidden"); } /* rk-canwrite */
+        const nm = s.display_name || s.username;
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 group" title="账户管理">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600 group-hover:border-primary transition-colors">' +
+            '<span class="text-gray-300 group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">你好，' + nm + '</span></a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 py-1">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-6 h-6 rounded-full object-cover border border-gray-600">' +
+            '<span class="text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-[12rem]">你好，' + nm + '</span></a>';
+    } else {
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary hover:underline mr-2"><i class="fa fa-sign-in mr-1"></i>登录</a>' +
+            '<a href="https://ale211.eu.org/auth/register.html" class="text-gray-400 hover:underline">注册</a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary">登录</a> · <a href="https://ale211.eu.org/auth/register.html" class="text-gray-400">注册</a>';
+    }
+    d.classList.remove('hidden');
+    m.classList.remove('hidden');
+}).catch(() => {});
+
+
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+});
+backTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+const leftTocList = document.getElementById('leftTocList');
+const headings = Array.from(document.querySelectorAll('h2[id]'));
+headings.forEach(h => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`;
+    a.textContent = h.innerText;
+    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
+    li.appendChild(a);
+    leftTocList.appendChild(li);
+});
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = leftTocList.querySelector(`a[href="#${id}"]`);
+        if(entry.isIntersecting){
+            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
+            link?.classList.add('toc-active');
+        }
+    });
+},{rootMargin:"-15% 0px -65% 0px"});
+headings.forEach(h=>observer.observe(h));
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>window.RK_SLUG='fnos-tesla-m40-driver';</script>
+<script src="/assets/js/rk-post-widgets.js"></script>
+</body>
+</html>

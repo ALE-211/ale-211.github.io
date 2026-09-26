@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickC.TechBlog | 开发</title>
+<meta name="description" content="开发与项目：ESP32-C3 AI 机器狗 Hi-Dog、飞牛OS Tesla M40 显卡驱动安装、404 动画 Demo 等技术文章。">
+<meta name="keywords" content="嵌入式, ESP32, AI 玩具, 飞牛OS, Tesla M40, NVIDIA 驱动, 技术博客">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | 开发">
+<meta property="og:description" content="开发与项目：ESP32-C3 AI 机器狗 Hi-Dog、飞牛OS Tesla M40 显卡驱动安装、404 动画 Demo 等技术文章。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/board/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        /* 全局字号放大 */
+        html { font-size: 17px; }
+
+        /* 正文字体：西文 Cascadia Mono → Consolas 回退，中文 微软雅黑 */
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* 代码字体：Consolas 优先，中文回退微软雅黑 */
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+
+        /* 侧边栏滚动条 */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 页面区块标题 */
+        .section-title {
+            font-size: 1.65rem;
+            margin-bottom: 1.25rem;
+            padding-left: 0.875rem;
+            padding-bottom: 0.35rem;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        p, li { line-height: 1.85; }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+/* ===== 全站统一渐变背景 ===== */
+body {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-attachment: fixed;
+}
+.bg-cardbg {
+    background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                      linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+/* ===== RickC-ANIM 载入动画 ===== */
+#pageProgress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#3b82f6);z-index:9999;transition:width .18s ease,opacity .5s ease;box-shadow:0 0 8px rgba(59,130,246,.6)}
+#pageProgress.done{opacity:0;pointer-events:none}
+.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.25,.6,.3,1),transform .7s cubic-bezier(.25,.6,.3,1)}
+.rk-reveal.rk-in{opacity:1;transform:none}
+}
+header{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+/* ===== /RickC-ANIM ===== */
+</style>
+
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/board/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+    <!-- 顶部快捷导航栏 -->
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <!-- 侧边栏 个人信息 -->
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-microchip text-primary mr-2"></i>ESP32 / 单片机</p>
+                    <p><i class="fa fa-puzzle-piece text-primary mr-2"></i>PCB 与结构设计</p>
+                    <p><i class="fa fa-file-code-o text-primary mr-2"></i>固件 / 源码</p>
+                </div>
+            </div>
+
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-list-ul text-primary"></i>文章分类
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="./index.html" class="block px-2 py-1 rounded bg-primary/20 text-primary">全部项目</a></li>
+                    <li><a href="#" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">AI 玩具</a></li>
+                    <li><a href="#" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">电路设计</a></li>
+                    <li><a href="#" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">3D 结构</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <section class="lg:col-span-3 space-y-8">
+            <!-- 板块简介 -->
+            <div class="bg-cardbg rounded-xl p-8">
+                <h1 class="text-3xl font-bold text-white mb-4">开发</h1>
+                <p class="text-textlight leading-relaxed">
+                    这里记录我的嵌入式硬件项目：从方案选型、原理图与 PCB 设计，到结构件打印、固件烧录与调试的完整过程。每篇文章都附物料清单与开源链接，欢迎上手复现。
+                </p>
+            </div>
+
+            <!-- 文章列表 -->
+            <div>
+                <h2 class="section-title text-white">项目文章</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- 已有文章 -->
+                    <a href="./hidog/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="rounded-lg overflow-hidden mb-4">
+                            <img src="../assets/images/hidog/zD35e5dF9A3pLEtdsNtukDPNT9dksyg1MHftgc1d.png" alt="Hi-Dog 产品展示" class="w-full h-40 object-cover">
+                        </div>
+                        <span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">AI 玩具 · ESP32-C3</span>
+                        <h3 class="text-lg font-bold text-white mb-2">Hi-Dog: ESP32-C3 AI 机器狗</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-3">
+                            基于 ESP32-C3 的 AI 对话机器狗：双 PCB 设计、小智大模型接入、表情彩屏、4 舵机动作与网页遥控。
+                        </p>
+                        <p class="text-primary text-sm">阅读全文 <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+
+                    <a href="./nvidia-tesla-m40/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="rounded-lg overflow-hidden mb-4 h-40 bg-gray-800 flex items-center justify-center">
+                            <img src="../assets/images/nvidia/nvidia-logo.png" alt="NVIDIA" class="h-full w-auto object-contain p-4">
+                        </div>
+                        <span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded mb-2">服务器 · NVIDIA 驱动</span>
+                        <h3 class="text-lg font-bold text-white mb-2">飞牛OS 重装 Tesla M40 驱动（580 → 535）</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-3">
+                            飞牛定制内核内置 580 驱动卸不掉？GRUB 黑名单屏蔽 builtin 模块，再手动装官方 run 版 535 的完整流程与避坑。
+                        </p>
+                        <p class="text-primary text-sm">阅读全文 <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+
+                    <a href="../404.html" class="bg-cardbg rounded-xl p-6 card-hover block">
+                        <div class="rounded-lg overflow-hidden mb-4 h-40 bg-gray-800 flex items-center justify-center">
+                            <img src="../assets/images/demo/404-logo.png" alt="404 Demo" class="w-full h-full object-cover">
+                        </div>
+                        <span class="inline-block text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded mb-2">Demo · CSS 动画</span>
+                        <h3 class="text-lg font-bold text-white mb-2">404 Not Found 鸿蒙OS风味版</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-3">
+                            纯 CSS 复刻鸿蒙开机动画：中间 0 闭眼睁开、聚光灯从中心向两侧扫开、蓝色下划线收尾。
+                        </p>
+                        <p class="text-primary text-sm">查看 Demo <i class="fa fa-arrow-right ml-1"></i></p>
+                    </a>
+
+                    <!-- 占位卡片：不可点击，仅展示 -->
+                    <div class="bg-cardbg rounded-xl p-6 border border-dashed border-gray-700">
+                        <div class="rounded-lg overflow-hidden mb-4 h-40 bg-gray-800 flex items-center justify-center text-gray-500">
+                            <i class="fa fa-cube text-4xl"></i>
+                        </div>
+                        <span class="inline-block text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded mb-2">持续更新中</span>
+                        <h3 class="text-lg font-bold text-gray-300 mb-2">下一个项目…</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">
+                            新项目正在制作与整理中，敬请期待。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 回到顶部按钮 -->
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- 页脚 -->
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+// ========= 移动端菜单 =========
+fetch('/auth/status.php', {cache: 'no-store'}).then(r => r.json()).then(s => {
+    const d = document.getElementById('userBadgeDesktop');
+    const m = document.getElementById('userBadgeMobile');
+    if (!d || !m) return;
+        if (s.logged_in) { if (s.can_write) { var wd=document.getElementById("writeBtnDesktop"),wm=document.getElementById("writeBtnMobile"); if(wd)wd.classList.remove("hidden"); if(wm)wm.classList.remove("hidden"); } /* rk-canwrite */
+        const nm = s.display_name || s.username;
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 group" title="账户管理">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600 group-hover:border-primary transition-colors">' +
+            '<span class="text-gray-300 group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">你好，' + nm + '</span></a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 py-1">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-6 h-6 rounded-full object-cover border border-gray-600">' +
+            '<span class="text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-[12rem]">你好，' + nm + '</span></a>';
+    } else {
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary hover:underline mr-2"><i class="fa fa-sign-in mr-1"></i>登录</a>' +
+            '<a href="https://ale211.eu.org/auth/register.html" class="text-gray-400 hover:underline">注册</a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary">登录</a> · <a href="https://ale211.eu.org/auth/register.html" class="text-gray-400">注册</a>';
+    }
+    d.classList.remove('hidden');
+    m.classList.remove('hidden');
+}).catch(() => {});
+
+
+// ========= 回到顶部 =========
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+})
+backTopBtn.addEventListener('click', ()=>{
+    window.scrollTo({top:0, behavior:'smooth'})
+})
+</script>
+
+<script>/* ===== RickC-ANIM 载入动画 ===== */
+(function(){if(window.__rkAnimLoaded)return;window.__rkAnimLoaded=true;var bar=document.createElement("div");bar.id="pageProgress";document.body.insertBefore(bar,document.body.firstChild);var p=0,done=false;var timer=setInterval(function(){if(done)return;p=Math.min(p+(100-p)*0.18+1.5,92);bar.style.width=p+"%";},120);function finish(){if(done)return;done=true;clearInterval(timer);bar.style.width="100%";setTimeout(function(){bar.classList.add("done");},350);setTimeout(function(){if(bar.parentNode)bar.parentNode.removeChild(bar);},1200);}if(document.readyState==="complete")finish();else window.addEventListener("load",finish);setTimeout(finish,4000);var SEL=".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]:not(.rk-reveal)";var els=function(){return Array.prototype.slice.call(document.querySelectorAll(SEL));};function reveal(){var list=els();if(!list.length)return;var idx=0;list.forEach(function(el){if(el.classList.contains("rk-in"))return;el.classList.add("rk-reveal");var r=el.getBoundingClientRect();if(r.top<window.innerHeight&&r.bottom>0){setTimeout(function(){el.classList.add("rk-in");},150+idx*120);idx++;}else{var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("rk-in");io.unobserve(en.target);}});},{rootMargin:"0px 0px -40px 0px",threshold:0.05});io.observe(el);}});}function start(){if(window.__rkStarted)return;window.__rkStarted=true;reveal();setTimeout(function(){els().forEach(function(el){el.classList.add("rk-in");});},5000);}if(document.readyState==="complete")setTimeout(start,150);else window.addEventListener("load",function(){setTimeout(start,150);});setTimeout(function(){start();},3000);if("MutationObserver" in window&&!window.__rkMo){window.__rkMo=new MutationObserver(function(muts){var need=false;muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if((n.matches&&n.matches(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]"))||(n.querySelectorAll&&n.querySelectorAll(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]").length))need=true;});});if(need)reveal();});window.__rkMo.observe(document.body,{childList:true,subtree:true});}})();
+/* ===== /RickC-ANIM ===== */
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+</body>
+</html>

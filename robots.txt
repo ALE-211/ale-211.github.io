@@ -1,0 +1,4 @@
+# ale211.eu.org 的 GitHub Pages 镜像站，不参与搜索引擎索引。
+# 主站：https://ale211.eu.org
+User-agent: *
+Disallow: /

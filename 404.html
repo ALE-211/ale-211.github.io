@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/LOGO260721.png">
+    <title>RickC.TechBlog | 404 Not Found</title>
+<style>
+* {
+padding: 0;
+margin: 0;
+}
+html {
+height: 100%;
+font-size: 10px;
+}
+body {
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: Arial;
+background-color: black;
+overflow: hidden;
+}
+@media screen and (max-width: 767px) {
+html {
+font-size: 6px;
+}
+}
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+html {
+font-size: 8px;
+}
+}
+@media screen and (min-width: 1024px) and (max-width: 1199px) {
+html {
+font-size: 10px;
+}
+}
+@media screen and (min-width: 1200px) {
+html {
+font-size: 12px;
+}
+}
+.container {
+position: relative;
+display: flex;
+justify-content: center;
+font-size: 10rem;
+color: white;
+transform: scale(2.5);
+transform-origin: -10% 50%;
+animation: move 0.8s 1.5s cubic-bezier(0.1, 0.6, 0, 1) forwards;
+}
+.delay{
+opacity: 0;
+animation: fade_in 2s 0.5s forwards;
+}
+.letter {
+position: relative;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+.letter .ul {
+position: relative;
+width: 7rem;
+height: 3.5rem;
+padding: 1rem;
+list-style: none;
+overflow: hidden;
+}
+.letter .ul:first-of-type {
+padding-bottom: 0;
+}
+.letter .ul:last-of-type {
+padding-top: 0;
+/* margin-top: -2px; */
+/* animation: letter-move .1s 1.2s forwards; */
+}
+.letter .ul .harmony {
+position: absolute;
+top: 1rem;
+left: 1rem;
+width: 5rem;
+height: 5rem;
+border: 1rem solid white;
+border-radius: 50%;
+transform: translateY(50%);
+box-shadow: 0px 0px 1.5rem 0px white, inset 0 0 1rem white;
+animation: move 1.2s forwards, shadow 1.5s 1.2s forwards;
+}
+.letter .ul:last-of-type>.harmony {
+top: auto;
+bottom: 1rem;
+transform: translateY(-50%);
+filter: url(#blur);
+}
+.letter svg {
+position: absolute;
+width: 0;
+height: 0;
+}
+.letter .line{
+position: absolute;
+bottom: 0;
+width: 100%;
+height: 1rem;
+display: flex;
+justify-content: center;
+}
+.letter .line::after{
+content: '';
+width: 0%;
+background-color: #146df7;
+animation: line 0.5s 1.7s forwards;
+}
+.shadow__spot {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: radial-gradient(circle, transparent 6rem, black 20rem);
+animation: fade_spot 1s 1.5s forwards;
+}
+@keyframes move {
+to {
+transform: none;
+}
+}
+@keyframes shadow {
+to {
+box-shadow: none;
+}
+}
+@keyframes fade_spot {
+to {
+transform: translateX(10rem) scale(5);
+}
+}
+@keyframes fade_in {
+to {
+opacity: 1;
+}
+}
+@keyframes line {
+to {
+width: 60%;
+}
+}
+/* @keyframes letter-move {
+to { margin-top: 0 }
+} */
+.btn-row {
+position: absolute;
+bottom: 12%;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 1.5rem;
+opacity: 0;
+animation: btnIn 0.8s ease-out 3.5s forwards;
+}
+.btn {
+padding: 1rem 2.4rem;
+border-radius: 0.6rem;
+font-size: 1.4rem;
+font-family: Arial, sans-serif;
+text-decoration: none;
+cursor: pointer;
+border: none;
+transition: all 0.25s;
+}
+.btn-primary {
+background: #146df7;
+color: #fff;
+}
+.btn-primary:hover { background: #0d5be0; transform: translateY(-2px); }
+.btn-ghost {
+background: transparent;
+color: #ccc;
+border: 1px solid #333;
+}
+.btn-ghost:hover { border-color: #146df7; color: #146df7; }
+@keyframes btnIn {
+to { opacity: 1; }
+}
+.mobile-note {
+position: absolute;
+bottom: 20%;
+left: 50%;
+transform: translateX(-50%);
+font-size: 13px;
+color: #888;
+text-align: center;
+width: 88%;
+line-height: 1.6;
+opacity: 0;
+animation: btnIn 0.8s ease-out 3.8s forwards;
+}
+@media (min-width: 768px) {
+.mobile-note { display: none; }
+}
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/404.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body>
+<div class="container">
+<span class="delay">4</span>
+<div class="letter">
+<ul class="ul">
+<li class="harmony"></li>
+</ul>
+<ul class="ul">
+<li class="harmony"></li>
+</ul>
+<svg>
+<filter id="blur">
+<feGaussianBlur in="SourceGraphic" stdDeviation="0 6" />
+</filter>
+</svg>
+<div class="line"></div>
+</div>
+<span class="delay">4 Not Found</span>
+</div>
+<div class="shadow__spot"></div>
+<div class="btn-row">
+<a href="./index.html" class="btn btn-primary">前往首页</a>
+<button class="btn btn-ghost" onclick="history.back()">返回上一页</button>
+</div>
+<p class="mobile-note">本页动画未针对移动端优化，建议使用桌面端浏览器打开</p>
+<script>
+const filterElem = document.querySelector('feGaussianBlur')
+const clearFilter = () => {
+const value = parseFloat(filterElem.getAttribute('stdDeviation').split(' ')[1]) - 0.06
+if (value > 0) {
+filterElem.setAttribute('stdDeviation', `0 ${value}`)
+requestAnimationFrame(clearFilter)
+} else {
+return
+}
+}
+setTimeout(clearFilter, 300)
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+</body>
+</html>

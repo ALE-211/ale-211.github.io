@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickC.TechBlog | Windows CS:GO 128tick 开服教程</title>
+<link rel="canonical" href="https://ale211.eu.org/server/csgo-dedicated/index.html">
+<meta name="description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、双栈 start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
+<meta name="keywords" content="CS:GO 开服, srcds, SteamCMD, 128tick, SourceMod, MetaMod, PTaH, eItems, server.cfg">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | Windows CS:GO 128tick 开服教程">
+<meta property="og:description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、双栈 start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/server/csgo-dedicated/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../../LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+            .toc-active {
+                @apply bg-primary/20 text-primary;
+            }
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        html { font-size: 17px; }
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        article h1 {
+            font-size: 2.25rem !important;
+            margin-bottom: 2rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.35);
+            letter-spacing: 0.02em;
+        }
+        article h2 {
+            font-size: 1.65rem !important;
+            margin-top: 3rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-left: 0.875rem !important;
+            padding-bottom: 0.35rem !important;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        article h3 {
+            font-size: 1.3rem !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-left: 0.625rem !important;
+            border-left: 3px solid rgba(59, 130, 246, 0.55);
+            font-weight: 700 !important;
+        }
+        article p, article li, article td, article th {
+            line-height: 1.85;
+        }
+
+        .cmd-block {
+            background: #0b1220;
+            border: 1px solid rgba(59,130,246,0.35);
+            border-left: 4px solid #3b82f6;
+            border-radius: 0.5rem;
+            padding: 0.9rem 1.1rem;
+            font-family: Consolas, "Microsoft YaHei", monospace;
+            font-size: 0.92rem;
+            color: #4ade80;
+            overflow-x: auto;
+            margin: 0.75rem 0 1.25rem;
+            white-space: pre;
+            line-height: 1.7;
+        }
+        .cmd-block .cmt { color: #64748b; }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+/* 文章页：手机上目录排到正文后面 */
+@media (max-width: 1023px) {
+    main.grid { display: flex !important; flex-direction: column !important; }
+    main aside { order: 2; width: 100%; }
+    main section { order: 1; width: 100%; }
+}
+/* ===== 全站统一渐变背景 ===== */
+body {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-attachment: fixed;
+}
+.bg-cardbg {
+    background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                      linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/server/csgo-dedicated/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-gamepad text-primary mr-2"></i>Minecraft 1.10.2</p>
+                    <p><i class="fa fa-crosshairs text-primary mr-2"></i>CS:GO / CS2</p>
+                    <p><i class="fa fa-server text-primary mr-2"></i>开服运维</p>
+                </div>
+            </div>
+
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-list-ul text-primary"></i>目录
+                </h3>
+                <ul id="leftTocList" class="space-y-2 text-sm"></ul>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-3 space-y-8">
+            <article class="bg-cardbg rounded-xl p-6">
+                <h1 class="text-3xl font-bold text-white mb-6">Windows CS:GO 128tick 开服教程</h1>
+
+                <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">适用场景</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    本文记录在 Windows Server / Win10/11 上搭建 CS:GO 独立服务器（srcds）的完整流程，最终跑通 <strong class="text-white">128tick 纯净对战服</strong>，支持内网、Radmin VPN、IPv6 三种联机方式，并装上 <strong class="text-white">SourceMod + PTaH + eItems</strong> 实现玩家 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!ws</code> / <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!knife</code> 切换皮肤。
+                </p>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    内容均为实测修正后的可用配置，涵盖卡顿、拒绝连接、BOT 不动、皮肤不生效等常见问题的最终解法。
+                </p>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-link text-primary mr-2"></i>客户端怎么进服见 <a class="text-primary hover:underline" href="../csgo/index.html">CS:GO 联机教程</a>，本文只讲服务端搭建。</p>
+                </div>
+
+                <h2 id="section2" class="text-xl font-bold text-white mt-10 mb-3">第一步：环境准备</h2>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>系统：Windows Server 全系 / Win10 / Win11 专业版</li>
+                    <li>关闭所有杀毒软件、火绒、电脑管家，避免误拦 srcds 网络行为</li>
+                    <li>电源计划设为「高性能」，防止 CPU 降频导致 tick 抖动</li>
+                    <li>准备好 SteamCMD、CS:GO 服务端文件、MetaMod + SourceMod、PTaH / eItems 扩展</li>
+                </ul>
+
+                <h2 id="section3" class="text-xl font-bold text-white mt-10 mb-3">第二步：用 SteamCMD 安装服务端</h2>
+                <p class="text-textlight mb-3 leading-relaxed">下载 SteamCMD，解压到<strong class="text-white">纯英文路径</strong>（路径里别带中文和空格），运行 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">steamcmd.exe</code>，在弹出的命令行里依次执行：</p>
+                <pre class="cmd-block">login anonymous
+app_update 740 validate
+quit</pre>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    服务端装完后位于 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">steamcmd\steamapps\common\Counter-Strike Global Offensive Beta - Dedicated Server</code>，后续所有配置都在这个目录下操作。
+                </p>
+
+                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：启动批处理（IPv4 + IPv6 双栈）</h2>
+                <p class="text-textlight mb-3 leading-relaxed">在服务端根目录新建 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">start.bat</code>，内容如下：</p>
+                <pre class="cmd-block">srcds.exe -game csgo -console -usercon -ip 0.0.0.0 -ip :: -port 27015 -tickrate 128 -nohltv +exec server.cfg</pre>
+                <p class="text-textlight mb-3 leading-relaxed">参数说明：</p>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-ip 0.0.0.0</code>：监听所有 IPv4 地址（包括内网和 Radmin 虚拟网卡）</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-ip ::</code>：监听所有 IPv6 地址，支持 IPv6 客户端直连</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-tickrate 128</code>：强制 128tick</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-nohltv</code>：关闭 HLTV 录像，降低服务器资源开销</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-port 27015</code>：游戏主端口</li>
+                </ul>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>同时写两个 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-ip</code> 参数可以让服务端同时监听 IPv4 和 IPv6，客户端用哪种地址都能连。</p>
+                </div>
+
+                <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">第四步：server.cfg 完整配置</h2>
+                <p class="text-textlight mb-3 leading-relaxed">把下面内容存到 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">csgo\cfg\server.cfg</code>。其中 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">sv_setsteamaccount</code> 需要先去 <a class="text-primary hover:underline" href="https://steamcommunity.com/dev/managegameservers" target="_blank">Steam 游戏服务器管理页</a> 申请一个 GSLT 令牌填进去。</p>
+                <pre class="cmd-block"><span class="cmt">// 网络核心（强制 128tick）</span>
+sv_maxcmdrate "128"
+sv_mincmdrate "128"
+sv_maxupdaterate "128"
+sv_minupdaterate "128"
+sv_maxrate "0"
+sv_minrate "0"
+
+sv_lan "0"
+sv_region "4"
+sv_setsteamaccount "你的GSLT令牌"
+
+<span class="cmt">// 基础设置</span>
+hostname "私人128tick服务器"
+rcon_password "自定义密码"
+
+<span class="cmt">// 游戏设置</span>
+mp_friendlyfire "1"
+mp_autoteambalance "0"
+mp_autokick "0"
+mp_tkpunish "0"
+sv_alltalk "1"
+sv_deadtalk "1"
+sv_full_alltalk "1"
+sv_pausable "1"
+mp_limitteams "2"
+sv_voiceenable "1"
+sv_allow_lobby_connect_only "0"
+sv_allow_wait_command "1"
+
+<span class="cmt">// 皮肤、自定义模型必需</span>
+sv_cheats "0"
+sv_pure "0"
+sv_consistency "0"
+sv_pure_kick_clients "0"
+
+<span class="cmt">// 快照防抖（Windows 服务端优化）</span>
+sv_parallel_sendsnapshot 0
+sv_parallel_packentities 0
+net_compresspackets 0
+
+<span class="cmt">// 对局设置</span>
+mp_forcecamera "0"
+mp_do_warmup_period "1"
+mp_warmuptime "60"
+mp_force_pick_time "30"
+mp_join_grace_time "600"
+mp_match_end_restart "0"
+mp_maxmoney "99999"
+
+<span class="cmt">// BOT 完整激活设置（解决 BOT 原地不动）</span>
+bot_difficulty 3
+bot_chatter "normal"
+bot_join_after_player 0
+bot_quota 10
+bot_join_team any
+bot_defer_to_human 0
+bot_stop 0
+bot_freeze 0
+
+<span class="cmt">// 下载权限（皮肤 / 自定义模型必需）</span>
+sv_allowdownload 1
+sv_allowupload 1</pre>
+
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">几个关键参数</h3>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-6 pl-2">
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">bot_join_after_player 0</code>：无人时 BOT 也会激活 AI，正常移动、对战、下包；默认值会导致 BOT 站桩不动。</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">sv_pure 0</code>：开启皮肤插件、自定义模型必须关闭纯文件校验。</li>
+                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">sv_lan 0</code> + GSLT 令牌：解决 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">#Valve_Reject_LAN_Game</code> 拒绝连接报错。</li>
+                </ul>
+
+                <h2 id="section6" class="text-xl font-bold text-white mt-10 mb-3">第五步：插件框架（皮肤功能）</h2>
+                <p class="text-textlight mb-3 leading-relaxed">按顺序安装，不能颠倒：</p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>MetaMod Source</li>
+                    <li>SourceMod</li>
+                    <li>PTaH 扩展（皮肤底层 API）</li>
+                    <li>eItems 扩展（皮肤数据解析）</li>
+                </ol>
+                <p class="text-textlight mb-3 leading-relaxed">装好后把 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">weapons.smx</code> 插件放到 SourceMod 插件目录，进服用 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!ws</code> 换武器皮肤、<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!knife</code> 换刀具。</p>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">BOT 皮肤：</strong>原版 weapons 插件只给真人玩家加载皮肤，BOT 不会自动带皮肤。如果要 BOT 也带皮肤，需要 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">bot_inventory</code> 插件 + PTaH + eItems + <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">modelch.ext.dll</code>，依赖不全插件会直接加载失败（控制台红色报错）。不想折腾这套依赖，也可以用轻量化脚本让 BOT 随机拿皮肤。</p>
+                </div>
+
+                <h2 id="section7" class="text-xl font-bold text-white mt-10 mb-3">第六步：联机方案</h2>
+                <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li><strong class="text-white">内网朋友</strong>：直接连服务器内网 IPv4 地址，延迟最低。</li>
+                    <li><strong class="text-white">外网朋友走 Radmin VPN</strong>：连 Radmin 分配的虚拟 IPv4 地址。</li>
+                    <li><strong class="text-white">外网朋友走 IPv6</strong>：启动脚本已双栈监听，客户端直接连服务器公网 IPv6 地址。</li>
+                </ul>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">连接拒绝报错：</strong>如果用 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_lan 1</code> 搭配 Radmin 的 26 段虚拟 IP，Steam 客户端会随机拒绝连接。改成 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_lan 0</code> 并配置 GSLT 令牌可彻底解决。</p>
+                </div>
+
+                <h2 id="section8" class="text-xl font-bold text-white mt-10 mb-3">128tick 卡顿排查</h2>
+                <p class="text-textlight mb-3 leading-relaxed">如果遇到 tick 抖动，按顺序排查：</p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>确认没有乱改网卡硬件参数（会导致服务器 CPU 负载飙升、tick 抖动）。</li>
+                    <li>卡顿可能在客户端本地：显卡驱动、DPC 延迟、电源计划问题，重启客户端电脑即可恢复。</li>
+                    <li>Radmin VPN 的 TCP 封装本身会带来抖动，测试稳定性时优先内网直连。</li>
+                    <li>Windows 版 srcds 多核调度有问题，可手动限定进程 CPU 核心数优化。</li>
+                </ol>
+                <p class="text-textlight mb-6 leading-relaxed">服务端控制台看 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">up/cmd=128</code>，<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">sv</code>、<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">var</code> 数值稳定且低、内网直连无抖动、BOT 正常跑动、<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!ws</code> <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!knife</code> 正常，就算跑稳了。</p>
+
+                <h2 id="section9" class="text-xl font-bold text-white mt-10 mb-3">常见问题</h2>
+                <ol class="list-decimal list-inside text-textlight space-y-3 mb-6 pl-2">
+                    <li class="leading-relaxed"><strong class="text-white">不要 sv_lan 1 搭配 Radmin 26 段 IP</strong>：大概率出现连接拒绝，改 sv_lan 0 + GSLT。</li>
+                    <li class="leading-relaxed"><strong class="text-white">BOT 原地不动</strong>：检查 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">bot_join_after_player 0</code> 和 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">bot_stop 0</code> 是否生效。</li>
+                    <li class="leading-relaxed"><strong class="text-white">皮肤不生效</strong>：检查 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_pure</code> 是否为 0，以及插件依赖是否齐全。</li>
+                    <li class="leading-relaxed"><strong class="text-white">客户端卡顿</strong>：优先排查客户端本地驱动、电源计划、显卡设置，不一定是服务器问题。</li>
+                    <li class="leading-relaxed"><strong class="text-white">本地建房人机卡顿</strong>：属于 Listen 服务器单核压力问题，和独立 srcds 服务端无关。</li>
+                </ol>
+
+                <div class="border-t border-gray-700 pt-6 mt-8">
+                    <p class="text-gray-400 text-sm mb-2"><strong class="text-white">Rick Chou</strong> &nbsp;|&nbsp; ale211@foxmail.com</p>
+                    <p class="text-gray-500 text-xs">Windows srcds · CS:GO · 128tick · IPv4 / IPv6 双栈</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+fetch('/auth/status.php', {cache: 'no-store'}).then(r => r.json()).then(s => {
+    const d = document.getElementById('userBadgeDesktop');
+    const m = document.getElementById('userBadgeMobile');
+    if (!d || !m) return;
+        if (s.logged_in) { if (s.can_write) { var wd=document.getElementById("writeBtnDesktop"),wm=document.getElementById("writeBtnMobile"); if(wd)wd.classList.remove("hidden"); if(wm)wm.classList.remove("hidden"); } /* rk-canwrite */
+        const nm = s.display_name || s.username;
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 group" title="账户管理">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600 group-hover:border-primary transition-colors">' +
+            '<span class="text-gray-300 group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">你好，' + nm + '</span></a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 py-1">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-6 h-6 rounded-full object-cover border border-gray-600">' +
+            '<span class="text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-[12rem]">你好，' + nm + '</span></a>';
+    } else {
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary hover:underline mr-2"><i class="fa fa-sign-in mr-1"></i>登录</a>' +
+            '<a href="https://ale211.eu.org/auth/register.html" class="text-gray-400 hover:underline">注册</a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary">登录</a> · <a href="https://ale211.eu.org/auth/register.html" class="text-gray-400">注册</a>';
+    }
+    d.classList.remove('hidden');
+    m.classList.remove('hidden');
+}).catch(() => {});
+
+
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+});
+backTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+const leftTocList = document.getElementById('leftTocList');
+const headings = Array.from(document.querySelectorAll('h2[id]'));
+headings.forEach(h => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`;
+    a.textContent = h.innerText;
+    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
+    li.appendChild(a);
+    leftTocList.appendChild(li);
+});
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = leftTocList.querySelector(`a[href="#${id}"]`);
+        if(entry.isIntersecting){
+            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
+            link?.classList.add('toc-active');
+        }
+    });
+},{rootMargin:"-15% 0px -65% 0px"});
+headings.forEach(h=>observer.observe(h));
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>window.RK_SLUG='csgo-dedicated-server';</script>
+<script src="/assets/js/rk-post-widgets.js"></script>
+</body>
+</html>

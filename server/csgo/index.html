@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickC.TechBlog | CS:GO 联机教程</title>
+<link rel="canonical" href="https://ale211.eu.org/server/csgo/index.html">
+<meta name="description" content="CS:GO 客户端联机教程：CS2 切 csgo_legacy 测试版、打开控制台、connect 直连服务器，支持 IPv6 与 Radmin VPN。">
+<meta name="keywords" content="CS:GO 联机, csgo_legacy, CS2, 控制台, connect, 27015, Radmin VPN">
+<meta name="author" content="Rick Chou">
+<meta property="og:title" content="RickC.TechBlog | CS:GO 联机教程">
+<meta property="og:description" content="CS:GO 客户端联机教程：CS2 切 csgo_legacy 测试版、打开控制台、connect 直连服务器，支持 IPv6 与 Radmin VPN。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ale211.eu.org/server/csgo/">
+<meta property="og:site_name" content="RickC.TechBlog">
+    <script src="/assets/js/tailwind.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../../../LOGO260721.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        textlight: '#cbd5e1'
+                    },
+                    fontFamily: {
+                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+            }
+            
+            .toc-active {
+                @apply bg-primary/20 text-primary;
+            }
+        }
+            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+    <style>
+        html { font-size: 17px; }
+        body {
+            font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Microsoft JhengHei", monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        code, pre, kbd, samp {
+            font-family: Consolas, "Cascadia Mono", "Cascadia Code", "Microsoft YaHei", "微软雅黑", monospace !important;
+        }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        article h1 {
+            font-size: 2.25rem !important;
+            margin-bottom: 2rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.35);
+            letter-spacing: 0.02em;
+        }
+        article h2 {
+            font-size: 1.65rem !important;
+            margin-top: 3rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-left: 0.875rem !important;
+            padding-bottom: 0.35rem !important;
+            border-left: 4px solid #3b82f6;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+            letter-spacing: 0.01em;
+        }
+        article h3 {
+            font-size: 1.3rem !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-left: 0.625rem !important;
+            border-left: 3px solid rgba(59, 130, 246, 0.55);
+            font-weight: 700 !important;
+        }
+        article p, article li, article td, article th {
+            line-height: 1.85;
+        }
+        /* 命令代码块 */
+        .cmd-block {
+            background: #0b1220;
+            border: 1px solid rgba(59,130,246,0.35);
+            border-left: 4px solid #3b82f6;
+            border-radius: 0.5rem;
+            padding: 0.9rem 1.1rem;
+            font-family: Consolas, "Microsoft YaHei", monospace;
+            font-size: 0.95rem;
+            color: #4ade80;
+            overflow-x: auto;
+            margin: 0.75rem 0 1.25rem;
+        }
+        .cmd-block .cmt { color: #64748b; }
+    /* ===== 移动端优化 ===== */
+@media (max-width: 1023px) {
+    html { font-size: 15px; }
+    body { padding: 0; }
+    main.container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; gap: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-8 { padding: 1.25rem !important; }
+    .bg-cardbg.rounded-xl.p-6 { padding: 1rem !important; }
+    article h1 { font-size: 1.65rem !important; padding-bottom: 0.6rem !important; margin-bottom: 1.25rem !important; }
+    article h2 { font-size: 1.3rem !important; margin-top: 1.75rem !important; margin-bottom: 0.9rem !important; padding-left: 0.6rem !important; }
+    article h3 { font-size: 1.1rem !important; margin-top: 1.5rem !important; }
+    .cmd-block { font-size: 0.78rem !important; padding: 0.7rem 0.8rem !important; line-height: 1.6 !important; }
+    .stage h1, .container h1.text-4xl { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    table { font-size: 0.8rem !important; }
+    table th, table td { padding: 0.5rem 0.6rem !important; }
+    .dl-card { padding: 0.875rem !important; }
+}
+@media (max-width: 639px) {
+    html { font-size: 14px; }
+    .avatar-side, .about-card { padding: 1rem !important; }
+}
+/* 文章页：手机上目录排到正文后面 */
+@media (max-width: 1023px) {
+    main.grid { display: flex !important; flex-direction: column !important; }
+    main aside { order: 2; width: 100%; }
+    main section { order: 1; width: 100%; }
+}
+/* ===== 全站统一渐变背景 ===== */
+body {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
+        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-attachment: fixed;
+}
+.bg-cardbg {
+    background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
+                      linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
+}
+        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
+        .search-box button:hover { background:#2563eb; }
+            /* ===== 移动端通用优化 ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        * { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 767px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+    </style>
+
+<style>
+.nav-link { padding:.5rem 1rem; border-radius:.5rem; transition:all .3s; font-size:.95rem; }
+.nav-link:hover { background:rgba(59,130,246,.18); color:#60a5fa; }
+.nav-link.active { background:rgba(59,130,246,.18); color:#60a5fa; }
+</style>
+
+<style>
+/* ===== RickC-HD 响应式顶栏 ===== */
+.hd-nav,.hd-search,.hd-actions{display:none}
+.hd-menu-btn{display:inline-flex}
+.hd-mobile-menu{display:none}
+.hd-mobile-menu.open{display:block !important}
+@media (min-width:768px){
+  .hd-nav{display:flex !important}
+  .hd-search{display:flex !important}
+  .hd-actions{display:flex !important}
+  .hd-menu-btn{display:none !important}
+  .hd-mobile-menu{display:none !important}
+}
+header.phys-mobile .hd-nav,header.phys-mobile .hd-search,header.phys-mobile .hd-actions{display:none !important}
+header.phys-mobile .hd-menu-btn{display:inline-flex !important}
+header.phys-mobile .hd-mobile-menu{display:none}
+header.phys-mobile .hd-mobile-menu.open{display:block !important}
+.search-box{display:flex;align-items:stretch !important}
+.search-box button{display:flex !important;align-items:center;min-width:2.4rem;height:auto !important}
+.search-box input{box-sizing:border-box;height:auto !important}
+/* ===== /RickC-HD ===== */
+</style>
+<style>/* ===== RickC-HDR 顶栏统一高度 ===== */
+header.sticky, header{ height:68px !important; box-sizing:border-box; }
+header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* ===== /RickC-HDR ===== */</style>
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<script>window.RK_MIRROR=true;</script>
+<link rel="canonical" href="https://ale211.eu.org/server/csgo/index.html">
+<meta name="robots" content="noindex,follow">
+</head>
+<body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
+        <div id="rk-navbar"></div>
+<script src="/assets/js/rk-navbar.js"></script>
+
+    <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
+            <div class="bg-cardbg rounded-xl p-6 card-hover">
+                <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3395132708&spec=100" alt="Rick Chou 头像" class="w-24 h-24 mx-auto rounded-full object-cover mb-4" loading="lazy">
+                <h2 class="text-xl text-center font-bold text-white mb-2">Rick Chou</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">ALE_211 [QQ @枫]</p>
+                <div class="flex justify-center gap-4 text-lg mb-6">
+                    <a href="https://github.com/ALE-211/ale-211.github.io" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                    <a href="https://qm.qq.com/q/rQ57QLXz4A" target="_blank" class="hover:text-primary transition-colors"><i class="fa fa-qq"></i></a>
+                    <a href="mailto:ale211@foxmail.com" class="hover:text-primary transition-colors"><i class="fa fa-envelope"></i></a>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <p><i class="fa fa-gamepad text-primary mr-2"></i>Minecraft 1.10.2</p>
+                    <p><i class="fa fa-steam text-primary mr-2"></i>CS:GO / CS2</p>
+                    <p><i class="fa fa-link text-primary mr-2"></i>联机教程</p>
+                </div>
+            </div>
+
+            <div class="bg-cardbg rounded-xl p-6 mt-6 card-hover">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa fa-list-ul text-primary"></i>目录
+                </h3>
+                <ul id="leftTocList" class="space-y-2 text-sm">
+                    <!-- JS自动填充目录 -->
+                </ul>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-3 space-y-8">
+            <article class="bg-cardbg rounded-xl p-6">
+                <h1 class="text-3xl font-bold text-white mb-6">CS:GO 联机教程（和朋友开黑用）</h1>
+
+                <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">先说在前面</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    别看到标题就去 Steam 商店搜 CS:GO——<strong class="text-white">搜不到了</strong>。2023 年 9 月 Valve 把 CS:GO 直接下架，换成了 CS2。但老 CS:GO 没彻底死，想进我们这台服，得用下面这套办法把"老版本"调出来。
+                </p>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    我们的服跑的就是原版 CS:GO（不是 CS2）。IPv6 直连地址：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ale211.eu.org:27015</code>；走 Radmin VPN 的话直接连主机虚拟 IP：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131:27015</code>。Radmin 网络名 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>，密码 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code>。
+                </p>
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-link text-primary mr-2"></i>整个流程四步：<strong class="text-white">装 CS2 → 切到 legacy 测试版 → 打开控制台 → connect 命令连服</strong>。Radmin VPN 那步和 MC 教程通用，需要的话翻 <a class="text-primary hover:underline" href="../minecraft/index.html#section5">MC 教程第五步</a> 就行。</p>
+                </div>
+
+                <h2 id="section2" class="text-xl font-bold text-white mt-10 mb-3">第一步：装 CS2，然后切到 legacy 测试版</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    CS:GO 本身已经不能单独下载了，但 Steam 留了个后门：在 CS2 里选测试版分支，就能装回老版本。
+                </p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>Steam 库里先装好 <strong class="text-white">Counter-Strike 2</strong>（免费，没装的话商店直接搜）。</li>
+                    <li>库里右键 <strong class="text-white">Counter-Strike 2</strong> → <strong class="text-white">属性</strong>。</li>
+                    <li>切到 <strong class="text-white">测试版 / Betas</strong> 标签页，"参与测试"下拉框选：
+                        <div class="cmd-block">csgo_legacy - Legacy Version of CS:GO</div>
+                    </li>
+                    <li>关掉属性窗口，Steam 会自动开始下载老版本文件（<strong class="text-white">大约 13 GB</strong>，第一次等久一点）。</li>
+                    <li>下完点绿色"开始"按钮，Steam 会弹个小框问你启动哪个版本，<strong class="text-white">选 "Play Legacy Version of CS:GO"</strong>，别选成 CS2 了。</li>
+                </ol>
+                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">注意：</strong>切到 legacy 之后，你以后点"开始游戏"默认进的就是老 CS:GO。想回去玩 CS2，再到同一个地方把测试版改回"无 - 不选择任何测试版"即可。</p>
+                </div>
+
+                <h2 id="section3" class="text-xl font-bold text-white mt-10 mb-3">第二步：打开开发者控制台</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    CS:GO 的控制台默认是关的，得手动开。连服务器全靠它。
+                </p>
+                <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
+                    <li>进游戏主菜单，点左下角齿轮 <strong class="text-white">设置</strong>。</li>
+                    <li>切到 <strong class="text-white">游戏设置 / Game</strong> 标签。</li>
+                    <li>找到 <strong class="text-white">"启用开发者控制台（~）"</strong>，选 <strong class="text-white">是 / Yes</strong>。</li>
+                    <li>按键盘左上角 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">~</code>（Tab 上面、Esc 下面那个波浪号键），能弹出黑底白字的控制台就成了。</li>
+                </ol>
+                <p class="text-textlight mb-6 leading-relaxed">
+                    按不出来？看看是不是被输入法占了，或者换个键位：在设置 → 键盘/鼠标里找"打开控制台"，改成你顺手的键。
+                </p>
+
+                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：连服务器</h2>
+                <p class="text-textlight mb-4 leading-relaxed">
+                    打开控制台，敲下面命令回车就行。和 MC 一样，先看自己有没有 IPv6：浏览器开 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">test-ipv6.com</code>，显示 10/10 就走方式 A，否则走方式 B。
+                </p>
+
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">方式 A：IPv6 直连（推荐）</h3>
+                <p class="text-textlight mb-2 leading-relaxed">控制台里直接敲：</p>
+                <div class="cmd-block">connect ale211.eu.org</div>
+                <p class="text-textlight mb-4 leading-relaxed">回车，等个几秒钟右下角会显示正在连接，加载完就进服了。</p>
+
+                <h3 class="text-lg font-bold text-primary mt-6 mb-2">方式 B：没有 IPv6，走 Radmin VPN</h3>
+                <p class="text-textlight mb-2 leading-relaxed">
+                    Radmin 的安装、加网络那套和 MC 完全一样（网络名 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>，密码 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code>），这里不重复了，<a class="text-primary hover:underline" href="../minecraft/index.html#section5">直接看 MC 教程第五步</a>。
+                </p>
+                <p class="text-textlight mb-2 leading-relaxed">加完网络后，主机的 Radmin 虚拟 IP 已经固定为 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>，不用自己抄。控制台直接敲：</p>
+                <div class="cmd-block">connect 26.21.59.131</div>
+
+                <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>如果以后开了服务器密码，命令格式是这样（注意中间分号）：</p>
+                    <div class="cmd-block" style="margin-top:0.5rem">connect ale211.eu.org:27015; password 你的密码</div>
+                </div>
+
+                <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">常见问题</h2>
+                <ol class="list-decimal list-inside text-textlight space-y-3 mb-6 pl-2">
+                    <li class="leading-relaxed"><strong class="text-white">点"开始游戏"直接进 CS2 了，没让选版本</strong>：说明你没切到 csgo_legacy 分支，或者下完之后 Steam 自动更新回去了。回属性 → 测试版，重新选一次。</li>
+                    <li class="leading-relaxed"><strong class="text-white">connect 之后一直卡"正在连接"然后超时</strong>：先 ping 一下域名通不通。IPv6 直连不通就老老实实走 Radmin；Radmin 也连不上，确认你和主机都在 ALE_211 网络里、防火墙放行 Radmin。</li>
+                    <li class="leading-relaxed"><strong class="text-white">按 ~ 没反应</strong>：控制台没开。回设置 → 游戏，确认"启用开发者控制台"是"是"；中文输入法状态下也可能吞键，切回英文再试。</li>
+                    <li class="leading-relaxed"><strong class="text-white">提示"服务器在运行不同版本"（Disconnect: Server is running a different version）</strong>：你进的是 CS2 而不是 legacy 版。按第一步重新确认启动版本。</li>
+                    <li class="leading-relaxed"><strong class="text-white">想玩 CS2 不想玩老 CS:GO 了</strong>：从Steam库中启动cs时选择cs2即可</li>
+                    <li class="leading-relaxed"><strong class="text-white">找不到 CS:GO 商店页</strong>：正常，Valve 已经下架了，不要到处找安装包，就用上面的 legacy 分支方法。</li>
+                </ol>
+
+                <div class="border-t border-gray-700 pt-6 mt-8">
+                    <p class="text-gray-400 text-sm mb-2"><strong class="text-white">Rick Chou</strong> &nbsp;|&nbsp; ale211@foxmail.com</p>
+                    <p class="text-gray-500 text-xs">服务器：CS:GO Legacy · ale211.eu.org:27015 · 同 Radmin 网络 ALE_211</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <button id="backTopBtn" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-primary text-white shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-blue-600">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+    </footer>
+
+<script>
+fetch('/auth/status.php', {cache: 'no-store'}).then(r => r.json()).then(s => {
+    const d = document.getElementById('userBadgeDesktop');
+    const m = document.getElementById('userBadgeMobile');
+    if (!d || !m) return;
+        if (s.logged_in) { if (s.can_write) { var wd=document.getElementById("writeBtnDesktop"),wm=document.getElementById("writeBtnMobile"); if(wd)wd.classList.remove("hidden"); if(wm)wm.classList.remove("hidden"); } /* rk-canwrite */
+        const nm = s.display_name || s.username;
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 group" title="账户管理">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600 group-hover:border-primary transition-colors">' +
+            '<span class="text-gray-300 group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">你好，' + nm + '</span></a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/account.html" class="flex items-center gap-2 py-1">' +
+            '<img src="' + (s.avatar || '') + '" alt="" class="w-6 h-6 rounded-full object-cover border border-gray-600">' +
+            '<span class="text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-[12rem]">你好，' + nm + '</span></a>';
+    } else {
+        d.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary hover:underline mr-2"><i class="fa fa-sign-in mr-1"></i>登录</a>' +
+            '<a href="https://ale211.eu.org/auth/register.html" class="text-gray-400 hover:underline">注册</a>';
+        m.innerHTML = '<a href="https://ale211.eu.org/auth/login.html" class="text-primary">登录</a> · <a href="https://ale211.eu.org/auth/register.html" class="text-gray-400">注册</a>';
+    }
+    d.classList.remove('hidden');
+    m.classList.remove('hidden');
+}).catch(() => {});
+
+
+const backTopBtn = document.getElementById('backTopBtn');
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 350){
+        backTopBtn.classList.remove('opacity-0','pointer-events-none');
+        backTopBtn.classList.add('opacity-100','pointer-events-auto');
+    }else{
+        backTopBtn.classList.add('opacity-0','pointer-events-none');
+        backTopBtn.classList.remove('opacity-100','pointer-events-auto');
+    }
+});
+backTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+const leftTocList = document.getElementById('leftTocList');
+const headings = Array.from(document.querySelectorAll('h2[id]'));
+headings.forEach(h => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`;
+    a.textContent = h.innerText;
+    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
+    li.appendChild(a);
+    leftTocList.appendChild(li);
+});
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = leftTocList.querySelector(`a[href="#${id}"]`);
+        if(entry.isIntersecting){
+            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
+            link?.classList.add('toc-active');
+        }
+    });
+},{rootMargin:"-15% 0px -65% 0px"});
+headings.forEach(h=>observer.observe(h));
+</script>
+
+<script>
+/* ===== RickC-HD 物理视口判定 ===== */
+(function(){function mq(){return window.innerWidth<768;}function apply(){var h=document.querySelector('header');if(h)h.classList.toggle('phys-mobile',mq());var mm=document.getElementById('mobileMenu');if(mm&&!mq())mm.classList.remove('open');}apply();window.addEventListener('resize',apply);document.addEventListener('DOMContentLoaded',apply);})();
+/* ===== /RickC-HD-JS ===== */
+</script>
+<script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>window.RK_SLUG='csgo-join-guide';</script>
+<script src="/assets/js/rk-post-widgets.js"></script>
+</body>
+</html>
