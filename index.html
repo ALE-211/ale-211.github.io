@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="msvalidate.01" content="3C096849FE56F346D40B12914310D4D2" />
     <title>RickC.TechBlog | 主页</title>
+    <link rel="alternate" type="application/rss+xml" title="RickC.TechBlog | RSS 订阅" href="/feed.php">
 <meta name="description" content="Rick Chou 的技术与游戏博客：嵌入式硬件项目、游戏服务器运维、资源下载。包含 MC 1.10.2 AoE 联机教程、CS:GO 128tick 开服、飞牛OS Tesla M40 驱动等实战记录。">
 <meta name="keywords" content="Rick Chou, 技术博客, 游戏服务器, Minecraft, CS:GO, 嵌入式, ESP32, 飞牛OS, Tesla M40">
 <meta name="author" content="Rick Chou">
@@ -13,6 +14,19 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ale211.eu.org/">
 <meta property="og:site_name" content="RickC.TechBlog">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "RickC.TechBlog",
+  "url": "https://ale211.eu.org/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {"@type": "EntryPoint", "urlTemplate": "https://ale211.eu.org/search.php?q={search_term_string}"},
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
     <script src="/assets/js/tailwind.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="./LOGO260721.png">
@@ -363,6 +377,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
     <!-- 页脚 -->
     <footer class="bg-cardbg border-t border-gray-700 mt-12 py-6 text-center text-gray-500 text-sm">
         <p>© 2026 RickC.TechBlog 个人博客 | 所有资源仅供学习交流</p>
+        <p class="mt-2"><a href="/feed.php" class="inline-flex items-center gap-1 hover:text-primary transition-colors" title="RSS 订阅"><i class="fa fa-rss"></i>RSS 订阅</a></p>
     </footer>
 
 <script>
