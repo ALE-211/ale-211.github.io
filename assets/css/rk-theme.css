@@ -57,8 +57,159 @@
   --rk-info-rgb:56 189 248;
   --rk-accent-2-rgb:192 132 252;
   --rk-h:68px;
+  /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
+  --rk-body-bg:#0f172a;
+  --rk-body-image:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.25), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.18), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.12), transparent 60%),
+    linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%);
+  --rk-card-image:
+    linear-gradient(135deg, rgba(59,130,246,.08), transparent 40%),
+    linear-gradient(315deg, rgba(139,92,246,.06), transparent 40%);
+  --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #172033 100%);
+  --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.7);
+  --rk-shadow-weak:0 4px 6px -1px rgba(0,0,0,.30);
+  --rk-veil:rgba(15,23,42,.65);
+  --rk-code-bg:#0b1220;
+  --rk-code-fg:#4ade80;
 }
 
+/* ============================================================
+   21-B 深浅色主题（TASK-025）
+   默认（:root）= 深色不动；亮色只走 html[data-theme="light"]
+   与 @media (prefers-color-scheme: light){ html:not([data-theme]) }。
+   灰阶层级保持相对关系：深色下"越亮越突出"，亮色下"越深越突出"。
+   ============================================================ */
+html[data-theme="light"]{
+  --rk-bg:#f6f8fc;
+  --rk-card:#ffffff;
+  --rk-surface-2:#e2e8f0;
+  --rk-surface-1:#eef2f7;
+  --rk-title:#0f172a;
+  --rk-text:#334155;
+  --rk-text-soft:#1e293b;
+  --rk-text-dim:#475569;
+  --rk-text-mute:#64748b;
+  --rk-text-faint:#94a3b8;
+  --rk-border:#e2e8f0;
+  --rk-primary:#2563eb;
+  --rk-primary-hi:#3b82f6;
+  --rk-ok:#16a34a;
+  --rk-warn:#d97706;
+  --rk-err:#dc2626;
+  --rk-info:#0284c7;
+  --rk-accent-2:#7c3aed;
+  --rk-bg-rgb:246 248 252;
+  --rk-card-rgb:255 255 255;
+  --rk-surface-2-rgb:226 232 240;
+  --rk-surface-1-rgb:238 242 247;
+  --rk-title-rgb:15 23 42;
+  --rk-text-rgb:51 65 85;
+  --rk-text-soft-rgb:30 41 59;
+  --rk-text-dim-rgb:71 85 105;
+  --rk-text-mute-rgb:100 116 139;
+  --rk-text-faint-rgb:148 163 184;
+  --rk-border-rgb:226 232 240;
+  --rk-primary-rgb:37 99 235;
+  --rk-primary-hi-rgb:59 130 246;
+  --rk-ok-rgb:22 163 74;
+  --rk-warn-rgb:217 119 6;
+  --rk-err-rgb:220 38 38;
+  --rk-info-rgb:2 132 199;
+  --rk-accent-2-rgb:124 58 237;
+  --rk-body-bg:#f6f8fc;
+  --rk-body-image:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.13), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.10), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.08), transparent 60%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2fb 50%, #f8fafc 100%);
+  --rk-card-image:
+    linear-gradient(135deg, rgba(59,130,246,.06), transparent 40%),
+    linear-gradient(315deg, rgba(139,92,246,.05), transparent 40%);
+  --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
+  --rk-shadow-strong:0 18px 34px -14px rgba(15,23,42,.18);
+  --rk-shadow-weak:0 4px 6px -1px rgba(15,23,42,.10);
+  --rk-veil:rgba(248,250,252,.72);
+  /* 代码块保持深色（Prism 配色为深底设计），值不变 */
+  --rk-code-bg:#0b1220;
+  --rk-code-fg:#4ade80;
+}
+@media (prefers-color-scheme: light){
+  html:not([data-theme]){
+    --rk-bg:#f6f8fc;
+    --rk-card:#ffffff;
+    --rk-surface-2:#e2e8f0;
+    --rk-surface-1:#eef2f7;
+    --rk-title:#0f172a;
+    --rk-text:#334155;
+    --rk-text-soft:#1e293b;
+    --rk-text-dim:#475569;
+    --rk-text-mute:#64748b;
+    --rk-text-faint:#94a3b8;
+    --rk-border:#e2e8f0;
+    --rk-primary:#2563eb;
+    --rk-primary-hi:#3b82f6;
+    --rk-ok:#16a34a;
+    --rk-warn:#d97706;
+    --rk-err:#dc2626;
+    --rk-info:#0284c7;
+    --rk-accent-2:#7c3aed;
+    --rk-bg-rgb:246 248 252;
+    --rk-card-rgb:255 255 255;
+    --rk-surface-2-rgb:226 232 240;
+    --rk-surface-1-rgb:238 242 247;
+    --rk-title-rgb:15 23 42;
+    --rk-text-rgb:51 65 85;
+    --rk-text-soft-rgb:30 41 59;
+    --rk-text-dim-rgb:71 85 105;
+    --rk-text-mute-rgb:100 116 139;
+    --rk-text-faint-rgb:148 163 184;
+    --rk-border-rgb:226 232 240;
+    --rk-primary-rgb:37 99 235;
+    --rk-primary-hi-rgb:59 130 246;
+    --rk-ok-rgb:22 163 74;
+    --rk-warn-rgb:217 119 6;
+    --rk-err-rgb:220 38 38;
+    --rk-info-rgb:2 132 199;
+    --rk-accent-2-rgb:124 58 237;
+    --rk-body-bg:#f6f8fc;
+    --rk-body-image:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.13), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.08), transparent 60%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2fb 50%, #f8fafc 100%);
+    --rk-card-image:
+      linear-gradient(135deg, rgba(59,130,246,.06), transparent 40%),
+      linear-gradient(315deg, rgba(139,92,246,.05), transparent 40%);
+    --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
+    --rk-shadow-strong:0 18px 34px -14px rgba(15,23,42,.18);
+    --rk-shadow-weak:0 4px 6px -1px rgba(15,23,42,.10);
+    --rk-veil:rgba(248,250,252,.72);
+    --rk-code-bg:#0b1220;
+    --rk-code-fg:#4ade80;
+  }
+}
+
+/* ---- 背景变量化覆盖（关键：19 页内联 body 渐变带 !important，
+   html body 特异性更高且不依赖加载顺序） ---- */
+html body{
+  background-color:var(--rk-body-bg) !important;
+  background-image:var(--rk-body-image) !important;
+  background-attachment:fixed;
+}
+html .bg-cardbg{ background-image:var(--rk-card-image) !important; }
+
+/* ---- 主题切换按钮（rk-navbar.js 注入） ---- */
+.rk-theme-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  background:rgba(59,130,246,.15); border:0; cursor:pointer;
+  color:var(--rk-primary); font-size:.9em; line-height:1;
+  width:2.2em; height:2.2em; border-radius:.5em; flex:0 0 auto;
+  transition:background-color .2s, color .2s;
+}
+.rk-theme-btn:hover{ background:rgba(59,130,246,.28); }
+.rk-theme-btn:active{ background:rgba(59,130,246,.38); }
 /* ---- 全站根字号统一（对齐主页）----
    真因：主页单独声明了 html{font-size:17px}（≤1023px→15px，≤639px→14px），
    而 auth / blog / search 等页**没有声明** → 用浏览器默认 16px，
@@ -84,7 +235,7 @@ header.rk-header{
   height:var(--rk-h); min-height:var(--rk-h); box-sizing:border-box;
   background-color:var(--rk-card);
   border-bottom:1px solid var(--rk-border);
-  box-shadow:0 4px 6px -1px rgba(0,0,0,.30);
+  box-shadow:var(--rk-shadow-weak);
   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
 }
 @media (max-width:1023.98px){ header.rk-header{ font-size:15px; } }
@@ -175,9 +326,9 @@ header.rk-header{
    ============================================================ */
 .rk-mobile{
   display:none;
-  background:linear-gradient(180deg, var(--rk-card) 0%, #172033 100%);
+  background:var(--rk-mobile-menu-image);
   border-top:1px solid var(--rk-border);
-  box-shadow:0 18px 34px -14px rgba(0,0,0,.7);
+  box-shadow:var(--rk-shadow-strong);
   padding:.9em 1em 1.1em;
   max-height:calc(100vh - var(--rk-h));
   overflow-y:auto;
@@ -197,7 +348,7 @@ header.rk-header{
   align-items:center; gap:.65em;
   padding:.6em .8em; margin-bottom:.6em;
   border-radius:.6em;
-  background:rgba(15,23,42,.65);
+  background:var(--rk-veil);
   border:1px solid var(--rk-border);
 }
 .rk-mobile .rk-user img{ width:2.2em; height:2.2em; }
@@ -253,10 +404,10 @@ html.tw-fail .rk-search input{ color:#fff !important; }
 
 /* ---- 命令代码块 cmd-block（原各静态页内联，收敛共享，动态页通用） ---- */
 .cmd-block{
-  background:#0b1220; border:1px solid rgba(59,130,246,.35);
+  background:var(--rk-code-bg); border:1px solid rgba(59,130,246,.35);
   border-left:4px solid #3b82f6; border-radius:.5rem;
   padding:.9rem 1.1rem; font-family:Consolas,"Microsoft YaHei",monospace;
-  font-size:.92rem; color:#4ade80; overflow-x:auto;
+  font-size:.92rem; color:var(--rk-code-fg); overflow-x:auto;
   margin:.75rem 0 1.25rem; white-space:pre; line-height:1.7; position:relative;
 }
 .cmd-block .cmt{ color:#64748b; }
@@ -298,7 +449,7 @@ pre.cmd-block .token.atrule, #articleBody pre .token.atrule{ color:#f472b6; }
 .rk-toast{
   position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(1rem);
   z-index:99999; padding:.55rem 1.1rem; font-size:.82rem; color:#e2e8f0;
-  background:#1e293b; border:1px solid rgba(59,130,246,.5); border-radius:.6rem;
+  background:var(--rk-card); border:1px solid rgba(59,130,246,.5); border-radius:.6rem;
   box-shadow:0 8px 24px rgba(0,0,0,.4); opacity:0; pointer-events:none;
   transition:opacity .25s, transform .25s; font-family:inherit;
 }

@@ -45,6 +45,47 @@
        —— 这样主站与镜像站共用同一份 HTML/CSS/JS，不会出现"两份不同步"。 */
     var MIRROR = !!window.RK_MIRROR;
     var MAIN   = 'https://ale211.eu.org';
+    /* ---- 21-B 深浅色主题（三态：浅色 → 深色 → 跟随系统） ----
+       存储键 rk-theme，值仅 'light' / 'dark'；"跟随系统"= 删除键（无键即默认）。
+       按钮循环：light → dark → 跟随系统 → light … */
+    var THEME_KEY = 'rk-theme';
+    function applyTheme(t) {
+        if (t === 'light' || t === 'dark') {
+            document.documentElement.setAttribute('data-theme', t);
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+    function currentTheme() {
+        var t = document.documentElement.getAttribute('data-theme');
+        if (t === 'light' || t === 'dark') { return t; }
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+    function themeCycle() {
+        var cur = currentTheme();
+        var next = cur === 'light' ? 'dark' : (cur === 'dark' ? null : 'light');
+        if (next === null) {
+            try { localStorage.removeItem(THEME_KEY); } catch (e) {}
+            applyTheme(null);
+        } else {
+            try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+            applyTheme(next);
+        }
+        return currentTheme();
+    }
+    function themeBtnIcon(t) {
+        if (t === 'light') { return 'fa-sun-o'; }
+        if (t === 'dark')  { return 'fa-moon-o'; }
+        return 'fa-adjust';
+    }
+    function updateThemeBtn() {
+        var b = document.getElementById('rkThemeBtn');
+        if (!b) { return; }
+        var t = currentTheme();
+        b.innerHTML = '<i class="fa ' + themeBtnIcon(t) + '"></i>';
+        b.setAttribute('aria-label', t === 'light' ? '切换到深色' : (t === 'dark' ? '切换为跟随系统' : '切换到浅色'));
+        b.title = t === 'light' ? '当前浅色，点击切换深色' : (t === 'dark' ? '当前深色，点击切换跟随系统' : '当前跟随系统，点击切换浅色');
+    }
 
     function isActive(n) {
         try { return !!n.test(PATH); } catch (e) { return false; }
@@ -84,6 +125,7 @@
                 '<nav class="rk-nav" id="rkNav" aria-label="主导航">' + navLinks() + '</nav>' +
                 searchBox() +
                 '<div class="rk-actions">' +
+                    '<button type="button" id="rkThemeBtn" class="rk-theme-btn" aria-label="切换深浅色"><i class="fa fa-adjust"></i></button>' +
                     '<a id="rkWriteDesktop" href="/blog/admin.html" class="rk-write" style="display:none">' +
                         '<i class="fa fa-pencil"></i>写文章</a>' +
                     '<span id="rkUserDesktop"></span>' +
@@ -135,6 +177,24 @@
         document.addEventListener('keydown', function (e) {
             if ((e.key === 'Escape' || e.keyCode === 27) && panel && panel.classList.contains('open')) { close(); }
         });
+
+        /* 主题按钮：点击循环三态 */
+        var tb = document.getElementById('rkThemeBtn');
+        if (tb) {
+            tb.addEventListener('click', function () {
+                themeCycle();
+                updateThemeBtn();
+            });
+        }
+        /* 跟随系统：仅在用户未手动选择（无 data-theme）时跟随变化 */
+        if (window.matchMedia) {
+            var cmq = window.matchMedia('(prefers-color-scheme: dark)');
+            var cmqOn = function () {
+                if (!document.documentElement.getAttribute('data-theme')) { updateThemeBtn(); }
+            };
+            if (cmq.addEventListener) { cmq.addEventListener('change', cmqOn); }
+            else if (cmq.addListener) { cmq.addListener(cmqOn); }
+        }
 
         /* 视口回到桌面宽度时收起移动面板（断点与 CSS 保持一致：900px） */
         var mq = window.matchMedia('(max-width:899.98px)');
@@ -220,6 +280,7 @@
         mounted = true;
         bind();
         fillAccount();
+        updateThemeBtn();
         mirrorNotice();
         return true;
     }
@@ -234,5 +295,5 @@
     }
 
     /* 便于其它脚本在极端情况下手动重建 */
-    window.rkNavbar = { render: render, version: '1.0.0' };
+    window.rkNavbar = { render: render, version: '1.1.0' };
 })();

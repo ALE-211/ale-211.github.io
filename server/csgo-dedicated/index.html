@@ -10,7 +10,7 @@
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Windows CS:GO 128tick 开服教程",
-  "description": "Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、双栈 start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。",
+  "description": "Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。",
   "datePublished": "2026-09-08T00:00:00+08:00",
   "dateModified": "2026-09-26T00:00:00+08:00",
   "author": {"@type": "Person", "name": "Rick Chou"},
@@ -21,11 +21,11 @@
   "keywords": "csgo, \u5f00\u670d, 128tick, srcds, sourcemod, metamod"
 }
 </script>
-<meta name="description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、双栈 start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
+<meta name="description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
 <meta name="keywords" content="CS:GO 开服, srcds, SteamCMD, 128tick, SourceMod, MetaMod, PTaH, eItems, server.cfg">
 <meta name="author" content="Rick Chou">
 <meta property="og:title" content="RickC.TechBlog | Windows CS:GO 128tick 开服教程">
-<meta property="og:description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、双栈 start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
+<meta property="og:description" content="Windows CS:GO 128tick 开服完整教程：SteamCMD 装服务端、start.bat、server.cfg 配置、SourceMod 皮肤插件、128tick 卡顿排查。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ale211.eu.org/server/csgo-dedicated/">
 <meta property="og:site_name" content="RickC.TechBlog">
@@ -198,14 +198,15 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260926v7">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260926v8">
+<script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/server/csgo-dedicated/index.html">
 <meta name="robots" content="index,follow">
 </head>
 <body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
         <div id="rk-navbar"></div>
-<script src="/assets/js/rk-navbar.js"></script>
+<script src="/assets/js/rk-navbar.js?v=20260926v8"></script>
 
     <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
         <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
@@ -239,7 +240,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
                 <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">适用场景</h2>
                 <p class="text-textlight mb-4 leading-relaxed">
-                    本文记录在 Windows Server / Win10/11 上搭建 CS:GO 独立服务器（srcds）的完整流程，最终跑通 <strong class="text-white">128tick 纯净对战服</strong>，支持内网、Radmin VPN、IPv6 三种联机方式，并装上 <strong class="text-white">SourceMod + PTaH + eItems</strong> 实现玩家 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!ws</code> / <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!knife</code> 切换皮肤。
+                    本文记录在 Windows Server / Win10/11 上搭建 CS:GO 独立服务器（srcds）的完整流程，最终跑通 <strong class="text-white">128tick 纯净对战服</strong>，支持内网与 Radmin VPN 两种联机方式，并装上 <strong class="text-white">SourceMod + PTaH + eItems</strong> 实现玩家 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!ws</code> / <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">!knife</code> 切换皮肤。
                 </p>
                 <p class="text-textlight mb-4 leading-relaxed">
                     内容均为实测修正后的可用配置，涵盖卡顿、拒绝连接、BOT 不动、皮肤不生效等常见问题的最终解法。
@@ -265,22 +266,21 @@ quit</pre>
                     服务端装完后位于 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">steamcmd\steamapps\common\Counter-Strike Global Offensive Beta - Dedicated Server</code>，后续所有配置都在这个目录下操作。目录名可以改、也可以整体挪到别的盘（例如 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">C:\GameServers\</code>），只要启动脚本里的路径跟着改。
                 </p>
 
-                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：启动批处理（IPv4 + IPv6 双栈）</h2>
+                <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：启动批处理</h2>
                 <p class="text-textlight mb-3 leading-relaxed">在服务端根目录新建 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">start.bat</code>，内容如下：</p>
-                <pre class="cmd-block">srcds.exe -game csgo -console -usercon -ip 0.0.0.0 -ip :: -port 27015 -tickrate 128 -nohltv -maxplayers_override 10 +map de_dust2 +exec server.cfg</pre>
+                <pre class="cmd-block">srcds.exe -game csgo -console -usercon -ip 0.0.0.0 -port 27015 -tickrate 128 -nohltv -maxplayers_override 10 +map de_dust2 +exec server.cfg</pre>
                 <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
                     <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">别漏了 +map：</strong>少了 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">+map de_dust2</code>，srcds 启起来后会停在控制台等指令、<strong class="text-white">不加载任何地图</strong>，客户端连上来也进不去。想换图就在服务端控制台敲 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">map 地图名</code>。<code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-maxplayers_override 10</code> 是人数上限（不加则用默认值）。</p>
                 </div>
                 <p class="text-textlight mb-3 leading-relaxed">参数说明：</p>
                 <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
                     <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-ip 0.0.0.0</code>：监听所有 IPv4 地址（包括内网和 Radmin 虚拟网卡）</li>
-                    <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-ip ::</code>：监听所有 IPv6 地址，支持 IPv6 客户端直连</li>
                     <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-tickrate 128</code>：强制 128tick</li>
                     <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-nohltv</code>：关闭 HLTV 录像，降低服务器资源开销</li>
                     <li><code class="bg-gray-700 px-2 py-0.5 rounded text-sm">-port 27015</code>：游戏主端口</li>
                 </ul>
                 <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
-                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>同时写两个 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-ip</code> 参数可以让服务端同时监听 IPv4 和 IPv6，客户端用哪种地址都能连。</p>
+                    <p class="text-textlight text-sm"><i class="fa fa-info-circle text-primary mr-2"></i>实测 CS:GO 的 srcds 只监听 IPv4；写 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-ip ::</code> 不会让它支持 IPv6 客户端，去掉即可。</p>
                 </div>
                 <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
                     <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">GSLT 与 -insecure 只能二选一：</strong>启动参数里加了 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-insecure</code>，就等于<strong class="text-white">关闭 VAC、并且不再用 GSLT 向 Steam 认证</strong>——此时 server.cfg 里的 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_setsteamaccount</code> 等于白填，服务器也不会出现在公网服务器列表里。私人联机这样最省事；想让服务器被公网收录并正常使用 GSLT，就去掉 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">-insecure</code>。</p>
@@ -376,7 +376,6 @@ sv_allowupload 1</pre>
                 <ul class="list-disc list-inside text-textlight space-y-2 mb-4 pl-2">
                     <li><strong class="text-white">内网朋友</strong>：直接连服务器内网 IPv4 地址，延迟最低。</li>
                     <li><strong class="text-white">外网朋友走 Radmin VPN</strong>：连 Radmin 分配的虚拟 IPv4 地址。</li>
-                    <li><strong class="text-white">外网朋友走 IPv6</strong>：启动脚本已双栈监听，客户端直接连服务器公网 IPv6 地址。</li>
                 </ul>
                 <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
                     <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">连接拒绝报错：</strong>如果用 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_lan 1</code> 搭配 Radmin 的 26 段虚拟 IP，Steam 客户端会<strong class="text-white">大概率</strong>拒绝连接（sv_lan 1 时服务器只接受内网地址，而 Radmin 的 26 段属于公网地址段）。改成 <code class="bg-gray-700 px-1 py-0.5 rounded text-sm">sv_lan 0</code> 并配置 GSLT 令牌可彻底解决。</p>
@@ -403,7 +402,7 @@ sv_allowupload 1</pre>
 
                 <div class="border-t border-gray-700 pt-6 mt-8">
                     <p class="text-gray-400 text-sm mb-2"><strong class="text-white">Rick Chou</strong> &nbsp;|&nbsp; ale211@foxmail.com</p>
-                    <p class="text-gray-500 text-xs">Windows srcds · CS:GO · 128tick · IPv4 / IPv6 双栈</p>
+                    <p class="text-gray-500 text-xs">Windows srcds · CS:GO · 128tick · IPv4</p>
                 </div>
             </article>
         </section>
