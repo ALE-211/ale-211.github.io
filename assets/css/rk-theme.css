@@ -59,7 +59,7 @@
   --rk-h:68px;
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
   --rk-body-bg:#16171a;
-  --rk-noise:url('/assets/images/noise.png');
+  --rk-noise:url('/assets/images/noise.png?v=2');
   --rk-body-image:
     radial-gradient(78% 50% at 50% -12%, rgba(59,130,246,.16), transparent 70%),
     radial-gradient(66% 44% at 50% 0%, rgba(99,102,241,.09), transparent 72%),
