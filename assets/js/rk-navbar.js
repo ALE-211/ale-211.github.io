@@ -192,7 +192,23 @@
     function mirrorNotice() {
         if (!MIRROR) { return; }
         var el = document.getElementById('rkMirrorNotice');
-        if (el) { el.style.display = ''; }
+        if (!el) {
+            /* 镜像站所有页面统一显示提示条：页面里没有就由 JS 创建。
+               这样不必在每个 HTML 里各塞一份（避免又多一处"多份不同步"）。 */
+            el = document.createElement('div');
+            el.id = 'rkMirrorNotice';
+            el.style.cssText = 'max-width:1280px;margin:0 auto;padding:.75rem 1rem 0;';
+            el.innerHTML =
+                '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#fcd34d;' +
+                'border-radius:.75rem;padding:.65rem 1rem;font-size:.875rem;line-height:1.6;">' +
+                '<i class="fa fa-info-circle"></i> 这里是 RickC.TechBlog 的镜像站，使用完整功能请访问 ' +
+                '<a href="https://ale211.eu.org" style="font-weight:600;text-decoration:underline;color:inherit;">ale211.eu.org</a>' +
+                '<span style="display:block;font-size:.75rem;opacity:.75;margin-top:.25rem;">' +
+                '镜像站仅提供文章阅读；评论、搜索、账户等功能请前往主站，下载页的大文件也由主站提供。</span></div>';
+            var hdr = document.getElementById('rkHeader');
+            if (hdr && hdr.parentNode) { hdr.parentNode.insertBefore(el, hdr.nextSibling); }
+        }
+        el.style.display = '';
     }
 
     var mounted = false;
