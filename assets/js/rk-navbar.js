@@ -45,9 +45,9 @@
        —— 这样主站与镜像站共用同一份 HTML/CSS/JS，不会出现"两份不同步"。 */
     var MIRROR = !!window.RK_MIRROR;
     var MAIN   = 'https://ale211.eu.org';
-    /* ---- 21-B 深浅色主题（三态：浅色 → 深色 → 跟随系统） ----
-       存储键 rk-theme，值仅 'light' / 'dark'；"跟随系统"= 删除键（无键即默认）。
-       按钮循环：light → dark → 跟随系统 → light … */
+    /* ---- 21-B 深浅色主题（TASK-029 重写，P0 修复）
+       单击 = 浅/深互换（必然产生可见变化，消灭"点了没反应"死锁）；
+       长按 ≈600ms = 恢复跟随系统。存储键 rk-theme 仅存 light/dark，无键=跟随系统。 */
     var THEME_KEY = 'rk-theme';
     function applyTheme(t) {
         if (t === 'light' || t === 'dark') {
@@ -56,35 +56,35 @@
             document.documentElement.removeAttribute('data-theme');
         }
     }
-    function currentTheme() {
-        var t = document.documentElement.getAttribute('data-theme');
-        if (t === 'light' || t === 'dark') { return t; }
-        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    function storedTheme() {
+        try {
+            var t = localStorage.getItem(THEME_KEY);
+            return (t === 'light' || t === 'dark') ? t : null;
+        } catch (e) { return null; }
     }
-    function themeCycle() {
-        var cur = currentTheme();
-        var next = cur === 'light' ? 'dark' : (cur === 'dark' ? null : 'light');
-        if (next === null) {
-            try { localStorage.removeItem(THEME_KEY); } catch (e) {}
-            applyTheme(null);
-        } else {
-            try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
-            applyTheme(next);
-        }
-        return currentTheme();
+    function systemTheme() {
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+               ? 'dark' : 'light';
     }
-    function themeBtnIcon(t) {
-        if (t === 'light') { return 'fa-sun-o'; }
-        if (t === 'dark')  { return 'fa-moon-o'; }
-        return 'fa-adjust';
+    function shownTheme() { return storedTheme() || systemTheme(); }
+    function themeToggle() {
+        var next = shownTheme() === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+        applyTheme(next);
     }
+    function themeFollowSystem() {
+        try { localStorage.removeItem(THEME_KEY); } catch (e) {}
+        applyTheme(null);
+    }
+    function themeBtnIcon(t) { return t === 'light' ? 'fa-sun-o' : 'fa-moon-o'; }
     function updateThemeBtn() {
         var b = document.getElementById('rkThemeBtn');
         if (!b) { return; }
-        var t = currentTheme();
+        var t = shownTheme();
         b.innerHTML = '<i class="fa ' + themeBtnIcon(t) + '"></i>';
-        b.setAttribute('aria-label', t === 'light' ? '切换到深色' : (t === 'dark' ? '切换为跟随系统' : '切换到浅色'));
-        b.title = t === 'light' ? '当前浅色，点击切换深色' : (t === 'dark' ? '当前深色，点击切换跟随系统' : '当前跟随系统，点击切换浅色');
+        var next = t === 'dark' ? '浅色' : '深色';
+        b.setAttribute('aria-label', '切换到' + next);
+        b.title = '当前' + (t === 'dark' ? '深色' : '浅色') + '，点击切换' + next + '（长按恢复跟随系统）';
     }
 
     function isActive(n) {
@@ -178,19 +178,38 @@
             if ((e.key === 'Escape' || e.keyCode === 27) && panel && panel.classList.contains('open')) { close(); }
         });
 
-        /* 主题按钮：点击循环三态 */
+        /* 主题按钮：单击 = 浅/深互换；长按 ≈600ms = 恢复跟随系统 */
         var tb = document.getElementById('rkThemeBtn');
         if (tb) {
-            tb.addEventListener('click', function () {
-                themeCycle();
-                updateThemeBtn();
-            });
+            var lpTimer = null;
+            var longPress = false;
+            var cancelLP = function () { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
+            if (tb.addEventListener) {
+                tb.addEventListener('pointerdown', function () {
+                    longPress = false;
+                    cancelLP();
+                    lpTimer = setTimeout(function () {
+                        longPress = true;
+                        themeFollowSystem();
+                        updateThemeBtn();
+                    }, 600);
+                });
+                tb.addEventListener('pointerup', cancelLP);
+                tb.addEventListener('pointerleave', cancelLP);
+                tb.addEventListener('click', function () {
+                    if (longPress) { longPress = false; return; }
+                    themeToggle();
+                    updateThemeBtn();
+                });
+            } else {
+                tb.addEventListener('click', function () { themeToggle(); updateThemeBtn(); });
+            }
         }
-        /* 跟随系统：仅在用户未手动选择（无 data-theme）时跟随变化 */
+        /* 跟随系统：仅当用户未手动选择（storedTheme()===null）时跟随变化 */
         if (window.matchMedia) {
             var cmq = window.matchMedia('(prefers-color-scheme: dark)');
             var cmqOn = function () {
-                if (!document.documentElement.getAttribute('data-theme')) { updateThemeBtn(); }
+                if (storedTheme() === null) { updateThemeBtn(); }
             };
             if (cmq.addEventListener) { cmq.addEventListener('change', cmqOn); }
             else if (cmq.addListener) { cmq.addListener(cmqOn); }
@@ -295,5 +314,5 @@
     }
 
     /* 便于其它脚本在极端情况下手动重建 */
-    window.rkNavbar = { render: render, version: '1.1.0' };
+    window.rkNavbar = { render: render, version: '1.2.0' };
 })();
