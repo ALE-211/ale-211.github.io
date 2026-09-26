@@ -60,9 +60,9 @@
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
   --rk-body-bg:#0d1117;
   --rk-body-image:
-    radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.10), transparent 55%),
-    radial-gradient(90% 60% at 12% 102%, rgba(99,102,241,.06), transparent 60%),
-    linear-gradient(180deg, #0d1117 0%, #101822 50%, #0d1117 100%);
+    radial-gradient(150% 85% at 50% -12%, rgba(59,130,246,.11), transparent 62%),
+    radial-gradient(95% 65% at 10% 104%, rgba(99,102,241,.07), transparent 65%),
+    linear-gradient(180deg, #0d1117 0%, #111a27 50%, #0d1117 100%);
   --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #111a26 100%);
   --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.5);
@@ -81,7 +81,7 @@
    灰阶层级保持相对关系：深色下"越亮越突出"，亮色下"越深越突出"。
    ============================================================ */
 html[data-theme="light"]{
-  --rk-bg:#eaeef5;
+  --rk-bg:#e9eefb;
   --rk-card:#fbfcfe;
   --rk-surface-2:#d7dee8;
   --rk-surface-1:#e3e8f0;
@@ -99,7 +99,7 @@ html[data-theme="light"]{
   --rk-err:#dc2626;
   --rk-info:#0284c7;
   --rk-accent-2:#7c3aed;
-  --rk-bg-rgb:234 238 245;
+  --rk-bg-rgb:233 238 251;
   --rk-card-rgb:251 252 254;
   --rk-surface-2-rgb:215 222 232;
   --rk-surface-1-rgb:227 232 240;
@@ -117,11 +117,11 @@ html[data-theme="light"]{
   --rk-err-rgb:220 38 38;
   --rk-info-rgb:2 132 199;
   --rk-accent-2-rgb:124 58 237;
-  --rk-body-bg:#eaeef5;
+  --rk-body-bg:#e9eefb;
   --rk-body-image:
-    radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.14), transparent 55%),
-    radial-gradient(85% 55% at 88% 100%, rgba(139,92,246,.09), transparent 60%),
-    linear-gradient(180deg, #eff3f9 0%, #e2e8f3 50%, #eff3f9 100%);
+    radial-gradient(95% 80% at 6% -10%, rgba(96,165,250,.26), transparent 80%),
+    radial-gradient(90% 70% at 96% 2%, rgba(167,139,250,.20), transparent 78%),
+    linear-gradient(180deg, #f0f5fe 0%, #e6ecfa 55%, #f0f5fe 100%);
   --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
   --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
@@ -135,7 +135,7 @@ html[data-theme="light"]{
 }
 @media (prefers-color-scheme: light){
   html:not([data-theme]){
-    --rk-bg:#eaeef5;
+    --rk-bg:#e9eefb;
     --rk-card:#fbfcfe;
     --rk-surface-2:#d7dee8;
     --rk-surface-1:#e3e8f0;
@@ -153,7 +153,7 @@ html[data-theme="light"]{
     --rk-err:#dc2626;
     --rk-info:#0284c7;
     --rk-accent-2:#7c3aed;
-    --rk-bg-rgb:234 238 245;
+    --rk-bg-rgb:233 238 251;
     --rk-card-rgb:251 252 254;
     --rk-surface-2-rgb:215 222 232;
     --rk-surface-1-rgb:227 232 240;
@@ -171,11 +171,11 @@ html[data-theme="light"]{
     --rk-err-rgb:220 38 38;
     --rk-info-rgb:2 132 199;
     --rk-accent-2-rgb:124 58 237;
-    --rk-body-bg:#eaeef5;
+    --rk-body-bg:#e9eefb;
     --rk-body-image:
-      radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.14), transparent 55%),
-      radial-gradient(85% 55% at 88% 100%, rgba(139,92,246,.09), transparent 60%),
-      linear-gradient(180deg, #eff3f9 0%, #e2e8f3 50%, #eff3f9 100%);
+      radial-gradient(95% 80% at 6% -10%, rgba(96,165,250,.26), transparent 80%),
+      radial-gradient(90% 70% at 96% 2%, rgba(167,139,250,.20), transparent 78%),
+      linear-gradient(180deg, #f0f5fe 0%, #e6ecfa 55%, #f0f5fe 100%);
     --rk-card-image:none;
     --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
     --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
