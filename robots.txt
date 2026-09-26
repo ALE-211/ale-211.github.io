@@ -1,4 +1,8 @@
-# ale211.eu.org 的 GitHub Pages 镜像站，不参与搜索引擎索引。
-# 主站：https://ale211.eu.org
+# GitHub Pages mirror of https://ale211.eu.org
+# Indexing is intentionally ALLOWED: the main site is IPv6-only and the
+# mirror is the only reliably crawlable entry point for search engines.
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /.git/
+
+Sitemap: https://ale-211.github.io/sitemap.xml
