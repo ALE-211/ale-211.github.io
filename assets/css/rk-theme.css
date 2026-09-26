@@ -59,7 +59,10 @@
   --rk-h:68px;
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
   --rk-body-bg:#0d1117;
-  --rk-body-image:linear-gradient(180deg, #0d1117 0%, #0f151d 50%, #0d1117 100%);
+  --rk-body-image:
+    radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.10), transparent 55%),
+    radial-gradient(90% 60% at 12% 102%, rgba(99,102,241,.06), transparent 60%),
+    linear-gradient(180deg, #0d1117 0%, #101822 50%, #0d1117 100%);
   --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #111a26 100%);
   --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.5);
@@ -116,10 +119,9 @@ html[data-theme="light"]{
   --rk-accent-2-rgb:124 58 237;
   --rk-body-bg:#eaeef5;
   --rk-body-image:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.08), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.06), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.05), transparent 60%),
-    linear-gradient(180deg, #eef2f8 0%, #e4e9f2 50%, #eef2f8 100%);
+    radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.14), transparent 55%),
+    radial-gradient(85% 55% at 88% 100%, rgba(139,92,246,.09), transparent 60%),
+    linear-gradient(180deg, #eff3f9 0%, #e2e8f3 50%, #eff3f9 100%);
   --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
   --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
@@ -171,10 +173,9 @@ html[data-theme="light"]{
     --rk-accent-2-rgb:124 58 237;
     --rk-body-bg:#eaeef5;
     --rk-body-image:
-      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.08), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.06), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.05), transparent 60%),
-      linear-gradient(180deg, #eef2f8 0%, #e4e9f2 50%, #eef2f8 100%);
+      radial-gradient(120% 70% at 50% -10%, rgba(59,130,246,.14), transparent 55%),
+      radial-gradient(85% 55% at 88% 100%, rgba(139,92,246,.09), transparent 60%),
+      linear-gradient(180deg, #eff3f9 0%, #e2e8f3 50%, #eff3f9 100%);
     --rk-card-image:none;
     --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
     --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
@@ -192,9 +193,10 @@ html[data-theme="light"]{
 html body{
   background-color:var(--rk-body-bg) !important;
   background-image:var(--rk-body-image) !important;
-  background-attachment:scroll;
+  background-attachment:fixed;
 }
 html .bg-cardbg{ background-image:var(--rk-card-image) !important; }
+html .bg-cardbg{ border-top:1px solid rgba(255,255,255,.05); }
 
 /* ---- 主题切换按钮（rk-navbar.js 注入） ---- */
 .rk-theme-btn{
