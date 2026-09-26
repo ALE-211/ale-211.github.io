@@ -42,8 +42,8 @@ tailwind.config = {
             /* 8 页 @apply hover:shadow-lg hover:shadow-primary/20 依赖（历史遗留类，
                不配 boxShadowColor 会导致 Play CDN 编译 CssSyntaxError、全站类不生成） */
             boxShadowColor: {
-                primary: 'rgb(var(--rk-primary-rgb) / <alpha-value>)',
-                'primary-hi': 'rgb(var(--rk-primary-hi-rgb) / <alpha-value>)'
+                primary: 'rgb(var(--rk-shadow-tint-rgb) / <alpha-value>)',
+                'primary-hi': 'rgb(var(--rk-shadow-tint-rgb) / <alpha-value>)'
             }
         }
     }

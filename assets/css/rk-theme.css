@@ -59,17 +59,13 @@
   --rk-h:68px;
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
   --rk-body-bg:#0d1117;
-  --rk-body-image:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.12), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.07), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.06), transparent 60%),
-    linear-gradient(180deg, #0d1117 0%, #111a26 50%, #0d1117 100%);
-  --rk-card-image:
-    linear-gradient(135deg, rgba(59,130,246,.04), transparent 40%),
-    linear-gradient(315deg, rgba(139,92,246,.03), transparent 40%);
+  --rk-body-image:linear-gradient(180deg, #0d1117 0%, #0f151d 50%, #0d1117 100%);
+  --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #111a26 100%);
-  --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.7);
+  --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.5);
   --rk-shadow-weak:0 4px 6px -1px rgba(0,0,0,.30);
+  --rk-shadow-tint:#3b82f6;
+  --rk-shadow-tint-rgb:59 130 246;
   --rk-veil:rgba(13,17,23,.65);
   --rk-code-bg:#0b1220;
   --rk-code-fg:#4ade80;
@@ -82,17 +78,17 @@
    灰阶层级保持相对关系：深色下"越亮越突出"，亮色下"越深越突出"。
    ============================================================ */
 html[data-theme="light"]{
-  --rk-bg:#f6f8fc;
-  --rk-card:#ffffff;
-  --rk-surface-2:#e2e8f0;
-  --rk-surface-1:#eef2f7;
+  --rk-bg:#eaeef5;
+  --rk-card:#fbfcfe;
+  --rk-surface-2:#d7dee8;
+  --rk-surface-1:#e3e8f0;
   --rk-title:#0f172a;
   --rk-text:#334155;
   --rk-text-soft:#1e293b;
   --rk-text-dim:#475569;
-  --rk-text-mute:#64748b;
-  --rk-text-faint:#94a3b8;
-  --rk-border:#e2e8f0;
+  --rk-text-mute:#52627a;
+  --rk-text-faint:#67748c;
+  --rk-border:#ccd4e0;
   --rk-primary:#2563eb;
   --rk-primary-hi:#3b82f6;
   --rk-ok:#16a34a;
@@ -100,17 +96,17 @@ html[data-theme="light"]{
   --rk-err:#dc2626;
   --rk-info:#0284c7;
   --rk-accent-2:#7c3aed;
-  --rk-bg-rgb:246 248 252;
-  --rk-card-rgb:255 255 255;
-  --rk-surface-2-rgb:226 232 240;
-  --rk-surface-1-rgb:238 242 247;
+  --rk-bg-rgb:234 238 245;
+  --rk-card-rgb:251 252 254;
+  --rk-surface-2-rgb:215 222 232;
+  --rk-surface-1-rgb:227 232 240;
   --rk-title-rgb:15 23 42;
   --rk-text-rgb:51 65 85;
   --rk-text-soft-rgb:30 41 59;
   --rk-text-dim-rgb:71 85 105;
-  --rk-text-mute-rgb:100 116 139;
-  --rk-text-faint-rgb:148 163 184;
-  --rk-border-rgb:226 232 240;
+  --rk-text-mute-rgb:82 98 122;
+  --rk-text-faint-rgb:103 116 140;
+  --rk-border-rgb:204 212 224;
   --rk-primary-rgb:37 99 235;
   --rk-primary-hi-rgb:59 130 246;
   --rk-ok-rgb:22 163 74;
@@ -118,18 +114,18 @@ html[data-theme="light"]{
   --rk-err-rgb:220 38 38;
   --rk-info-rgb:2 132 199;
   --rk-accent-2-rgb:124 58 237;
-  --rk-body-bg:#f6f8fc;
+  --rk-body-bg:#eaeef5;
   --rk-body-image:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.13), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.10), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.08), transparent 60%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2fb 50%, #f8fafc 100%);
-  --rk-card-image:
-    linear-gradient(135deg, rgba(59,130,246,.06), transparent 40%),
-    linear-gradient(315deg, rgba(139,92,246,.05), transparent 40%);
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.08), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.06), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.05), transparent 60%),
+    linear-gradient(180deg, #eef2f8 0%, #e4e9f2 50%, #eef2f8 100%);
+  --rk-card-image:none;
   --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
-  --rk-shadow-strong:0 18px 34px -14px rgba(15,23,42,.18);
-  --rk-shadow-weak:0 4px 6px -1px rgba(15,23,42,.10);
+  --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
+  --rk-shadow-weak:0 4px 6px -1px rgba(16,24,40,.05);
+  --rk-shadow-tint:#101828;
+  --rk-shadow-tint-rgb:16 24 40;
   --rk-veil:rgba(248,250,252,.72);
   /* 代码块保持深色（Prism 配色为深底设计），值不变 */
   --rk-code-bg:#0b1220;
@@ -137,17 +133,17 @@ html[data-theme="light"]{
 }
 @media (prefers-color-scheme: light){
   html:not([data-theme]){
-    --rk-bg:#f6f8fc;
-    --rk-card:#ffffff;
-    --rk-surface-2:#e2e8f0;
-    --rk-surface-1:#eef2f7;
+    --rk-bg:#eaeef5;
+    --rk-card:#fbfcfe;
+    --rk-surface-2:#d7dee8;
+    --rk-surface-1:#e3e8f0;
     --rk-title:#0f172a;
     --rk-text:#334155;
     --rk-text-soft:#1e293b;
     --rk-text-dim:#475569;
-    --rk-text-mute:#64748b;
-    --rk-text-faint:#94a3b8;
-    --rk-border:#e2e8f0;
+    --rk-text-mute:#52627a;
+    --rk-text-faint:#67748c;
+    --rk-border:#ccd4e0;
     --rk-primary:#2563eb;
     --rk-primary-hi:#3b82f6;
     --rk-ok:#16a34a;
@@ -155,17 +151,17 @@ html[data-theme="light"]{
     --rk-err:#dc2626;
     --rk-info:#0284c7;
     --rk-accent-2:#7c3aed;
-    --rk-bg-rgb:246 248 252;
-    --rk-card-rgb:255 255 255;
-    --rk-surface-2-rgb:226 232 240;
-    --rk-surface-1-rgb:238 242 247;
+    --rk-bg-rgb:234 238 245;
+    --rk-card-rgb:251 252 254;
+    --rk-surface-2-rgb:215 222 232;
+    --rk-surface-1-rgb:227 232 240;
     --rk-title-rgb:15 23 42;
     --rk-text-rgb:51 65 85;
     --rk-text-soft-rgb:30 41 59;
     --rk-text-dim-rgb:71 85 105;
-    --rk-text-mute-rgb:100 116 139;
-    --rk-text-faint-rgb:148 163 184;
-    --rk-border-rgb:226 232 240;
+    --rk-text-mute-rgb:82 98 122;
+    --rk-text-faint-rgb:103 116 140;
+    --rk-border-rgb:204 212 224;
     --rk-primary-rgb:37 99 235;
     --rk-primary-hi-rgb:59 130 246;
     --rk-ok-rgb:22 163 74;
@@ -173,18 +169,18 @@ html[data-theme="light"]{
     --rk-err-rgb:220 38 38;
     --rk-info-rgb:2 132 199;
     --rk-accent-2-rgb:124 58 237;
-    --rk-body-bg:#f6f8fc;
+    --rk-body-bg:#eaeef5;
     --rk-body-image:
-      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.13), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.10), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.08), transparent 60%),
-      linear-gradient(180deg, #f8fafc 0%, #eef2fb 50%, #f8fafc 100%);
-    --rk-card-image:
-      linear-gradient(135deg, rgba(59,130,246,.06), transparent 40%),
-      linear-gradient(315deg, rgba(139,92,246,.05), transparent 40%);
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,.08), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139,92,246,.06), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14,165,233,.05), transparent 60%),
+      linear-gradient(180deg, #eef2f8 0%, #e4e9f2 50%, #eef2f8 100%);
+    --rk-card-image:none;
     --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #e2e8f0 100%);
-    --rk-shadow-strong:0 18px 34px -14px rgba(15,23,42,.18);
-    --rk-shadow-weak:0 4px 6px -1px rgba(15,23,42,.10);
+    --rk-shadow-strong:0 18px 34px -14px rgba(16,24,40,.08);
+    --rk-shadow-weak:0 4px 6px -1px rgba(16,24,40,.05);
+  --rk-shadow-tint:#101828;
+  --rk-shadow-tint-rgb:16 24 40;
     --rk-veil:rgba(248,250,252,.72);
     --rk-code-bg:#0b1220;
     --rk-code-fg:#4ade80;
@@ -196,7 +192,7 @@ html[data-theme="light"]{
 html body{
   background-color:var(--rk-body-bg) !important;
   background-image:var(--rk-body-image) !important;
-  background-attachment:fixed;
+  background-attachment:scroll;
 }
 html .bg-cardbg{ background-image:var(--rk-card-image) !important; }
 
