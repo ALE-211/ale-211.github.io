@@ -12,7 +12,7 @@
   "headline": "Minecraft 1.10.2 联机教程",
   "description": "Minecraft 1.10.2 Age of Engineering 联机图文教程：装 Java、PCL2 启动器、导入整合包、IPv6 直连或 Radmin VPN 加网络 ALE_211。",
   "datePublished": "2026-09-01T00:00:00+08:00",
-  "dateModified": "2026-09-01T00:00:00+08:00",
+  "dateModified": "2026-09-26T00:00:00+08:00",
   "author": {"@type": "Person", "name": "Rick Chou"},
   "image": "https://ale211.eu.org/LOGO260721.png",
   "mainEntityOfPage": "https:\/\/ale211.eu.org\/server\/minecraft\/index.html",
@@ -32,24 +32,7 @@
     <script src="/assets/js/tailwind.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../../../LOGO260721.png">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        darkbg: '#0f172a',
-                        cardbg: '#1e293b',
-                        textlight: '#cbd5e1'
-                    },
-                    fontFamily: {
-                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="/assets/js/rk-tailwind-config.js?v=20260926v3"></script>
     <style type="text/tailwindcss">
         @layer utilities {
             
@@ -241,7 +224,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260926v7">
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/server/minecraft/index.html">
 <meta name="robots" content="index,follow">
@@ -388,7 +371,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <li>下载 <a class="dl-btn" href="https://ale211.eu.org/assets/modpacks/Age%20of%20Engineering%20RCMS%201.4.zip"><i class="fa fa-download"></i>Age of Engineering RCMS 1.4.zip</a>。<strong class="text-white">保持 zip 原样，不要解压</strong>。</li>
                     <li>打开 PCL2，左侧点「<strong class="text-white">下载</strong>」→ 上方选「<strong class="text-white">整合包</strong>」→「<strong class="text-white">导入本地整合包文件</strong>」。</li>
                     <li>选中刚下载的 zip，PCL2 自动识别版本（1.10.2 + Forge）并下载游戏文件与全部 mod。</li>
-                    <li>下载完成后回到「开始游戏」页，左上角版本下拉选择 <strong class="text-white">Age of Engineering</strong>。</li>
+                    <li>下载完成后回到「开始游戏」页，左上角版本下拉选择 <strong class="text-white">Age of Engineering RCMS</strong>。</li>
                     <li>首次启动会安装所有 mod、生成世界文件，进度条走完前不要关闭窗口。</li>
                 </ol>
                 <div class="mb-6 rounded-xl overflow-hidden">
@@ -401,7 +384,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
                 <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">第四步：连接服务器</h2>
                 <p class="text-textlight mb-4 leading-relaxed">
-                    先启动一次游戏进入主菜单。打开「多人游戏」，如果列表里已经有一台<strong class="text-white">显示绿色或黄色信号条</strong>的服务器，双击它即可直接加入，下面的步骤都不用看。
+                    先启动一次游戏进入主菜单，打开「多人游戏」。整合包里预置了一份服务器列表，<strong class="text-white">里面可能有多条记录、其中一些是过期的</strong>——请只认这两条：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ale211.eu.org</code>（走 IPv6）与 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>（走 Radmin VPN）。其余记录如果连不上，直接删掉即可，不必怀疑是自己网络的问题。
                 </p>
                 <p class="text-textlight mb-4 leading-relaxed">如果没有，先判断自己的网络是否支持 IPv6：浏览器打开 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">test-ipv6.com</code>，页面显示 10/10 或出现 IPv6 地址即表示支持。然后按下面两种方式之一连接。</p>
 
@@ -431,8 +414,8 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                             <li>密码（Password）：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code></li>
                         </ul>
                     </li>
-                    <li>加入成功后，主界面列表里会出现主机（名字含 ALE_211），后面跟着形如 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.xx.xx.xx</code> 的虚拟 IP。</li>
-                    <li>回游戏「多人游戏」→「添加服务器」，地址填这个 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.xx.xx.xx</code> 的 IP，完成后双击进入。</li>
+                    <li>加入成功后，主界面列表里会出现主机（名字含 ALE_211），后面跟着一个 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.x.x.x</code> 形式的虚拟 IP（目前是 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>）。</li>
+                    <li>回游戏「多人游戏」→「添加服务器」，地址填这个虚拟 IP（<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>），完成后双击进入。<strong class="text-white">以你 Radmin 列表里实际显示的为准</strong>——网络重建后地址可能变。</li>
                 </ol>
                 <div class="mb-6 rounded-xl overflow-hidden">
                     <img src="../../../assets/images/mc/mc-radmin-join.png" alt="Radmin VPN 加入现有网络对话框" class="w-full h-auto max-w-md mx-auto rounded-lg">

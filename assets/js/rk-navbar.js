@@ -151,9 +151,9 @@
 
         /* 镜像站：不请求后端，直接给出回主站的入口 */
         if (MIRROR) {
-            if (d) { d.innerHTML = '<a href="' + MAIN + '/auth/login.html" class="rk-login">' +
+            if (d) { d.innerHTML = '<a href="' + MAIN + '/" class="rk-login">' +
                                     '<i class="fa fa-sign-in"></i> 前往主站</a>'; }
-            if (m) { m.innerHTML = '<a href="' + MAIN + '/auth/login.html" class="rk-login">前往主站登录</a>'; }
+            if (m) { m.innerHTML = '<a href="' + MAIN + '/" class="rk-login">前往主站首页</a>'; }
             return;
         }
 

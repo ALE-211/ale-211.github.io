@@ -12,7 +12,7 @@
   "headline": "CS:GO 联机教程",
   "description": "CS:GO 客户端联机教程：CS2 切 csgo_legacy 测试版、打开控制台、connect 直连服务器，支持 IPv6 与 Radmin VPN。",
   "datePublished": "2026-09-05T00:00:00+08:00",
-  "dateModified": "2026-09-05T00:00:00+08:00",
+  "dateModified": "2026-09-26T00:00:00+08:00",
   "author": {"@type": "Person", "name": "Rick Chou"},
   "image": "https://ale211.eu.org/LOGO260721.png",
   "mainEntityOfPage": "https:\/\/ale211.eu.org\/server\/csgo\/index.html",
@@ -32,24 +32,7 @@
     <script src="/assets/js/tailwind.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../../../LOGO260721.png">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        darkbg: '#0f172a',
-                        cardbg: '#1e293b',
-                        textlight: '#cbd5e1'
-                    },
-                    fontFamily: {
-                        mono: ['"Cascadia Mono"', '"Cascadia Code"', 'Consolas', '"Microsoft YaHei"', '"微软雅黑"', '"PingFang SC"', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="/assets/js/rk-tailwind-config.js?v=20260926v3"></script>
     <style type="text/tailwindcss">
         @layer utilities {
             
@@ -213,7 +196,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260926v7">
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/server/csgo/index.html">
 <meta name="robots" content="index,follow">
@@ -256,7 +239,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
                 <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">先说在前面</h2>
                 <p class="text-textlight mb-4 leading-relaxed">
-                    别看到标题就去 Steam 商店搜 CS:GO——<strong class="text-white">搜不到了</strong>。2023 年 9 月 Valve 把 CS:GO 直接下架，换成了 CS2。但老 CS:GO 没彻底死，想进我们这台服，得用下面这套办法把"老版本"调出来。
+                    别看到标题就去 Steam 商店搜 CS:GO——<strong class="text-white">搜不到了</strong>。2023 年 9 月 Valve 把 CS:GO 直接下架，换成了 CS2。但老 CS:GO 没彻底死，想进我们这台服，得用下面这套办法把「老版本」调出来。
                 </p>
                 <p class="text-textlight mb-4 leading-relaxed">
                     我们的服跑的就是原版 CS:GO（不是 CS2）。IPv6 直连地址：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ale211.eu.org:27015</code>；走 Radmin VPN 的话直接连主机虚拟 IP：<code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131:27015</code>。Radmin 网络名 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>，密码 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code>。
@@ -272,14 +255,14 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
                     <li>Steam 库里先装好 <strong class="text-white">Counter-Strike 2</strong>（免费，没装的话商店直接搜）。</li>
                     <li>库里右键 <strong class="text-white">Counter-Strike 2</strong> → <strong class="text-white">属性</strong>。</li>
-                    <li>切到 <strong class="text-white">测试版 / Betas</strong> 标签页，"参与测试"下拉框选：
+                    <li>切到 <strong class="text-white">测试版 / Betas</strong> 标签页，「参与测试」下拉框选：
                         <div class="cmd-block">csgo_legacy - Legacy Version of CS:GO</div>
                     </li>
                     <li>关掉属性窗口，Steam 会自动开始下载老版本文件（<strong class="text-white">大约 13 GB</strong>，第一次等久一点）。</li>
-                    <li>下完点绿色"开始"按钮，Steam 会弹个小框问你启动哪个版本，<strong class="text-white">选 "Play Legacy Version of CS:GO"</strong>，别选成 CS2 了。</li>
+                    <li>下完点绿色「开始」按钮，Steam 会弹个小框问你启动哪个版本，<strong class="text-white">选「Play Legacy Version of CS:GO」</strong>，别选成 CS2 了。</li>
                 </ol>
                 <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded mb-6">
-                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">注意：</strong>切到 legacy 之后，你以后点"开始游戏"默认进的就是老 CS:GO。想回去玩 CS2，再到同一个地方把测试版改回"无 - 不选择任何测试版"即可。</p>
+                    <p class="text-textlight text-sm"><i class="fa fa-exclamation-circle text-yellow-500 mr-2"></i><strong class="text-yellow-400">注意：</strong>切到 legacy 之后，你以后点「开始游戏」默认进的就是老 CS:GO。想回去玩 CS2，再到同一个地方把测试版改回「无 - 不选择任何测试版」即可。</p>
                 </div>
 
                 <h2 id="section3" class="text-xl font-bold text-white mt-10 mb-3">第二步：打开开发者控制台</h2>
@@ -289,11 +272,11 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 <ol class="list-decimal list-inside text-textlight space-y-2 mb-4 pl-2">
                     <li>进游戏主菜单，点左下角齿轮 <strong class="text-white">设置</strong>。</li>
                     <li>切到 <strong class="text-white">游戏设置 / Game</strong> 标签。</li>
-                    <li>找到 <strong class="text-white">"启用开发者控制台（~）"</strong>，选 <strong class="text-white">是 / Yes</strong>。</li>
+                    <li>找到 <strong class="text-white">「启用开发者控制台（~）」</strong>，选 <strong class="text-white">是 / Yes</strong>。</li>
                     <li>按键盘左上角 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">~</code>（Tab 上面、Esc 下面那个波浪号键），能弹出黑底白字的控制台就成了。</li>
                 </ol>
                 <p class="text-textlight mb-6 leading-relaxed">
-                    按不出来？看看是不是被输入法占了，或者换个键位：在设置 → 键盘/鼠标里找"打开控制台"，改成你顺手的键。
+                    按不出来？看看是不是被输入法占了，或者换个键位：在设置 → 键盘/鼠标里找「打开控制台」，改成你顺手的键。
                 </p>
 
                 <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">第三步：连服务器</h2>
@@ -310,7 +293,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 <p class="text-textlight mb-2 leading-relaxed">
                     Radmin 的安装、加网络那套和 MC 完全一样（网络名 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">ALE_211</code>，密码 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">123456</code>），这里不重复了，<a class="text-primary hover:underline" href="../minecraft/index.html#section5">直接看 MC 教程第五步</a>。
                 </p>
-                <p class="text-textlight mb-2 leading-relaxed">加完网络后，主机的 Radmin 虚拟 IP 已经固定为 <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>，不用自己抄。控制台直接敲：</p>
+                <p class="text-textlight mb-2 leading-relaxed">加完网络后，看 Radmin 列表里主机后面显示的虚拟 IP（<strong class="text-white">目前是</strong> <code class="bg-gray-700 px-2 py-0.5 rounded text-sm">26.21.59.131</code>，<strong class="text-white">以列表显示为准</strong>——网络重建后可能变）。控制台直接敲：</p>
                 <div class="cmd-block">connect 26.21.59.131</div>
 
                 <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mb-6">
@@ -320,11 +303,11 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
                 <h2 id="section5" class="text-xl font-bold text-white mt-10 mb-3">常见问题</h2>
                 <ol class="list-decimal list-inside text-textlight space-y-3 mb-6 pl-2">
-                    <li class="leading-relaxed"><strong class="text-white">点"开始游戏"直接进 CS2 了，没让选版本</strong>：说明你没切到 csgo_legacy 分支，或者下完之后 Steam 自动更新回去了。回属性 → 测试版，重新选一次。</li>
-                    <li class="leading-relaxed"><strong class="text-white">connect 之后一直卡"正在连接"然后超时</strong>：先 ping 一下域名通不通。IPv6 直连不通就老老实实走 Radmin；Radmin 也连不上，确认你和主机都在 ALE_211 网络里、防火墙放行 Radmin。</li>
-                    <li class="leading-relaxed"><strong class="text-white">按 ~ 没反应</strong>：控制台没开。回设置 → 游戏，确认"启用开发者控制台"是"是"；中文输入法状态下也可能吞键，切回英文再试。</li>
-                    <li class="leading-relaxed"><strong class="text-white">提示"服务器在运行不同版本"（Disconnect: Server is running a different version）</strong>：你进的是 CS2 而不是 legacy 版。按第一步重新确认启动版本。</li>
-                    <li class="leading-relaxed"><strong class="text-white">想玩 CS2 不想玩老 CS:GO 了</strong>：从Steam库中启动cs时选择cs2即可</li>
+                    <li class="leading-relaxed"><strong class="text-white">点「开始游戏」直接进 CS2 了，没让选版本</strong>：说明你没切到 csgo_legacy 分支，或者下完之后 Steam 自动更新回去了。回属性 → 测试版，重新选一次。</li>
+                    <li class="leading-relaxed"><strong class="text-white">connect 之后一直卡「正在连接」然后超时</strong>：先 ping 一下域名通不通。IPv6 直连不通就老老实实走 Radmin；Radmin 也连不上，确认你和主机都在 ALE_211 网络里、防火墙放行 Radmin。</li>
+                    <li class="leading-relaxed"><strong class="text-white">按 ~ 没反应</strong>：控制台没开。回设置 → 游戏，确认「启用开发者控制台」是「是」；中文输入法状态下也可能吞键，切回英文再试。</li>
+                    <li class="leading-relaxed"><strong class="text-white">提示「服务器在运行不同版本」（Disconnect: Server is running a different version）</strong>：你进的是 CS2 而不是 legacy 版。按第一步重新确认启动版本。</li>
+                    <li class="leading-relaxed"><strong class="text-white">想玩 CS2 不想玩老 CS:GO 了</strong>：在 Steam 库里启动时选 CS2 即可（测试版分支留在 csgo_legacy 不影响）。</li>
                     <li class="leading-relaxed"><strong class="text-white">找不到 CS:GO 商店页</strong>：正常，Valve 已经下架了，不要到处找安装包，就用上面的 legacy 分支方法。</li>
                 </ol>
 

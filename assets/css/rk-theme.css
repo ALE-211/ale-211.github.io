@@ -20,11 +20,42 @@
 :root{
   --rk-bg:#0f172a;
   --rk-card:#1e293b;
+  --rk-surface-2:#1f2937;
+  --rk-surface-1:#111827;
+  --rk-title:#ffffff;      /* 原 text-white，亮色下将变深色 */
+  --rk-text:#cbd5e1;       /* 原 textlight */
+  --rk-text-soft:#d1d5db;  /* 原 gray-300 */
+  --rk-text-dim:#94a3b8;   /* 原 gray-400 */
+  --rk-text-mute:#6b7280;  /* 原 gray-500 */
+  --rk-text-faint:#4b5563; /* 原 gray-600 */
+  --rk-border:#334155;     /* 原 gray-700 */
   --rk-primary:#3b82f6;
   --rk-primary-hi:#60a5fa;
-  --rk-text:#cbd5e1;
-  --rk-text-dim:#94a3b8;
-  --rk-border:#334155;
+  --rk-ok:#4ade80;
+  --rk-warn:#fbbf24;
+  --rk-err:#f87171;
+  --rk-info:#38bdf8;
+  --rk-accent-2:#c084fc;
+  /* ---- rgb 三元组（TASK-021-A 回退方案：Tailwind 透明度类
+      对 var(hex) 生成 rgb(var()/alpha) 会失效，须用三元组形式） ---- */
+  --rk-bg-rgb:15 23 42;
+  --rk-card-rgb:30 41 59;
+  --rk-surface-2-rgb:31 41 55;
+  --rk-surface-1-rgb:17 24 39;
+  --rk-title-rgb:255 255 255;
+  --rk-text-rgb:203 213 225;
+  --rk-text-soft-rgb:209 213 219;
+  --rk-text-dim-rgb:148 163 184;
+  --rk-text-mute-rgb:107 114 128;
+  --rk-text-faint-rgb:75 85 99;
+  --rk-border-rgb:51 65 85;
+  --rk-primary-rgb:59 130 246;
+  --rk-primary-hi-rgb:96 165 250;
+  --rk-ok-rgb:74 222 128;
+  --rk-warn-rgb:251 191 36;
+  --rk-err-rgb:248 113 113;
+  --rk-info-rgb:56 189 248;
+  --rk-accent-2-rgb:192 132 252;
   --rk-h:68px;
 }
 
