@@ -460,3 +460,37 @@ pre.cmd-block .token.atrule, #articleBody pre .token.atrule{ color:#f472b6; }
   transition:opacity .25s, transform .25s; font-family:inherit;
 }
 .rk-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+/* ============================================================
+   TASK-039 评论 widget（rk-comments.js 配套样式）
+   全部使用 --rk-* 令牌，深浅色均可读，不引入硬编码色
+   ============================================================ */
+.rk-c-title{ font-size:1.05rem; font-weight:700; color:var(--rk-title); margin:1.5rem 0 .8rem; }
+.rk-c-note{ color:var(--rk-text-mute); font-size:.85rem; padding:.4rem 0; }
+.rk-c-list{ display:flex; flex-direction:column; gap:.75rem; }
+.rk-c-item{ background:var(--rk-card); border:1px solid var(--rk-border); border-radius:.75rem; padding:.75rem; display:flex; gap:.7rem; }
+.rk-c-avatar{ width:2.2rem; height:2.2rem; border-radius:9999px; object-fit:cover; border:1px solid var(--rk-border); flex-shrink:0; }
+.rk-c-body{ flex:1; min-width:0; }
+.rk-c-head{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
+.rk-c-name{ font-weight:600; color:var(--rk-title); font-size:.9rem; }
+.rk-c-time{ color:var(--rk-text-mute); font-size:.72rem; }
+.rk-c-reply-tag{ color:var(--rk-info); font-size:.72rem; background:rgba(var(--rk-info-rgb),.12); border-radius:.35rem; padding:.05rem .4rem; }
+.rk-c-text{ color:var(--rk-text); font-size:.9rem; margin-top:.35rem; white-space:pre-wrap; word-break:break-word; line-height:1.6; }
+.rk-c-actions{ display:flex; gap:.45rem; margin-top:.45rem; flex-wrap:wrap; }
+.rk-c-btn{ font-size:.78rem; color:var(--rk-primary-hi); background:transparent; border:1px solid var(--rk-border); border-radius:.5rem; padding:.22rem .6rem; cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; }
+.rk-c-btn:hover{ border-color:var(--rk-primary); background:rgba(var(--rk-primary-rgb),.08); }
+.rk-c-btn-primary{ background:var(--rk-primary); color:#fff; border-color:var(--rk-primary); }
+.rk-c-btn-primary:hover{ background:var(--rk-primary-hi); border-color:var(--rk-primary-hi); }
+.rk-c-btn-danger{ color:var(--rk-err); border-color:rgba(var(--rk-err-rgb),.4); }
+.rk-c-btn-danger:hover{ border-color:var(--rk-err); background:rgba(var(--rk-err-rgb),.08); }
+.rk-c-replies{ margin-top:.75rem; padding-left:.8rem; border-left:2px solid var(--rk-border); display:flex; flex-direction:column; gap:.75rem; }
+.rk-c-form{ margin-top:1.1rem; display:flex; flex-direction:column; gap:.5rem; }
+.rk-c-input{ width:100%; box-sizing:border-box; background:var(--rk-card); border:1px solid var(--rk-border); border-radius:.75rem; color:var(--rk-text); padding:.6rem .75rem; font-size:.9rem; font-family:inherit; resize:vertical; min-height:5rem; }
+.rk-c-input:focus{ outline:none; border-color:var(--rk-primary); }
+.rk-c-input::placeholder{ color:var(--rk-text-faint); }
+.rk-c-toast{ position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); z-index:99999; padding:.5rem 1rem; font-size:.82rem; color:#e2e8f0; background:var(--rk-card); border:1px solid rgba(var(--rk-ok-rgb),.5); border-radius:.6rem; box-shadow:0 8px 24px rgba(0,0,0,.4); font-family:inherit; }
+.rk-c-toast-err{ border-color:rgba(var(--rk-err-rgb),.5); }
+@media (max-width:640px){
+  .rk-c-item{ padding:.6rem; gap:.5rem; }
+  .rk-c-avatar{ width:1.9rem; height:1.9rem; }
+  .rk-c-replies{ padding-left:.55rem; }
+}
