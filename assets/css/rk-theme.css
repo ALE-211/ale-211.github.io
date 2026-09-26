@@ -18,17 +18,17 @@
    ============================================================ */
 
 :root{
-  --rk-bg:#0d1117;
-  --rk-card:#161b22;
-  --rk-surface-2:#1b222c;
-  --rk-surface-1:#10151c;
+  --rk-bg:#1c1d20;
+  --rk-card:#26272b;
+  --rk-surface-2:#2e2f34;
+  --rk-surface-1:#222327;
   --rk-title:#ffffff;      /* 原 text-white，亮色下将变深色 */
   --rk-text:#cbd5e1;       /* 原 textlight */
   --rk-text-soft:#d1d5db;  /* 原 gray-300 */
   --rk-text-dim:#94a3b8;   /* 原 gray-400 */
   --rk-text-mute:#6b7280;  /* 原 gray-500 */
   --rk-text-faint:#4b5563; /* 原 gray-600 */
-  --rk-border:#30363d;     /* 原 gray-700 */
+  --rk-border:#3e4046;     /* 原 gray-700 */
   --rk-primary:#3b82f6;
   --rk-primary-hi:#60a5fa;
   --rk-ok:#4ade80;
@@ -38,17 +38,17 @@
   --rk-accent-2:#c084fc;
   /* ---- rgb 三元组（TASK-021-A 回退方案：Tailwind 透明度类
       对 var(hex) 生成 rgb(var()/alpha) 会失效，须用三元组形式） ---- */
-  --rk-bg-rgb:13 17 23;
-  --rk-card-rgb:22 27 34;
-  --rk-surface-2-rgb:27 34 44;
-  --rk-surface-1-rgb:16 21 28;
+  --rk-bg-rgb:28 29 32;
+  --rk-card-rgb:38 39 43;
+  --rk-surface-2-rgb:46 47 52;
+  --rk-surface-1-rgb:34 35 39;
   --rk-title-rgb:255 255 255;
   --rk-text-rgb:203 213 225;
   --rk-text-soft-rgb:209 213 219;
   --rk-text-dim-rgb:148 163 184;
   --rk-text-mute-rgb:107 114 128;
   --rk-text-faint-rgb:75 85 99;
-  --rk-border-rgb:48 54 61;
+  --rk-border-rgb:62 64 70;
   --rk-primary-rgb:59 130 246;
   --rk-primary-hi-rgb:96 165 250;
   --rk-ok-rgb:74 222 128;
@@ -58,18 +58,18 @@
   --rk-accent-2-rgb:192 132 252;
   --rk-h:68px;
   /* ---- 21-B：背景与面板（深色原值，亮色块覆盖） ---- */
-  --rk-body-bg:#0d1117;
+  --rk-body-bg:#1c1d20;
   --rk-body-image:
-    radial-gradient(150% 85% at 50% -12%, rgba(59,130,246,.11), transparent 62%),
-    radial-gradient(95% 65% at 10% 104%, rgba(99,102,241,.07), transparent 65%),
-    linear-gradient(180deg, #0d1117 0%, #111a27 50%, #0d1117 100%);
+    radial-gradient(140% 105% at 50% -22%, rgba(59,130,246,.12), transparent 82%),
+    radial-gradient(105% 75% at 92% 110%, rgba(99,102,241,.07), transparent 82%),
+    linear-gradient(180deg, #1c1d20 0%, #232428 52%, #1c1d20 100%);
   --rk-card-image:none;
-  --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #111a26 100%);
+  --rk-mobile-menu-image:linear-gradient(180deg, var(--rk-card) 0%, #222327 100%);
   --rk-shadow-strong:0 18px 34px -14px rgba(0,0,0,.5);
   --rk-shadow-weak:0 4px 6px -1px rgba(0,0,0,.30);
   --rk-shadow-tint:#3b82f6;
   --rk-shadow-tint-rgb:59 130 246;
-  --rk-veil:rgba(13,17,23,.65);
+  --rk-veil:rgba(28,29,32,.65);
   --rk-code-bg:#0b1220;
   --rk-code-fg:#4ade80;
 }
