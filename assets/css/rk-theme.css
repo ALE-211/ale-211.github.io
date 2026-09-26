@@ -212,3 +212,63 @@ header.rk-header{
 /* Tailwind 未加载时的兜底（保留旧机制，但不再承担基础文字色） */
 html.tw-fail header.rk-header{ background-color:var(--rk-card) !important; border-bottom:1px solid var(--rk-border) !important; }
 html.tw-fail .rk-search input{ color:#fff !important; }
+
+/* ============================================================
+   TASK-014/015：共享目录 + 代码块样式（TOC / Prism / 复制按钮）
+   ============================================================ */
+
+/* ---- TOC 目录滚动高亮（rk-toc.js） ---- */
+.toc-active{ background:rgba(59,130,246,.2); color:#3b82f6; }
+
+/* ---- 命令代码块 cmd-block（原各静态页内联，收敛共享，动态页通用） ---- */
+.cmd-block{
+  background:#0b1220; border:1px solid rgba(59,130,246,.35);
+  border-left:4px solid #3b82f6; border-radius:.5rem;
+  padding:.9rem 1.1rem; font-family:Consolas,"Microsoft YaHei",monospace;
+  font-size:.92rem; color:#4ade80; overflow-x:auto;
+  margin:.75rem 0 1.25rem; white-space:pre; line-height:1.7; position:relative;
+}
+.cmd-block .cmt{ color:#64748b; }
+.cmd-block .ok{ color:#fbbf24; }
+@media (max-width:1023px){
+  .cmd-block{ font-size:.78rem !important; padding:.7rem .8rem !important; line-height:1.6 !important; }
+}
+
+/* ---- Prism token 配色（对齐 cmd-block 绿色系，覆盖 #articleBody pre 通用块） ---- */
+pre.cmd-block .token.comment, #articleBody pre .token.comment{ color:#64748b; font-style:italic; }
+pre.cmd-block .token.keyword, #articleBody pre .token.keyword{ color:#4ade80; }
+pre.cmd-block .token.string, #articleBody pre .token.string{ color:#86efac; }
+pre.cmd-block .token.function, #articleBody pre .token.function{ color:#60a5fa; }
+pre.cmd-block .token.operator, #articleBody pre .token.operator{ color:#93c5fd; }
+pre.cmd-block .token.number, #articleBody pre .token.number{ color:#fbbf24; }
+pre.cmd-block .token.variable, #articleBody pre .token.variable{ color:#c4b5fd; }
+pre.cmd-block .token.punctuation, #articleBody pre .token.punctuation{ color:#94a3b8; }
+pre.cmd-block .token.builtin, #articleBody pre .token.builtin{ color:#7dd3fc; }
+pre.cmd-block .token.boolean, #articleBody pre .token.boolean{ color:#f472b6; }
+pre.cmd-block .token.property, #articleBody pre .token.property{ color:#93c5fd; }
+pre.cmd-block .token.selector, #articleBody pre .token.selector{ color:#4ade80; }
+pre.cmd-block .token.attr-name, #articleBody pre .token.attr-name{ color:#fbbf24; }
+pre.cmd-block .token.atrule, #articleBody pre .token.atrule{ color:#f472b6; }
+
+/* ---- 复制按钮（rk-code.js） ---- */
+.rk-copy-btn{
+  position:absolute; top:.5rem; right:.6rem; z-index:5;
+  display:inline-flex; align-items:center; gap:.35rem;
+  padding:.28rem .6rem; font-size:.72rem; font-weight:600;
+  color:#cbd5e1; background:rgba(15,23,42,.85);
+  border:1px solid rgba(59,130,246,.4); border-radius:.5rem;
+  cursor:pointer; opacity:.85; transition:opacity .15s, background .15s;
+  white-space:nowrap; font-family:inherit;
+}
+.rk-copy-btn:hover{ opacity:1; background:rgba(59,130,246,.25); }
+.rk-copy-btn.copied{ color:#4ade80; border-color:rgba(74,222,128,.5); }
+
+/* ---- 复制 toast（rk-code.js 自建） ---- */
+.rk-toast{
+  position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(1rem);
+  z-index:99999; padding:.55rem 1.1rem; font-size:.82rem; color:#e2e8f0;
+  background:#1e293b; border:1px solid rgba(59,130,246,.5); border-radius:.6rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.4); opacity:0; pointer-events:none;
+  transition:opacity .25s, transform .25s; font-family:inherit;
+}
+.rk-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }

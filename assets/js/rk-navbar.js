@@ -186,6 +186,15 @@
             });
     }
 
+    /* 镜像站提示条：页面里若有 #rkMirrorNotice 就展开它。
+       主站（未设 RK_MIRROR）保持隐藏 —— 因此这一块可以常驻所有页面，
+       由 JS 决定是否显示，不需要维护两份首页。 */
+    function mirrorNotice() {
+        if (!MIRROR) { return; }
+        var el = document.getElementById('rkMirrorNotice');
+        if (el) { el.style.display = ''; }
+    }
+
     var mounted = false;
     function render() {
         if (mounted) { return true; }
@@ -195,6 +204,7 @@
         mounted = true;
         bind();
         fillAccount();
+        mirrorNotice();
         return true;
     }
 

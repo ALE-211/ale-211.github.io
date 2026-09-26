@@ -41,9 +41,7 @@
                 @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
             }
             
-            .toc-active {
-                @apply bg-primary/20 text-primary;
-            }
+
         }
             .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
         .search-box input:focus { outline:none; border-color:#3b82f6; }
@@ -499,31 +497,7 @@ backTopBtn.addEventListener('click', ()=>{
     window.scrollTo({top:0, behavior:'smooth'})
 })
 
-// ========= 左侧侧边栏生成目录 + 滚动高亮 =========
-const leftTocList = document.getElementById('leftTocList');
-const headings = Array.from(document.querySelectorAll('h2[id]'));
 
-headings.forEach(h => {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${h.id}`;
-    a.textContent = h.innerText;
-    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
-    li.appendChild(a);
-    leftTocList.appendChild(li);
-})
-
-const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(entry => {
-        const id = entry.target.id;
-        const link = leftTocList.querySelector(`a[href="#${id}"]`);
-        if(entry.isIntersecting){
-            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
-            link?.classList.add('toc-active');
-        }
-    })
-},{rootMargin:"-15% 0px -65% 0px"})
-headings.forEach(h=>observer.observe(h));
 </script>
 
 <script>
@@ -533,6 +507,9 @@ headings.forEach(h=>observer.observe(h));
 </script>
 <script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
 <script>window.RK_SLUG='mc-server-guide';</script>
+<script src="/assets/js/prism-bundle.min.js?v=20260926"></script>
+<script src="/assets/js/rk-toc.js?v=20260926"></script>
+<script src="/assets/js/rk-code.js?v=20260926"></script>
 <script src="/assets/js/rk-post-widgets.js"></script>
 </body>
 </html>
