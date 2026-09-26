@@ -241,23 +241,23 @@ header.rk-header{
 
 .rk-bar{
   height:100%; max-width:1280px; margin:0 auto;
-  padding:0 1em;
-  display:flex; align-items:center; justify-content:space-between; gap:.75em;
+  padding:0 1.25em;
+  display:flex; align-items:center; justify-content:space-between; gap:1.25em;
 }
 
 /* logo */
 .rk-logo{
   display:flex; align-items:center; gap:.5em; flex:0 0 auto;
-  font-size:1.5em; line-height:1; font-weight:700; color:var(--rk-primary);
+  font-size:1.35em; line-height:1; font-weight:700; color:var(--rk-primary);
   white-space:nowrap;
 }
 .rk-logo img{ height:2em; width:auto; display:block; }
 
 /* 主导航 */
-.rk-nav{ display:flex; align-items:center; justify-content:center; gap:.25em; flex:1 1 auto; min-width:0; }
+.rk-nav{ display:flex; align-items:center; justify-content:center; gap:.6em; flex:1 1 auto; min-width:0; }
 .rk-nav a{
   display:inline-flex; align-items:center; gap:.3em;
-  padding:.5em 1em; border-radius:.5em;
+  padding:.5em .85em; border-radius:.5em;
   font-size:.95em; line-height:1.25em;
   color:var(--rk-text);
   white-space:nowrap; flex:0 0 auto;      /* 中文防竖排的关键 */
@@ -269,7 +269,7 @@ header.rk-header{
 
 /* 搜索框 */
 .rk-search{
-  display:flex; align-items:stretch; flex:0 0 auto; width:11em;
+  display:flex; align-items:stretch; flex:0 0 auto; width:10.5em;
   background:var(--rk-bg); border:1px solid var(--rk-border); border-radius:.5em;
   overflow:hidden;
 }
@@ -384,6 +384,14 @@ header.rk-header{
 }
 @media (max-width:400px){
   .rk-logo span{ display:none; }        /* 极窄屏只留 logo 图标 */
+}
+
+/* 窄桌面 900~1149px：整条顶栏原本正好铺满（1024 时零余量），
+   隐藏 logo 文字（保留图标）并收窄搜索框，把空间还给导航。 */
+@media (max-width:1149.98px){
+  .rk-logo span{ display:none; }
+  .rk-search{ width:9em; }
+  .rk-bar{ gap:1em; }
 }
 
 /* 中文防竖排兜底：任何按钮/标签类元素都不逐字换行 */
