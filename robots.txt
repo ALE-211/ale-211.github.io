@@ -5,4 +5,4 @@ User-agent: *
 Allow: /
 Disallow: /.git/
 
-Sitemap: https://ale-211.github.io/sitemap.xml
+Sitemap: https://mirror.ale211.eu.org/sitemap.xml
