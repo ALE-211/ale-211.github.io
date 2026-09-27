@@ -31,7 +31,19 @@
         { href: '/server/index.html',   icon: 'fa-server',          label: '服务器',
           test: function (p) { return p.indexOf('/server/') === 0; } },
         { href: '/blog/',               icon: 'fa-pencil-square-o', label: '博客',
-          test: function (p) { return p.indexOf('/blog') === 0 || p === '/search.php' || p === '/search'; } }
+          test: function (p) { return (p.indexOf('/blog') === 0
+                 && p !== '/blog/tools.php' && p !== '/blog/dashboard.php'
+                 && p !== '/blog/media.php'  && p !== '/blog/admin.html')
+                 || p === '/search.php' || p === '/search'; } },
+        /* 工作台（统一工具中心，2026-09-27 DeepSeek）：
+           站长反馈「不要跟盘丝洞一样左一个入口右一个入口，用个工具还要翻几层网页」。
+           所有管理/编辑工具（文章、看板、媒体库、导出、用户权限）收口到这一项。
+           ⚠️ 必须从上面「博客」的 test 里把这些路径排除掉，否则会**同时高亮两项**
+              —— 站长已就「标签/归档点开时博客栏也一起高亮」报过同一个问题，别再犯。 */
+        { href: '/blog/tools.php',      icon: 'fa-th-large',        label: '工作台',
+          test: function (p) { return p === '/blog/tools.php' || p === '/blog/dashboard.php'
+                 || p === '/blog/media.php' || p === '/blog/admin.html'
+                 || p === '/auth/admin.html'; } }
     ];
 
     var PATH = window.location.pathname || '/';
