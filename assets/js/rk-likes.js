@@ -79,7 +79,10 @@
             .then(function (r) { return r.json(); })
             .then(function (j) {
                 if (!j.ok) { return; }
-                render(j.count || 0, false);
+                /* TASK-070：原来这里写死 false，导致刷新/重载后高亮永远熄灭，
+                   而计数照旧 —— 高亮与计数两套状态各说各话（站长报的"一团浆糊"）。
+                   现在接口会回 liked，照它渲染，高亮才是可信的。 */
+                render(j.count || 0, !!j.liked);
             })
             .catch(function () {});
     }
