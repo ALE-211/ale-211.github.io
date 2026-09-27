@@ -31,11 +31,7 @@
         { href: '/server/index.html',   icon: 'fa-server',          label: '服务器',
           test: function (p) { return p.indexOf('/server/') === 0; } },
         { href: '/blog/',               icon: 'fa-pencil-square-o', label: '博客',
-          test: function (p) { return p.indexOf('/blog') === 0 || p === '/search.php' || p === '/search'; } },
-        { href: '/blog/tags.php',       icon: 'fa-tags',            label: '标签',
-          test: function (p) { return p.indexOf('/blog/tags') === 0; } },
-        { href: '/blog/archive.php',    icon: 'fa-archive',         label: '归档',
-          test: function (p) { return p.indexOf('/blog/archive') === 0; } }
+          test: function (p) { return p.indexOf('/blog') === 0 || p === '/search.php' || p === '/search'; } }
     ];
 
     var PATH = window.location.pathname || '/';

@@ -127,7 +127,7 @@
 /* ===== RickC-ANIM 载入动画 ===== */
 #pageProgress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#3b82f6);z-index:9999;transition:width .18s ease,opacity .5s ease;box-shadow:0 0 8px rgba(59,130,246,.6)}
 #pageProgress.done{opacity:0;pointer-events:none}
-.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.25,.6,.3,1),transform .7s cubic-bezier(.25,.6,.3,1)}
+.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]{opacity:0;transform:translateY(14px);transition:opacity .5s cubic-bezier(.25,.6,.3,1),transform .5s cubic-bezier(.25,.6,.3,1)}
 .rk-reveal.rk-in{opacity:1;transform:none}
 }
 header{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -180,7 +180,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 <body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300">
     <!-- 顶部快捷导航栏 -->
         <div id="rk-navbar"></div>
-<script src="/assets/js/rk-navbar.js?v=20260927v11"></script>
+<script src="/assets/js/rk-navbar.js?v=20260927v12"></script>
     <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
         <!-- 侧边栏 个人信息 -->
         <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto sidebar-scroll pr-1">
@@ -403,10 +403,7 @@ backTopBtn.addEventListener('click', ()=>{
 })
 </script>
 
-<script>/* ===== RickC-ANIM 载入动画 ===== */
-(function(){if(window.__rkAnimLoaded)return;window.__rkAnimLoaded=true;var bar=document.createElement("div");bar.id="pageProgress";document.body.insertBefore(bar,document.body.firstChild);var p=0,done=false;var timer=setInterval(function(){if(done)return;p=Math.min(p+(100-p)*0.18+1.5,92);bar.style.width=p+"%";},120);function finish(){if(done)return;done=true;clearInterval(timer);bar.style.width="100%";setTimeout(function(){bar.classList.add("done");},350);setTimeout(function(){if(bar.parentNode)bar.parentNode.removeChild(bar);},1200);}if(document.readyState==="complete")finish();else window.addEventListener("load",finish);setTimeout(finish,4000);var SEL=".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]:not(.rk-reveal)";var els=function(){return Array.prototype.slice.call(document.querySelectorAll(SEL));};function reveal(){var list=els();if(!list.length)return;var idx=0;list.forEach(function(el){if(el.classList.contains("rk-in"))return;el.classList.add("rk-reveal");var r=el.getBoundingClientRect();if(r.top<window.innerHeight&&r.bottom>0){setTimeout(function(){el.classList.add("rk-in");},150+idx*120);idx++;}else{var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("rk-in");io.unobserve(en.target);}});},{rootMargin:"0px 0px -40px 0px",threshold:0.05});io.observe(el);}});}function start(){if(window.__rkStarted)return;window.__rkStarted=true;reveal();setTimeout(function(){els().forEach(function(el){el.classList.add("rk-in");});},5000);}if(document.readyState==="complete")setTimeout(start,150);else window.addEventListener("load",function(){setTimeout(start,150);});setTimeout(function(){start();},3000);if("MutationObserver" in window&&!window.__rkMo){window.__rkMo=new MutationObserver(function(muts){var need=false;muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if((n.matches&&n.matches(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]"))||(n.querySelectorAll&&n.querySelectorAll(".card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]").length))need=true;});});if(need)reveal();});window.__rkMo.observe(document.body,{childList:true,subtree:true});}})();
-/* ===== /RickC-ANIM ===== */
-</script>
+<script src="/assets/js/rk-anim.js?v=20260927v1"></script>
 
 <script>
 /* ===== RickC-HD 物理视口判定 ===== */
