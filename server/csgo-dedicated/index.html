@@ -42,8 +42,8 @@
             
 
         }
-            .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
-        .search-box input:focus { outline:none; border-color:#3b82f6; }
+            .search-box input { background:var(--rk-surface-1); border:1px solid var(--rk-border); border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:var(--rk-primary); }
         .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
         .search-box button:hover { background:#2563eb; }
             /* ===== 移动端通用优化 ===== */
@@ -141,20 +141,16 @@
 }
 /* ===== 全站统一渐变背景 ===== */
 body {
-    background-color: #0f172a;
-    background-image:
-        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.25), transparent 60%),
-        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
-        radial-gradient(ellipse 60% 50% at 50% 100%, rgba(14, 165, 233, 0.12), transparent 60%),
-        linear-gradient(180deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%) !important;
+    background-color: var(--rk-bg);
+    background-image: var(--rk-body-image);
     background-attachment: fixed;
 }
 .bg-cardbg {
     background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 40%),
                       linear-gradient(315deg, rgba(139, 92, 246, 0.06), transparent 40%);
 }
-        .search-box input { background:#0f172a; border:1px solid #334155; border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
-        .search-box input:focus { outline:none; border-color:#3b82f6; }
+        .search-box input { background:var(--rk-surface-1); border:1px solid var(--rk-border); border-radius:.55rem 0 0 .55rem; padding:.45rem .8rem; font-size:.82rem; color:#fff; width:100%; }
+        .search-box input:focus { outline:none; border-color:var(--rk-primary); }
         .search-box button { background:#3b82f6; color:#fff; border-radius:0 .55rem .55rem 0; padding:0 .8rem; cursor:pointer; }
         .search-box button:hover { background:#2563eb; }
             /* ===== 移动端通用优化 ===== */
@@ -197,7 +193,7 @@ header.phys-mobile .hd-mobile-menu.open{display:block !important}
 header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
-<!-- RickC-FALLBACK --><style>html.tw-fail body{color:#cbd5e1 !important;background-color:#0f172a !important}html.tw-fail a{color:#93c5fd}html.tw-fail .nav-link{color:#cbd5e1 !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:#60a5fa !important;background:rgba(59,130,246,.18)}html.tw-fail header{background-color:#1e293b !important;border-bottom:1px solid #334155}html.tw-fail .search-box input{background:#0f172a !important;border:1px solid #334155 !important;color:#fff !important}</style><!-- /RickC-FALLBACK -->
+<!-- RickC-FALLBACK --><style>html.tw-fail body{color:var(--rk-text) !important;background-color:var(--rk-bg) !important}html.tw-fail a{color:var(--rk-primary-hi)}html.tw-fail .nav-link{color:var(--rk-text) !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:var(--rk-primary-hi) !important;background:rgb(var(--rk-primary-rgb) / .18)}html.tw-fail header{background-color:var(--rk-card) !important;border-bottom:1px solid var(--rk-border)}html.tw-fail .search-box input{background:var(--rk-surface-1) !important;border:1px solid var(--rk-border) !important;color:var(--rk-title) !important}</style><!-- /RickC-FALLBACK -->
 <link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260927v21">
 <script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
