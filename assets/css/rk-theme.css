@@ -239,11 +239,17 @@ header.rk-header{
 @media (max-width:1023.98px){ header.rk-header{ font-size:15px; } }
 @media (max-width:639.98px){  header.rk-header{ font-size:14px; } }
 
+/* TASK-045 V1：顶栏宽度与 Tailwind container 完全一致的断点（左右内边距 1rem 对齐 px-4） */
 .rk-bar{
-  height:100%; max-width:1280px; margin:0 auto;
-  padding:0 1.25em;
+  height:100%; max-width:100%; margin:0 auto;
+  padding:0 1rem;
   display:flex; align-items:center; justify-content:space-between; gap:1.25em;
 }
+@media (min-width:640px){  .rk-bar{ max-width:640px;  } }
+@media (min-width:768px){  .rk-bar{ max-width:768px;  } }
+@media (min-width:1024px){ .rk-bar{ max-width:1024px; } }
+@media (min-width:1280px){ .rk-bar{ max-width:1280px; } }
+@media (min-width:1536px){ .rk-bar{ max-width:1536px; } }
 
 /* logo */
 .rk-logo{
@@ -289,6 +295,25 @@ header.rk-header{
 /* 右侧账户区 */
 .rk-actions{ display:flex; align-items:center; justify-content:flex-end; gap:.75em; flex:0 0 auto; white-space:nowrap; }
 .rk-actions a, .rk-actions span{ white-space:nowrap; }
+
+/* 深浅色切换按钮（TASK-045 V3：桌面与移动面板各一个实例，class 化） */
+.rk-theme-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.35em;
+  background:transparent; border:0; cursor:pointer;
+  color:var(--rk-text-dim); font-size:.9em; line-height:1;
+  padding:.4em .5em; border-radius:.5em; white-space:nowrap;
+  transition:background-color .2s, color .2s;
+}
+.rk-theme-btn:hover{ background:rgba(59,130,246,.16); color:var(--rk-primary-hi); }
+.rk-mobile .rk-theme-btn{
+  display:flex; width:100%; box-sizing:border-box;
+  align-items:center; gap:.6em;
+  padding:.62em .8em; margin-bottom:.5em;
+  border-radius:.55em;
+  background:var(--rk-veil); border:1px solid var(--rk-border);
+  color:var(--rk-text); font-size:.95em;
+}
+.rk-mobile .rk-theme-btn:hover{ background:rgba(59,130,246,.14); color:var(--rk-primary-hi); }
 .rk-write{
   display:inline-flex; align-items:center; gap:.3em;
   font-size:.75em; font-weight:600; line-height:1;
@@ -388,7 +413,8 @@ header.rk-header{
 
 /* 窄桌面 900~1149px：整条顶栏原本正好铺满（1024 时零余量），
    隐藏 logo 文字（保留图标）并收窄搜索框，把空间还给导航。 */
-@media (max-width:1149.98px){
+/* TASK-045 V4：logo 文字只在中间档 900~1149px 隐藏；手机端（<900px）恢复显示文字 */
+@media (min-width:900px) and (max-width:1149.98px){
   .rk-logo span{ display:none; }
   .rk-search{ width:9em; }
   .rk-bar{ gap:1em; }
@@ -439,6 +465,8 @@ pre.cmd-block .token.attr-name, #articleBody pre .token.attr-name{ color:#fbbf24
 pre.cmd-block .token.atrule, #articleBody pre .token.atrule{ color:#f472b6; }
 
 /* ---- 复制按钮（rk-code.js） ---- */
+/* TASK-045 V2：渲染器生成的普通 <pre><code> 没有相对定位，绝对定位按钮会逃逸到视口 —— 加类兜底 */
+pre.rk-pre{ position:relative; }
 .rk-copy-btn{
   position:absolute; top:.5rem; right:.6rem; z-index:5;
   display:inline-flex; align-items:center; gap:.35rem;

@@ -69,6 +69,7 @@
       if (typeof Prism === 'undefined' || !Prism.highlightElement || hasHandSpans(pre)) {
         /* 降级或保留手写 span：只加复制按钮 */
         if (!pre.querySelector('.rk-copy-btn')) {
+          pre.classList.add('rk-pre'); /* TASK-045 V2：给插入按钮的 pre 加相对定位类 */
           var b0 = document.createElement('button');
           b0.type = 'button';
           b0.className = 'rk-copy-btn';
@@ -95,6 +96,7 @@
       }
       try { Prism.highlightElement(codeEl); } catch (e) {}
       if (!pre.querySelector('.rk-copy-btn')) {
+        pre.classList.add('rk-pre'); /* TASK-045 V2：给插入按钮的 pre 加相对定位类 */
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'rk-copy-btn';

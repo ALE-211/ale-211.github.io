@@ -78,13 +78,16 @@
     }
     function themeBtnIcon(t) { return t === 'light' ? 'fa-sun-o' : 'fa-moon-o'; }
     function updateThemeBtn() {
-        var b = document.getElementById('rkThemeBtn');
-        if (!b) { return; }
+        var bs = document.querySelectorAll('.rk-theme-btn');
+        if (!bs.length) { return; }
         var t = shownTheme();
-        b.innerHTML = '<i class="fa ' + themeBtnIcon(t) + '"></i>';
         var next = t === 'dark' ? '浅色' : '深色';
-        b.setAttribute('aria-label', '切换到' + next);
-        b.title = '当前' + (t === 'dark' ? '深色' : '浅色') + '，点击切换' + next + '（长按恢复跟随系统）';
+        bs.forEach(function (b) {
+            var mobile = b.classList.contains('rk-m');
+            b.innerHTML = '<i class="fa ' + themeBtnIcon(t) + '"></i>' + (mobile ? '切换深浅色' : '');
+            b.setAttribute('aria-label', '切换到' + next);
+            b.title = '当前' + (t === 'dark' ? '深色' : '浅色') + '，点击切换' + next + '（长按恢复跟随系统）';
+        });
     }
 
     function isActive(n) {
@@ -125,7 +128,7 @@
                 '<nav class="rk-nav" id="rkNav" aria-label="主导航">' + navLinks() + '</nav>' +
                 searchBox() +
                 '<div class="rk-actions">' +
-                    '<button type="button" id="rkThemeBtn" class="rk-theme-btn" aria-label="切换深浅色"><i class="fa fa-adjust"></i></button>' +
+                    '<button type="button" class="rk-theme-btn" aria-label="切换深浅色"><i class="fa fa-adjust"></i></button>' +
                     '<a id="rkWriteDesktop" href="/blog/admin.html" class="rk-write" style="display:none">' +
                         '<i class="fa fa-pencil"></i>写文章</a>' +
                     '<span id="rkUserDesktop"></span>' +
@@ -137,6 +140,7 @@
             '<div class="rk-mobile" id="rkMobile">' +
                 searchBox() +
                 '<div id="rkUserMobile"></div>' +
+                '<button type="button" class="rk-theme-btn rk-m" aria-label="切换深浅色"><i class="fa fa-adjust"></i>切换深浅色</button>' +
                 '<a id="rkWriteMobile" href="/blog/admin.html" class="rk-write" style="display:none">' +
                     '<i class="fa fa-pencil"></i>写文章</a>' +
                 '<div class="rk-mobile-sep"></div>' +
@@ -178,9 +182,9 @@
             if ((e.key === 'Escape' || e.keyCode === 27) && panel && panel.classList.contains('open')) { close(); }
         });
 
-        /* 主题按钮：单击 = 浅/深互换；长按 ≈600ms = 恢复跟随系统 */
-        var tb = document.getElementById('rkThemeBtn');
-        if (tb) {
+        /* 主题按钮（桌面 + 移动双实例）：单击 = 浅/深互换；长按 ≈600ms = 恢复跟随系统 */
+        var tbs = document.querySelectorAll('.rk-theme-btn');
+        tbs.forEach(function (tb) {
             var lpTimer = null;
             var longPress = false;
             var cancelLP = function () { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
@@ -204,7 +208,7 @@
             } else {
                 tb.addEventListener('click', function () { themeToggle(); updateThemeBtn(); });
             }
-        }
+        });
         /* 跟随系统：仅当用户未手动选择（storedTheme()===null）时跟随变化 */
         if (window.matchMedia) {
             var cmq = window.matchMedia('(prefers-color-scheme: dark)');
