@@ -198,6 +198,19 @@ html body{
 html .bg-cardbg{ background-image:var(--rk-card-image) !important; }
 html .bg-cardbg{ border-top:1px solid rgba(255,255,255,.05); }
 
+/* ---- 粘性底栏（TASK-053）：内容不足一屏时把底栏顶到视口底部 ----
+   站长反馈「底边栏声明也飞起来了」：实测 blog/post.php 底栏在 1050px 处、视口 1400px，
+   下面还空着 350px 底色 ⇒ 底栏"悬"在屏幕中间（MC 教程页内容长，所以看不出来）。
+   让 main 作为 flex 项吃满剩余高度即可把 footer 压到底部。
+   ⚠️ 不要改成为 footer 加 margin-top:auto —— `.mt-12` 是 class（特异性 0,1,0）会压过
+   元素选择器，且长页面会丢掉底栏与正文之间的间距。 */
+html body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+html body > main{ flex:1 0 auto; }
+
 /* ---- 主题切换按钮（rk-navbar.js 注入） ---- */
 .rk-theme-btn{
   display:inline-flex; align-items:center; justify-content:center;
