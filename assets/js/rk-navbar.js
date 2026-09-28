@@ -306,6 +306,16 @@
         el.style.display = '';
     }
 
+    /* 全站键盘快捷键（TASK-087）：由导航栏统一注入，避免 25+ 页面各引一份 */
+    function loadKeys() {
+        if (window.RK_MIRROR) { return; }        /* 镜像站无搜索后端，快捷键纯增强不参与 */
+        if (document.getElementById('rk-keys-script')) { return; }
+        var s = document.createElement('script');
+        s.id = 'rk-keys-script';
+        s.src = '/assets/js/rk-keys.js?v=20260928v1';
+        document.head.appendChild(s);
+    }
+
     var mounted = false;
     function render() {
         if (mounted) { return true; }
@@ -317,6 +327,7 @@
         fillAccount();
         updateThemeBtn();
         mirrorNotice();
+        loadKeys();
         return true;
     }
 
