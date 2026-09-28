@@ -316,6 +316,55 @@
         document.head.appendChild(s);
     }
 
+    /* TASK-091：移动端底部 tab（<900px 固定显示：首页/博客/下载/服务器/我的）
+       桌面端（>=900px）完全不显示；body 预留等高 padding 防遮挡；热区 >=44px；iOS 底部横条安全区。 */
+    function bottomTab() {
+        if (document.getElementById('rkTabbar')) { return; }
+        var st = document.createElement('style');
+        st.textContent = '' +
+            '.rk-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9995;display:none;' +
+            'background:var(--rk-card);border-top:1px solid var(--rk-border);' +
+            'padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -6px 20px rgba(0,0,0,.08)}' +
+            '.rk-tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+            'gap:2px;min-height:54px;font-size:11px;color:var(--rk-text);text-decoration:none;' +
+            'transition:color .2s}' +
+            '.rk-tabbar a i{font-size:17px;line-height:1}' +
+            '.rk-tabbar a.active{color:var(--rk-primary)}' +
+            '@media (max-width:899.98px){' +
+            'body.rk-has-tab{padding-bottom:calc(56px + env(safe-area-inset-bottom))}' +
+            '.rk-tabbar{display:flex}' +
+            '}';
+        document.head.appendChild(st);
+        var mine = MIRROR ? MAIN + '/auth/login.html' : '/auth/login.html';
+        var tab = document.createElement('nav');
+        tab.id = 'rkTabbar';
+        tab.className = 'rk-tabbar';
+        tab.setAttribute('aria-label', '底部导航');
+        function link(href, icon, label, act) {
+            var a = document.createElement('a');
+            a.href = href;
+            a.innerHTML = '<i class="fa ' + icon + '"></i><span>' + label + '</span>';
+            if (act) a.className = 'active';
+            return a;
+        }
+        var p = PATH;
+        tab.appendChild(link('/index.html', 'fa-home', '首页', p === '/' || p === '/index.html'));
+        tab.appendChild(link('/blog/', 'fa-pencil-square-o', '博客', p.indexOf('/blog') === 0 && p !== '/blog/tools.php' && p !== '/blog/dashboard.php' && p !== '/blog/media.php' && p !== '/blog/admin.html'));
+        tab.appendChild(link('/download/index.html', 'fa-download', '下载', p.indexOf('/download/') === 0));
+        tab.appendChild(link('/server/index.html', 'fa-server', '服务器', p.indexOf('/server/') === 0));
+        var mineA = link(mine, 'fa-user', '我的', p.indexOf('/auth/account.html') === 0);
+        mineA.id = 'rkTabMine';
+        tab.appendChild(mineA);
+        document.body.appendChild(tab);
+        document.body.classList.add('rk-has-tab');
+        /* 登录后把「我的」指向账户管理（fillAccount 异步完成前保持登录页） */
+        if (!MIRROR) {
+            fetch('/auth/status.php', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (s) {
+                if (s && s.logged_in) { mineA.href = '/auth/account.html'; }
+            }).catch(function () {});
+        }
+    }
+
     var mounted = false;
     function render() {
         if (mounted) { return true; }
@@ -328,6 +377,7 @@
         updateThemeBtn();
         mirrorNotice();
         loadKeys();
+        bottomTab();
         return true;
     }
 
