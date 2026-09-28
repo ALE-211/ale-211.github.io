@@ -209,7 +209,15 @@ html body{
   display:flex;
   flex-direction:column;
 }
-html body > main{ flex:1 0 auto; }
+html body > main{ flex:1 0 auto; width:100%; }
+/* ⚠️ TASK-074 关键修复（2026-09-27 DeepSeek）：
+   上面 `html body{display:flex;flex-direction:column}` 让 <main> 变成了 flex 项，
+   而本站所有页面的 main 都带 `max-w-6xl mx-auto` —— **auto 外边距会让 flex 项失去
+   align-items:stretch，变成「按内容收缩」**，于是 main 的宽度由当前内容决定：
+   内容少的页面（如个人中心的「权限信息」）窄、内容多的页面宽，**切栏目时整页宽度都在跳**
+   （站长报"每个栏目宽度都不一样 / 卡片左右边缘不在同一条竖线上"）。
+   `width:100%` 让它恢复成「撑满父级、但不超过 max-w-6xl、再由 mx-auto 居中」的原始意图。
+   ⚠️ 不要删这一行，也不要把上面的 body 改回 block（那会让粘性底栏失效）。 */
 
 /* ---- 主题切换按钮（rk-navbar.js 注入） ---- */
 .rk-theme-btn{
