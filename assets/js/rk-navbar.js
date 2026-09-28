@@ -306,6 +306,16 @@
         el.style.display = '';
     }
 
+    /* 正文图片灯箱（TASK-077）：由导航栏统一注入；仅对文章正文容器生效 */
+    function loadLightbox() {
+        if (window.RK_MIRROR) { return; }
+        if (document.getElementById('rk-lightbox-script')) { return; }
+        var s = document.createElement('script');
+        s.id = 'rk-lightbox-script';
+        s.src = '/assets/js/rk-lightbox.js?v=20260928v1';
+        document.head.appendChild(s);
+    }
+
     /* 全站键盘快捷键（TASK-087）：由导航栏统一注入，避免 25+ 页面各引一份 */
     function loadKeys() {
         if (window.RK_MIRROR) { return; }        /* 镜像站无搜索后端，快捷键纯增强不参与 */
@@ -377,6 +387,7 @@
         updateThemeBtn();
         mirrorNotice();
         loadKeys();
+        loadLightbox();
         bottomTab();
         return true;
     }
