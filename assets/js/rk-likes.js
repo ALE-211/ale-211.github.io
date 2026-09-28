@@ -1,6 +1,6 @@
 /* ============================================================
-   rk-likes.js —— 文章点赞 widget（TASK-068 共享唯一来源）
-   建立者：Doubao MainAgent ｜ 2026-09-27
+   rk-likes.js —— 文章点赞 + 收藏 widget（TASK-068/070 共享唯一来源）
+   建立者：Doubao MainAgent ｜ 2026-09-27（070 扩展双按钮）
 
    用法：
        <div id="rkLikes" data-post-id="12"></div>
@@ -8,6 +8,7 @@
 
    安全约定（与 api_likes.php 配套）：
      · 挂载点不套卡片容器（TASK-053 教训：容器别当框用）
+     · 点赞/收藏两个按钮各自独立，状态一律取接口返回真值（不硬写）
      · 未登录点击 → 提示请先登录并跳登录页，不产生记录
      · 失败只提示不报错；镜像站（window.RK_MIRROR）直接禁用
    ============================================================ */
@@ -23,11 +24,6 @@
     var API = '/blog/api_likes.php';
     var LOGIN = '/auth/login.html';
 
-    function esc(s) {
-        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
     function el(tag, cls, text) {
         var n = document.createElement(tag);
         if (cls) { n.className = cls; }
@@ -62,43 +58,69 @@
             });
         });
     }
+    function gotoLogin() {
+        toast('请先登录', true);
+        setTimeout(function () {
+            location.href = LOGIN + '?next=' + encodeURIComponent(location.pathname + location.search);
+        }, 900);
+    }
 
-    function render(count, liked) {
+    var state = { count: 0, liked: false, fav_count: 0, faved: false };
+    var btnLike, btnFav, spanLike, spanFav;
+
+    function render() {
         root.innerHTML = '';
-        var btn = el('button', 'rk-l-btn' + (liked ? ' rk-l-btn-on' : ''), '');
-        var icon = el('i', 'fa ' + (liked ? 'fa-heart' : 'fa-heart-o'));
-        btn.appendChild(icon);
-        btn.appendChild(el('span', 'rk-l-count', String(count)));
-        btn.title = liked ? '取消点赞' : '点赞';
-        btn.onclick = function () { toggle(); };
-        root.appendChild(btn);
+        var row = el('div', 'rk-l-row');
+        /* 点赞（心形） */
+        btnLike = el('button', 'rk-l-btn' + (state.liked ? ' rk-l-btn-on' : ''), '');
+        var iconLike = el('i', 'fa ' + (state.liked ? 'fa-heart' : 'fa-heart-o'));
+        spanLike = el('span', 'rk-l-count', String(state.count));
+        btnLike.appendChild(iconLike);
+        btnLike.appendChild(spanLike);
+        btnLike.title = state.liked ? '取消点赞' : '点赞';
+        btnLike.onclick = function () { toggle('toggle', 'liked', 'count', spanLike, btnLike, '点赞'); };
+        row.appendChild(btnLike);
+        /* 收藏（书签） */
+        btnFav = el('button', 'rk-l-btn' + (state.faved ? ' rk-l-btn-on' : ''), '');
+        var iconFav = el('i', 'fa ' + (state.faved ? 'fa-bookmark' : 'fa-bookmark-o'));
+        spanFav = el('span', 'rk-l-count', String(state.fav_count));
+        btnFav.appendChild(iconFav);
+        btnFav.appendChild(spanFav);
+        btnFav.title = state.faved ? '取消收藏' : '收藏';
+        btnFav.onclick = function () { toggle('fav_toggle', 'faved', 'fav_count', spanFav, btnFav, '收藏'); };
+        row.appendChild(btnFav);
+        root.appendChild(row);
+    }
+
+    function toggle(action, key, countKey, span, btn, label) {
+        api(action).then(function (j) {
+            if (j.ok) {
+                state[key] = !!j[key];
+                state[countKey] = j[countKey] || 0;
+                span.textContent = String(state[countKey]);
+                btn.classList.toggle('rk-l-btn-on', state[key]);
+                btn.title = state[key] ? '取消' + label : label;
+                return;
+            }
+            if (j.status === 401) { gotoLogin(); return; }
+            toast(j.error || '操作失败', true);
+            load();
+        });
     }
 
     function load() {
-        fetch(API + '?action=count&post_id=' + postId, { cache: 'no-store' })
-            .then(function (r) { return r.json(); })
-            .then(function (j) {
-                if (!j.ok) { return; }
-                /* TASK-070：原来这里写死 false，导致刷新/重载后高亮永远熄灭，
-                   而计数照旧 —— 高亮与计数两套状态各说各话（站长报的"一团浆糊"）。
-                   现在接口会回 liked，照它渲染，高亮才是可信的。 */
-                render(j.count || 0, !!j.liked);
-            })
-            .catch(function () {});
-    }
-
-    function toggle() {
-        api('toggle').then(function (j) {
-            if (j.ok) { render(j.count, !!j.liked); return; }
-            if (j.status === 401) {
-                toast('请先登录', true);
-                setTimeout(function () {
-                    location.href = LOGIN + '?next=' + encodeURIComponent(location.pathname + location.search);
-                }, 900);
-                return;
-            }
-            toast(j.error || '操作失败', true);
-            load();
+        /* 两个接口并行拉取，状态都取接口真值（不硬写） */
+        var c1 = fetch(API + '?action=count&post_id=' + postId, { cache: 'no-store' })
+            .then(function (r) { return r.json(); }).catch(function () { return {}; });
+        var c2 = fetch(API + '?action=fav_count&post_id=' + postId, { cache: 'no-store' })
+            .then(function (r) { return r.json(); }).catch(function () { return {}; });
+        Promise.all([c1, c2]).then(function (rs) {
+            var a = rs[0] || {}, b = rs[1] || {};
+            state.count = a.count || 0;
+            state.liked = !!a.liked;
+            state.fav_count = b.fav_count || 0;
+            state.faved = !!b.faved;
+            render();
         });
     }
 
