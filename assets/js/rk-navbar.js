@@ -316,6 +316,35 @@
         document.head.appendChild(s);
     }
 
+    /* 站点公告栏（TASK-084）：读取 blog/api_announce.php，生效期内显示公告条；关闭后 localStorage 记住 */
+    function loadAnnounce() {
+        if (window.RK_MIRROR) { return; }
+        fetch('/blog/api_announce.php?action=get', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+            if (!d || !d.ok || !d.enabled || !d.content) { return; }
+            try { if (localStorage.getItem('rk-announce-closed') === '1') { return; } } catch (e) {}
+            var st = document.getElementById('rkAnnounceStyle');
+            if (!st) {
+                st = document.createElement('style');
+                st.id = 'rkAnnounceStyle';
+                st.textContent = '#rkAnnounceBar{position:fixed;top:0;left:0;right:0;z-index:9990;background:var(--rk-primary);color:#fff;font-size:.8rem;padding:.4rem 1rem;display:flex;align-items:center;justify-content:center;gap:.6rem;box-shadow:0 2px 10px rgba(0,0,0,.18)}#rkAnnounceBar .rk-announce-text{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#rkAnnounceBar .rk-announce-close{background:none;border:0;color:#fff;cursor:pointer;font-size:.9rem;margin-left:auto;padding:0 .2rem}body.rk-has-announce header{top:34px !important}';
+                document.head.appendChild(st);
+            }
+            var bar = document.createElement('div');
+            bar.id = 'rkAnnounceBar';
+            bar.innerHTML = '<i class="fa fa-bullhorn"></i><span class="rk-announce-text"></span><button class="rk-announce-close" title="关闭">✕</button>';
+            bar.querySelector('.rk-announce-text').textContent = d.content;
+            bar.querySelector('.rk-announce-close').addEventListener('click', function () {
+                bar.remove();
+                document.body.classList.remove('rk-has-announce');
+                try { localStorage.setItem('rk-announce-closed', '1'); } catch (e) {}
+            });
+            var hdr = document.querySelector('header');
+            if (hdr && hdr.parentNode) { hdr.parentNode.insertBefore(bar, hdr); }
+            else { document.body.insertBefore(bar, document.body.firstChild); }
+            document.body.classList.add('rk-has-announce');
+        }).catch(function () {});
+    }
+
     /* 全站键盘快捷键（TASK-087）：由导航栏统一注入，避免 25+ 页面各引一份 */
     function loadKeys() {
         if (window.RK_MIRROR) { return; }        /* 镜像站无搜索后端，快捷键纯增强不参与 */
@@ -388,6 +417,7 @@
         mirrorNotice();
         loadKeys();
         loadLightbox();
+        loadAnnounce();
         bottomTab();
         return true;
     }

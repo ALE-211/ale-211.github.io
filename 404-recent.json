@@ -1,0 +1,32 @@
+[
+    {
+        "title": "测试文章",
+        "url": "\/blog\/post.php?slug=%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0",
+        "section": "home",
+        "date": "2026-09-27 10:58:19"
+    },
+    {
+        "title": "飞牛OS 重装 Tesla M40 驱动（580 → 535）",
+        "url": "\/board\/nvidia-tesla-m40\/index.html",
+        "section": "dev",
+        "date": "2026-09-10 00:00:00"
+    },
+    {
+        "title": "Windows CS:GO 128tick 开服教程",
+        "url": "\/server\/csgo-dedicated\/index.html",
+        "section": "server",
+        "date": "2026-09-08 00:00:00"
+    },
+    {
+        "title": "CS:GO 联机教程（legacy 版本 + 控制台 connect）",
+        "url": "\/server\/csgo\/index.html",
+        "section": "server",
+        "date": "2026-09-05 00:00:00"
+    },
+    {
+        "title": "本站 Minecraft 服务器联机指南（Age of Engineering）",
+        "url": "\/server\/minecraft\/index.html",
+        "section": "server",
+        "date": "2026-09-01 00:00:00"
+    }
+]

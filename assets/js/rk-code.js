@@ -13,6 +13,11 @@
 (function () {
   'use strict';
 
+  /* ---- TASK-086：语言标签样式（左上角；复制按钮在右上角，互不重叠） ---- */
+  var langStyle = document.createElement('style');
+  langStyle.textContent = 'pre.rk-pre .rk-lang-tag{position:absolute;top:.55rem;left:.6rem;z-index:2;font-size:.68rem;line-height:1;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:rgba(148,163,184,.9);background:rgba(30,41,59,.55);border:1px solid rgba(148,163,184,.25);border-radius:4px;padding:.28rem .5rem;pointer-events:none}@media(prefers-color-scheme:light){pre.rk-pre .rk-lang-tag{color:rgba(71,85,105,.85);background:rgba(226,232,240,.8);border-color:rgba(100,116,139,.3)}}pre.rk-pre{padding-top:2.6rem !important}';
+  document.head.appendChild(langStyle);
+
   /* ---- 轻量 toast ---- */
   var toastEl = null;
   function toast(msg) {
@@ -64,6 +69,20 @@
     return !!pre.querySelector('span');
   }
 
+  /* ---- TASK-086：语言标签（从 code.className 或启发式判定） ---- */
+  function langOf(pre, codeEl) {
+    var m = /(^|\s)language-([\w-]+)/.exec(codeEl && codeEl.className ? String(codeEl.className) : '');
+    if (m) { return m[2]; }
+    return guessLang(pre.innerText || '');
+  }
+  function addLangTag(pre, codeEl) {
+    if (pre.querySelector('.rk-lang-tag')) { return; }
+    var t = document.createElement('span');
+    t.className = 'rk-lang-tag';
+    t.textContent = langOf(pre, codeEl);
+    pre.appendChild(t);
+  }
+
   function enhancePre(pre) {
     try {
       if (typeof Prism === 'undefined' || !Prism.highlightElement || hasHandSpans(pre)) {
@@ -76,6 +95,7 @@
           b0.innerHTML = '<i class="fa fa-copy"></i>复制';
           b0.addEventListener('click', function () { copyText(pre.innerText, b0); });
           pre.appendChild(b0);
+          addLangTag(pre, pre.querySelector('code'));
         }
         return;
       }
@@ -103,6 +123,7 @@
         b.innerHTML = '<i class="fa fa-copy"></i>复制';
         b.addEventListener('click', function () { copyText(pre.innerText, b); });
         pre.appendChild(b);
+        addLangTag(pre, codeEl);
       }
     } catch (e) { /* 任何异常都不影响页面 */ }
   }
