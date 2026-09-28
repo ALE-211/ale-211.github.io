@@ -442,7 +442,13 @@ header.rk-header{
 }
 
 /* 中文防竖排兜底：任何按钮/标签类元素都不逐字换行 */
-.rk-nowrap, .rk-nav a, .rk-actions a, .rk-write, .rk-burger, .rk-nav-m a, .rk-mobile a, .pill, .badge, .btn-g, .btn-p, .btn-d, .tbl th, .tbl td{ white-space:nowrap; }
+.rk-nowrap, .rk-nav a, .rk-actions a, .rk-write, .rk-burger, .rk-nav-m a, .rk-mobile a, .pill, .badge, .btn-g, .btn-p, .btn-d, .tbl th{ white-space:nowrap; }
+/* ⚠️ TASK-075（2026-09-27 DeepSeek）：**绝对不要**再给 `.tbl td` 加 `white-space:nowrap`！
+   那会把表格的「最小内容宽度」撑到超过卡片宽度 ⇒ 底部出现横向滚动条、最后一列被截断
+   （站长截图报「不好看」就是这个）。表头 nowrap 没问题，
+   **正文单元格必须允许换行**；确需单行省略号的地方请按单元格单独写
+   （例：auth/admin.html 的 `#sec-users .tbl td:first-child`）。 */
+.tbl td{ white-space:normal; overflow-wrap:anywhere; }
 
 /* Tailwind 未加载时的兜底（保留旧机制，但不再承担基础文字色） */
 html.tw-fail header.rk-header{ background-color:var(--rk-card) !important; border-bottom:1px solid var(--rk-border) !important; }
