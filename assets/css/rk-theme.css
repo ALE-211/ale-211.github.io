@@ -584,7 +584,7 @@ pre.rk-pre{ position:relative; }
 .rk-anchor::after{content:'#'}
 
 /* ===== TASK-095：浮动竖排圆按钮（类 B 站，但是竖的、随时可点）+ 标题栏信息行 ===== */
-.rk-fab{position:fixed;right:max(14px,calc(50vw - 595px));top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.rk-fab{position:fixed;right:max(14px,calc(50vw - 623px));bottom:7.5rem;z-index:60;display:flex;flex-direction:column;align-items:center;gap:.7rem}
 .rk-fab .rk-l-row{flex-direction:column;gap:.7rem;align-items:center}
 .rk-fab .rk-l-btn{width:3.6rem;height:3.6rem;border-radius:9999px;flex-direction:column;gap:.02rem;padding:0;justify-content:center;font-size:.62rem;font-weight:600;box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
 .rk-fab .rk-l-btn i{font-size:1.4rem;line-height:1}
@@ -607,11 +607,15 @@ pre.rk-pre{ position:relative; }
 .rk-meta i{opacity:.85}
 /* ===== /TASK-095 ===== */
 /* TASK-095b：回到顶部也贴紧正文卡右边缘并放大（与 .rk-fab 同一条竖线；<1024px 回落 14px） */
-#backTopBtn{right:max(14px,calc(50vw - 595px));width:3.4rem;height:3.4rem;display:inline-flex;align-items:center;justify-content:center}
+#backTopBtn{right:max(14px,calc(50vw - 623px));bottom:1.75rem;width:3.4rem;height:3.4rem;display:inline-flex;align-items:center;justify-content:center}
 #backTopBtn i{font-size:1.15rem}
-/* TASK-095c：按下断点精确贴紧正文卡右边缘。
-   main 是 container（宽度随视口变：1024 / 1280 / 1536），卡片右边缘 = main右 - 1rem(17px)，
-   所以 right = 50vw - (main宽/2 - 17)。三种宽度各一条，宽屏才不会陷进卡片里。 */
-@media (min-width:1024px) and (max-width:1279.98px){ .rk-fab, #backTopBtn{ right: max(14px, calc(50vw - 495px)); } }
-@media (min-width:1280px) and (max-width:1535.98px){ .rk-fab, #backTopBtn{ right: max(14px, calc(50vw - 623px)); } }
-@media (min-width:1536px){ .rk-fab, #backTopBtn{ right: calc(50vw - 751px); } }
+/* TASK-095d：按钮组贴「正文卡外侧·右下角」。
+   main 是 container（1024/1280/1536 三档），卡片右边缘 = 50vw + main宽/2 − 17。
+   外侧位（按钮整体在卡片右边）：right = 50vw − main宽/2 − 56（含 12px 间隔 + 61px 按钮宽）；
+   仅当右侧留白 ≥73px 时用外侧，否则回落卡片内缘，避免按钮溢出屏幕或压在正文上。 */
+@media (min-width:1136px) and (max-width:1279.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 568px); } }   /* main=1024 外侧 */
+@media (min-width:1392px) and (max-width:1535.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 696px); } }   /* main=1280 外侧 */
+@media (min-width:1648px){ .rk-fab, #backTopBtn{ right: calc(50vw - 824px); } }                            /* main=1536 外侧 */
+@media (min-width:1024px) and (max-width:1135.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 495px); } }   /* main=1024 内缘 */
+@media (min-width:1280px) and (max-width:1391.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 623px); } }   /* main=1280 内缘 */
+@media (min-width:1536px) and (max-width:1647.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 751px); } }   /* main=1536 内缘 */
