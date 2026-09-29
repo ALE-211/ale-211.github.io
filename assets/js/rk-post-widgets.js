@@ -85,4 +85,97 @@
         .then(function (r) { return r.json(); })
         .then(function (d) { if (d && d.ok) { renderCard(d.author, d.author && d.author.stats); } })
         .catch(function () {});
+/* ================= TASK-094：静态教程页补齐「文章页那套」功能 =================
+   静态页没有 PHP，所以：阅读时长前端算、相关教程用 static_posts.json（**零 DB 依赖**，镜像站也可用）。
+   全部幂等：文章页有它自己的实现，这里只补静态页缺的部分。 */
+(function () {
+    /* ① 阅读进度条（文章页已自建 #rkReadBar，这里只在缺失时创建） */
+    if (!document.getElementById('rkReadBar')) {
+        var rb = document.createElement('div');
+        rb.id = 'rkReadBar';
+        document.body.appendChild(rb);
+        var upd = function () {
+            var h = document.documentElement.scrollHeight - window.innerHeight;
+            rb.style.width = (h > 0 ? Math.min(100, window.scrollY / h * 100) : 0) + '%';
+        };
+        window.addEventListener('scroll', upd, { passive: true });
+        window.addEventListener('resize', upd, { passive: true });
+        upd();
+    }
+
+    /* ② 预计阅读时长（文章页由 PHP 算；静态页前端算：汉字数÷400 + 图片×0.2，最少 1 分钟） */
+    var art = document.querySelector('article');
+    if (art && !document.querySelector('.rk-readmin')) {
+        var txt = (art.innerText || '').replace(/\s+/g, '');
+        var han = (txt.match(/[\u4e00-\u9fa5]/g) || []).length;
+        var imgs = art.querySelectorAll('img').length;
+        var mins = Math.max(1, Math.round(han / 400 + imgs * 0.2));
+        var h1 = art.querySelector('h1');
+        if (h1) {
+            var rm = document.createElement('div');
+            rm.className = 'rk-readmin';
+            rm.innerHTML = '<i class="fa fa-clock-o"></i>全文约 ' + han + ' 字 · 预计阅读 ' + mins + ' 分钟';
+            h1.parentNode.insertBefore(rm, h1.nextSibling);
+        }
+    }
+
+    /* ③ 标题锚点复制（静态页正文不叫 #articleBody，共享 CSS 已同时覆盖 article 选择器） */
+    if (art) {
+        Array.prototype.forEach.call(art.querySelectorAll('h2[id],h3[id]'), function (h) {
+            if (h.querySelector('.rk-anchor')) { return; }
+            var a = document.createElement('a');
+            a.className = 'rk-anchor';
+            a.href = '#' + h.id;
+            /* TASK-094：'#' 改由 .rk-anchor::after 画，不放文本节点 —— 否则会被 rk-toc 的 innerText 收进目录文字 */
+            a.title = '复制该标题链接';
+            a.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                var url = location.origin + location.pathname + '#' + h.id;
+                try { history.replaceState(null, '', '#' + h.id); } catch (e) { }
+                if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+            });
+            h.appendChild(a);
+        });
+    }
+
+    /* ④ 分享按钮（文章页有自己的处理；这里只接管尚未绑定的） */
+    var sh = document.getElementById('rkShareBtn');
+    if (sh && !sh.dataset.rkBound) {
+        sh.dataset.rkBound = '1';
+        sh.addEventListener('click', function () {
+            var url = location.origin + location.pathname;
+            var done = function () {
+                sh.innerHTML = '<i class="fa fa-check"></i><span class="rk-l-count">已复制</span>';
+                setTimeout(function () { sh.innerHTML = '<i class="fa fa-share-alt"></i><span class="rk-l-count">分享</span>'; }, 1500);
+            };
+            if (navigator.clipboard) { navigator.clipboard.writeText(url).then(done, done); } else { done(); }
+        });
+    }
+
+    /* ⑤ 相关教程：同 section 的其它静态页（数据来自 static_posts.json），插到评论区上方 */
+    var cm = document.getElementById('rkComments');
+    if (cm && !document.querySelector('.rk-rel-wrap')) {
+        fetch('/blog/static_posts.json', { cache: 'no-store' })
+            .then(function (r) { return r.json(); })
+            .then(function (list) {
+                if (!Array.isArray(list)) { return; }
+                var here = location.pathname.replace(/\/$/, '/index.html');
+                var me = list.filter(function (x) { return x.url === here; })[0];
+                var sec = me ? me.section : '';
+                var rel = list.filter(function (x) { return x.url !== here && (!sec || x.section === sec); }).slice(0, 6);
+                if (!rel.length) { rel = list.filter(function (x) { return x.url !== here; }).slice(0, 6); }
+                if (!rel.length) { return; }
+                var box = document.createElement('div');
+                box.className = 'rk-rel-wrap';
+                box.innerHTML = '<h3><i class="fa fa-th-large text-primary mr-1"></i>相关教程</h3><ul>' +
+                    rel.map(function (x) {
+                        return '<li><a href="' + x.url + '">' + (x.title || x.url) + '</a>' +
+                            (x.section ? '<span class="rk-rel-sec">' + x.section + '</span>' : '') + '</li>';
+                    }).join('') + '</ul>';
+                cm.parentNode.insertBefore(box, cm);
+            })
+            .catch(function () { });
+    }
+})();
+
 })();

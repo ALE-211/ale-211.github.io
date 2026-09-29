@@ -19,7 +19,8 @@
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.href = '#' + h.id;
-      a.textContent = h.innerText;
+      /* TASK-094：去掉标题内锚点带来的尾部 #，避免目录项显示成「章节名#」 */
+    a.textContent = String(h.innerText || '').replace(/\s*#\s*$/, '');
       a.className = 'block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight';
       li.appendChild(a);
       list.appendChild(li);

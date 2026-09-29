@@ -549,3 +549,36 @@ pre.rk-pre{ position:relative; }
   .rk-c-avatar{ width:1.9rem; height:1.9rem; }
   .rk-c-replies{ padding-left:.55rem; }
 }
+
+/* ===== TASK-094：点赞/收藏/分享/阅读进度/标题锚点 —— 从 blog/post.php 的内联样式抽到共享唯一来源
+   （原先这些只写在 post.php 里，导致静态教程页挂上同样结构后**没有任何样式**） ===== */
+.rk-l-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:9999px;font-size:.8rem;font-weight:600;color:var(--rk-text);background:var(--rk-surface-1);border:1px solid var(--rk-border);cursor:pointer;transition:all .15s;font-family:inherit}
+.rk-l-btn:hover{border-color:var(--rk-primary);color:var(--rk-primary-hi)}
+.rk-l-btn-on{color:var(--rk-primary-hi);border-color:var(--rk-primary);background:rgb(var(--rk-primary-rgb)/.12)}
+.rk-l-count{font-variant-numeric:tabular-nums}
+.rk-l-row{display:inline-flex;gap:.5rem;align-items:center}
+.rk-l-rail{display:flex;justify-content:center;margin-top:1.5rem}
+@media (min-width:1024px){
+  .rk-l-rail{margin-top:0;width:4rem;justify-content:flex-start}
+  .rk-l-row{flex-direction:column;gap:.6rem}
+}
+/* 静态教程页用：正文下方一行横排（不占栅格列，避免改动页面布局） */
+.rk-l-bar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:center;margin-top:1.25rem}
+#rkReadBar{position:fixed;top:4px;left:0;height:2px;width:0;background:var(--rk-primary);z-index:9998;transition:width .12s linear}
+/* 标题锚点：静态页正文不叫 #articleBody，所以两组选择器都要覆盖 */
+#articleBody h2 .rk-anchor,#articleBody h3 .rk-anchor,article h2 .rk-anchor,article h3 .rk-anchor{opacity:0;margin-left:.4em;font-size:.85em;color:var(--rk-primary);text-decoration:none;transition:opacity .15s}
+#articleBody h2:hover .rk-anchor,#articleBody h3:hover .rk-anchor,article h2:hover .rk-anchor,article h3:hover .rk-anchor{opacity:1}
+/* 预计阅读时长（静态页由 JS 计算后插入） */
+.rk-readmin{display:inline-flex;align-items:center;gap:.35em;font-size:.78rem;color:var(--rk-text-dim);margin:.35rem 0 1rem}
+/* 相关教程（静态页由 static_posts.json 生成，零 DB 依赖） */
+.rk-rel-wrap{margin-top:1.5rem;background:var(--rk-card);border:1px solid var(--rk-border);border-radius:.75rem;padding:1.25rem}
+.rk-rel-wrap h3{margin:0 0 .75rem;font-size:.95rem;font-weight:700;color:var(--rk-title)}
+.rk-rel-wrap ul{margin:0;padding:0;list-style:none}
+.rk-rel-wrap li{padding:.4rem 0;border-bottom:1px solid rgb(var(--rk-border-rgb)/.4)}
+.rk-rel-wrap li:last-child{border-bottom:0}
+.rk-rel-wrap a{color:var(--rk-text);text-decoration:none}
+.rk-rel-wrap a:hover{color:var(--rk-primary-hi)}
+.rk-rel-wrap .rk-rel-sec{color:var(--rk-text-mute);font-size:.72rem;margin-left:.4em}
+/* ===== /TASK-094 ===== */
+/* TASK-094：锚点 # 用伪元素，避免污染目录文字 */
+.rk-anchor::after{content:'#'}

@@ -192,7 +192,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:var(--rk-text) !important;background-color:var(--rk-bg) !important}html.tw-fail a{color:var(--rk-primary-hi)}html.tw-fail .nav-link{color:var(--rk-text) !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:var(--rk-primary-hi) !important;background:rgb(var(--rk-primary-rgb) / .18)}html.tw-fail header{background-color:var(--rk-card) !important;border-bottom:1px solid var(--rk-border)}html.tw-fail .search-box input{background:var(--rk-surface-1) !important;border:1px solid var(--rk-border) !important;color:var(--rk-title) !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260927v24">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260927v25">
 <script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/server/csgo/index.html">
@@ -232,7 +232,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
         <section class="lg:col-span-3 space-y-8">
             <article class="bg-cardbg rounded-xl p-6">
-                <h1 class="text-3xl font-bold text-white mb-6">CS:GO 联机教程（和朋友开黑用）</h1>
+                <h1 class="text-3xl font-bold text-white mb-6">CS:GO 联机教程</h1>
 
                 <h2 id="section1" class="text-xl font-bold text-white mt-8 mb-3">先说在前面</h2>
                 <p class="text-textlight mb-4 leading-relaxed">
@@ -313,6 +313,11 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 </div>
             </article>
             <!-- 评论（TASK-039：登录才可评，列表匿名可读） -->
+                        <!-- TASK-094：点赞 / 收藏 / 分享（与文章页同款结构；静态页用 data-slug，服务端换算成 post_id） -->
+            <div class="rk-l-bar">
+                <div id="rkLikes" data-slug="csgo-join-guide"></div>
+                <button type="button" id="rkShareBtn" class="rk-l-btn" title="复制本页链接"><i class="fa fa-share-alt"></i><span class="rk-l-count">分享</span></button>
+            </div>
             <div id="rkComments" data-slug="csgo-join-guide" class="mt-10"></div>
         </section>
     </main>
@@ -371,9 +376,10 @@ backTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smoo
 <script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
 <script>window.RK_SLUG='csgo-join-guide';</script>
 <script src="/assets/js/prism-bundle.min.js?v=20260926"></script>
-<script src="/assets/js/rk-toc.js?v=20260926"></script>
+<script src="/assets/js/rk-toc.js?v=20260929v1"></script>
 <script src="/assets/js/rk-code.js?v=20260927v10?v=20260926"></script>
 <script src="/assets/js/rk-post-widgets.js"></script>
 <script src="/assets/js/rk-comments.js?v=20260926v1"></script>
+<script src="/assets/js/rk-likes.js?v=20260927v2"></script>
 </body>
 </html>

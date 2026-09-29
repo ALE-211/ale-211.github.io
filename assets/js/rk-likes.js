@@ -21,6 +21,11 @@
     if (!root) { return; }
 
     var postId = parseInt(root.getAttribute('data-post-id') || '', 10);
+    var slug = root.getAttribute('data-slug') || '';
+    /* TASK-094：静态教程页用 data-slug（这些 slug 在 posts 表里有真实行，服务端换算成 post_id）；
+       文章页仍用 data-post-id。两者都没有就不初始化。 */
+    if (!(postId > 0) && !slug) { return; }
+    var QKEY = postId > 0 ? ('post_id=' + postId) : ('slug=' + encodeURIComponent(slug));
     var API = '/blog/api_likes.php';
     var LOGIN = '/auth/login.html';
 
@@ -48,7 +53,8 @@
             return fetch(API, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(Object.assign({ action: action, post_id: postId }, body))
+                body: JSON.stringify(Object.assign({ action: action },
+                    (postId > 0 ? { post_id: postId } : { slug: slug }), body))
             });
         });
         return req.then(function (r) {
@@ -110,9 +116,9 @@
 
     function load() {
         /* 两个接口并行拉取，状态都取接口真值（不硬写） */
-        var c1 = fetch(API + '?action=count&post_id=' + postId, { cache: 'no-store' })
+        var c1 = fetch(API + '?action=count&' + QKEY, { cache: 'no-store' })
             .then(function (r) { return r.json(); }).catch(function () { return {}; });
-        var c2 = fetch(API + '?action=fav_count&post_id=' + postId, { cache: 'no-store' })
+        var c2 = fetch(API + '?action=fav_count&' + QKEY, { cache: 'no-store' })
             .then(function (r) { return r.json(); }).catch(function () { return {}; });
         Promise.all([c1, c2]).then(function (rs) {
             var a = rs[0] || {}, b = rs[1] || {};
