@@ -582,3 +582,27 @@ pre.rk-pre{ position:relative; }
 /* ===== /TASK-094 ===== */
 /* TASK-094：锚点 # 用伪元素，避免污染目录文字 */
 .rk-anchor::after{content:'#'}
+
+/* ===== TASK-095：浮动竖排圆按钮（类 B 站，但是竖的、随时可点）+ 标题栏信息行 ===== */
+.rk-fab{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.rk-fab .rk-l-row{flex-direction:column;gap:.7rem;align-items:center}
+.rk-fab .rk-l-btn{width:3.05rem;height:3.05rem;border-radius:9999px;flex-direction:column;gap:.02rem;padding:0;justify-content:center;font-size:.62rem;font-weight:600;box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
+.rk-fab .rk-l-btn i{font-size:1.15rem;line-height:1}
+.rk-fab .rk-l-btn .rk-l-count{font-size:.62rem}
+/* 点赞=粉、收藏=琥珀、分享=主色（未选中淡色，选中实色） */
+.rk-fab .rk-l-row .rk-l-btn:nth-of-type(1){color:#f472b6;border-color:rgb(244 114 182/.45);background:rgb(244 114 182/.12)}
+.rk-fab .rk-l-row .rk-l-btn:nth-of-type(1).rk-l-btn-on{color:#fff;background:#f472b6;border-color:#f472b6}
+.rk-fab .rk-l-row .rk-l-btn:nth-of-type(2){color:#fbbf24;border-color:rgb(251 191 36/.45);background:rgb(251 191 36/.12)}
+.rk-fab .rk-l-row .rk-l-btn:nth-of-type(2).rk-l-btn-on{color:#1f2024;background:#fbbf24;border-color:#fbbf24}
+.rk-fab #rkShareBtn{color:var(--rk-primary-hi);border-color:rgb(var(--rk-primary-rgb)/.45);background:rgb(var(--rk-primary-rgb)/.12)}
+.rk-fab #rkShareBtn:hover{color:#fff;background:var(--rk-primary);border-color:var(--rk-primary)}
+/* <1024px：浮动会挡内容 ⇒ 退化成正文下方一行横排 */
+@media (max-width:1023px){
+  .rk-fab{position:static;transform:none;flex-direction:row;justify-content:center;gap:.6rem;margin-top:1.25rem}
+  .rk-fab .rk-l-row{flex-direction:row}
+}
+/* 标题栏信息行（静态教程页由 JS 渲染成与文章页同款） */
+.rk-meta{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem 1rem;font-size:.78rem;color:var(--rk-text-dim);margin:.5rem 0 1.1rem}
+.rk-meta span{display:inline-flex;align-items:center;gap:.3em;white-space:nowrap}
+.rk-meta i{opacity:.85}
+/* ===== /TASK-095 ===== */

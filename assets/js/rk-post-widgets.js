@@ -103,19 +103,54 @@
         upd();
     }
 
-    /* ② 预计阅读时长（文章页由 PHP 算；静态页前端算：汉字数÷400 + 图片×0.2，最少 1 分钟） */
+    /* ② 标题栏信息行（静态页没有 PHP ⇒ 前端拼；与文章页同款：作者 · 更新时间 · 阅读 · 经验lv · 阅读时长） */
     var art = document.querySelector('article');
-    if (art && !document.querySelector('.rk-readmin')) {
-        var txt = (art.innerText || '').replace(/\s+/g, '');
-        var han = (txt.match(/[\u4e00-\u9fa5]/g) || []).length;
-        var imgs = art.querySelectorAll('img').length;
-        var mins = Math.max(1, Math.round(han / 400 + imgs * 0.2));
-        var h1 = art.querySelector('h1');
-        if (h1) {
-            var rm = document.createElement('div');
-            rm.className = 'rk-readmin';
-            rm.innerHTML = '<i class="fa fa-clock-o"></i>全文约 ' + han + ' 字 · 预计阅读 ' + mins + ' 分钟';
-            h1.parentNode.insertBefore(rm, h1.nextSibling);
+    if (art && !document.querySelector('.rk-meta')) {
+        var h1m = art.querySelector('h1');
+        if (h1m) {
+            var txt = (art.innerText || '').replace(/\s+/g, '');
+            var han = (txt.match(/[\u4e00-\u9fa5]/g) || []).length;
+            var imgs = art.querySelectorAll('img').length;
+            var mins = Math.max(1, Math.round(han / 400 + imgs * 0.2));
+            var meta = document.createElement('div');
+            meta.className = 'rk-meta';
+            meta.innerHTML = '<span><i class="fa fa-user"></i>Rick Chou</span>' +
+                '<span data-rk-updated style="display:none"></span>' +
+                '<span data-rk-views style="display:none"></span>' +
+                '<span data-rk-exp style="display:none"></span>' +
+                '<span><i class="fa fa-hourglass-half"></i>约 ' + mins + ' 分钟阅读</span>';
+            h1m.parentNode.insertBefore(meta, h1m.nextSibling);
+            var setSpan = function (sel, html) {
+                var el = meta.querySelector(sel);
+                if (el) { el.innerHTML = html; el.style.display = ''; }
+            };
+            /* 更新时间：来自 static_posts.json */
+            fetch('/blog/static_posts.json', { cache: 'no-store' })
+                .then(function (r) { return r.json(); })
+                .then(function (list) {
+                    if (!Array.isArray(list)) { return; }
+                    var here = location.pathname.replace(/\/$/, '/index.html');
+                    var me = list.filter(function (x) { return x.url === here; })[0];
+                    if (me && me.updated) { setSpan('[data-rk-updated]', '<i class="fa fa-clock-o"></i>' + me.updated); }
+                }).catch(function () { });
+            /* 阅读量：api_views.php（顺带上报；已计过也返回当前值） */
+            if (SLUG) {
+                fetch('/blog/api_views.php?slug=' + encodeURIComponent(SLUG), { cache: 'no-store' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        if (!d || !d.ok) { return; }
+                        if (typeof d.views === 'number') { setSpan('[data-rk-views]', '<i class="fa fa-eye"></i>' + d.views + ' 阅读'); }
+                        if (d.updated_at) { setSpan('[data-rk-updated]', '<i class="fa fa-clock-o"></i>' + d.updated_at); }
+                    })
+                    .catch(function () { });
+            }
+            /* 经验 / 等级：api_author.php */
+            fetch('/blog/api_author.php?u=admin', { cache: 'no-store' })
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    var st = d && d.ok && d.author && d.author.stats;
+                    if (st) { setSpan('[data-rk-exp]', '<i class="fa fa-star"></i>' + st.exp + ' 经验 · lv' + st.level); }
+                }).catch(function () { });
         }
     }
 
