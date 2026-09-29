@@ -619,3 +619,6 @@ pre.rk-pre{ position:relative; }
 @media (min-width:1024px) and (max-width:1135.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 495px); } }   /* main=1024 内缘 */
 @media (min-width:1280px) and (max-width:1391.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 623px); } }   /* main=1280 内缘 */
 @media (min-width:1536px) and (max-width:1647.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 751px); } }   /* main=1536 内缘 */
+/* TASK-096：手机端底部 tab 栏（.rk-tabbar，高 56px + 安全区）会盖住回到顶部按钮 ⇒ 手机端把它抬高到 tab 栏之上。
+   用 body.rk-has-tab 限定，只在该页确实有底部导航时生效。 */
+body.rk-has-tab #backTopBtn{ bottom: calc(56px + env(safe-area-inset-bottom) + 14px); }
