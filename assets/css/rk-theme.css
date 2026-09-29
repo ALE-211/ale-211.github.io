@@ -584,11 +584,11 @@ pre.rk-pre{ position:relative; }
 .rk-anchor::after{content:'#'}
 
 /* ===== TASK-095：浮动竖排圆按钮（类 B 站，但是竖的、随时可点）+ 标题栏信息行 ===== */
-.rk-fab{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.rk-fab{position:fixed;right:max(14px,calc(50vw - 595px));top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;align-items:center;gap:.7rem}
 .rk-fab .rk-l-row{flex-direction:column;gap:.7rem;align-items:center}
-.rk-fab .rk-l-btn{width:3.05rem;height:3.05rem;border-radius:9999px;flex-direction:column;gap:.02rem;padding:0;justify-content:center;font-size:.62rem;font-weight:600;box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
-.rk-fab .rk-l-btn i{font-size:1.15rem;line-height:1}
-.rk-fab .rk-l-btn .rk-l-count{font-size:.62rem}
+.rk-fab .rk-l-btn{width:3.6rem;height:3.6rem;border-radius:9999px;flex-direction:column;gap:.02rem;padding:0;justify-content:center;font-size:.62rem;font-weight:600;box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
+.rk-fab .rk-l-btn i{font-size:1.4rem;line-height:1}
+.rk-fab .rk-l-btn .rk-l-count{font-size:.7rem}
 /* 点赞=粉、收藏=琥珀、分享=主色（未选中淡色，选中实色） */
 .rk-fab .rk-l-row .rk-l-btn:nth-of-type(1){color:#f472b6;border-color:rgb(244 114 182/.45);background:rgb(244 114 182/.12)}
 .rk-fab .rk-l-row .rk-l-btn:nth-of-type(1).rk-l-btn-on{color:#fff;background:#f472b6;border-color:#f472b6}
@@ -606,3 +606,12 @@ pre.rk-pre{ position:relative; }
 .rk-meta span{display:inline-flex;align-items:center;gap:.3em;white-space:nowrap}
 .rk-meta i{opacity:.85}
 /* ===== /TASK-095 ===== */
+/* TASK-095b：回到顶部也贴紧正文卡右边缘并放大（与 .rk-fab 同一条竖线；<1024px 回落 14px） */
+#backTopBtn{right:max(14px,calc(50vw - 595px));width:3.4rem;height:3.4rem;display:inline-flex;align-items:center;justify-content:center}
+#backTopBtn i{font-size:1.15rem}
+/* TASK-095c：按下断点精确贴紧正文卡右边缘。
+   main 是 container（宽度随视口变：1024 / 1280 / 1536），卡片右边缘 = main右 - 1rem(17px)，
+   所以 right = 50vw - (main宽/2 - 17)。三种宽度各一条，宽屏才不会陷进卡片里。 */
+@media (min-width:1024px) and (max-width:1279.98px){ .rk-fab, #backTopBtn{ right: max(14px, calc(50vw - 495px)); } }
+@media (min-width:1280px) and (max-width:1535.98px){ .rk-fab, #backTopBtn{ right: max(14px, calc(50vw - 623px)); } }
+@media (min-width:1536px){ .rk-fab, #backTopBtn{ right: calc(50vw - 751px); } }
