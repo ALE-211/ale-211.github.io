@@ -317,11 +317,22 @@
     }
 
     /* 站点公告栏（TASK-084）：读取 blog/api_announce.php，生效期内显示公告条；关闭后 localStorage 记住 */
+    /* TASK-111（2026-10-02，DeepSeek）：修站长报的「admin 更新了公告，回主页刷新却不显示；换个没登录的浏览器刷新就显示了」。
+       根因：原实现在关闭时写死 localStorage['rk-announce-closed'] = '1'，是个**永久开关** ——
+             只要关过任何一条公告，之后**所有新公告都会被永久屏蔽**（与登录状态无关）。
+       修法：改为记住「公告内容 + 生效期的指纹」，只屏蔽被关掉的那一条；公告内容一变就重新显示。
+       兼容：老值 '1' 与新指纹永不相等 ⇒ 曾关过的人会立刻看到新公告。 */
+    function rkAnnounceFp(s) {
+        var h = 5381, i = s.length;
+        while (i) { h = (h * 33) ^ s.charCodeAt(--i); }
+        return 'a' + (h >>> 0).toString(36) + '-' + s.length;
+    }
     function loadAnnounce() {
         if (window.RK_MIRROR) { return; }
         fetch('/blog/api_announce.php?action=get', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
             if (!d || !d.ok || !d.enabled || !d.content) { return; }
-            try { if (localStorage.getItem('rk-announce-closed') === '1') { return; } } catch (e) {}
+            var fp = rkAnnounceFp(String(d.content) + '|' + String(d.start || '') + '|' + String(d.end || ''));
+            try { if (localStorage.getItem('rk-announce-closed') === fp) { return; } } catch (e) {}
             var st = document.getElementById('rkAnnounceStyle');
             if (!st) {
                 st = document.createElement('style');
@@ -336,7 +347,7 @@
             bar.querySelector('.rk-announce-close').addEventListener('click', function () {
                 bar.remove();
                 document.body.classList.remove('rk-has-announce');
-                try { localStorage.setItem('rk-announce-closed', '1'); } catch (e) {}
+                try { localStorage.setItem('rk-announce-closed', fp); } catch (e) {}
             });
             var hdr = document.querySelector('header');
             if (hdr && hdr.parentNode) { hdr.parentNode.insertBefore(bar, hdr); }
