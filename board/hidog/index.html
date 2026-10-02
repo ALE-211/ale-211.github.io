@@ -174,7 +174,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:var(--rk-text) !important;background-color:var(--rk-bg) !important}html.tw-fail a{color:var(--rk-primary-hi)}html.tw-fail .nav-link{color:var(--rk-text) !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:var(--rk-primary-hi) !important;background:rgb(var(--rk-primary-rgb) / .18)}html.tw-fail header{background-color:var(--rk-card) !important;border-bottom:1px solid var(--rk-border)}html.tw-fail .search-box input{background:var(--rk-surface-1) !important;border:1px solid var(--rk-border) !important;color:var(--rk-title) !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v30">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v32">
 <script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/board/hidog/index.html">
@@ -466,6 +466,12 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <p class="text-gray-500 text-xs">Reference: <a href="https://oshwhub.com/esp-college/esp-hi" class="text-primary hover:underline" target="_blank">https://oshwhub.com/esp-college/esp-hi</a></p>
                 </div>
             </article>
+            <!-- TASK-098：点赞 / 收藏 / 分享（与文章页、其它静态教程页同款结构；静态页用 data-slug，服务端换算成 post_id） -->
+            <div class="rk-fab">
+                <div id="rkLikes" data-slug="hidog-esp32c3"></div>
+                <button type="button" id="rkShareBtn" class="rk-l-btn" title="复制本页链接"><i class="fa fa-share-alt"></i><span class="rk-l-count">分享</span></button>
+            </div>
+            <div id="rkComments" data-slug="hidog-esp32c3" class="mt-10"></div>
         </section>
     </main>
 
@@ -519,32 +525,10 @@ backTopBtn.addEventListener('click', ()=>{
 })
 
 // ========= 左侧侧边栏生成目录 + 滚动高亮 =========
-const leftTocList = document.getElementById('leftTocList');
-const headings = Array.from(document.querySelectorAll('h2[id]'));
-
-// 生成目录
-headings.forEach(h => {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${h.id}`;
-    a.textContent = h.innerText;
-    a.className = "block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight";
-    li.appendChild(a);
-    leftTocList.appendChild(li);
-})
-
-// 滚动观察高亮
-const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(entry => {
-        const id = entry.target.id;
-        const link = leftTocList.querySelector(`a[href="#${id}"]`);
-        if(entry.isIntersecting){
-            leftTocList.querySelectorAll('a').forEach(el=>el.classList.remove('toc-active'));
-            link?.classList.add('toc-active');
-        }
-    })
-},{rootMargin:"-15% 0px -65% 0px"})
-headings.forEach(h=>observer.observe(h));
+/* TASK-098（DeepSeek）：此处原有一份内联目录生成代码，已删除，改用全站共享的 rk-toc.js。
+   原因：这份内联代码与 rk-toc.js 填的是同一个容器 #leftTocList，两者同时加载会让目录「重复一遍」。
+   rk-toc.js 逻辑完全等价（扫 article 内 h2[id] → 填 #leftTocList → IntersectionObserver 滚动高亮），
+   并且多了「去掉标题内锚点尾部 #」的修正。 */
 </script>
 
 
@@ -554,4 +538,13 @@ headings.forEach(h=>observer.observe(h));
 /* ===== /RickC-HD-JS ===== */
 </script>
 <script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<!-- TASK-098：补齐与其它静态教程页一致的公共组件（原先这 6 个都没引，所以阅读进度条 / 标题信息行 /
+     标题锚点 / 相关教程 / 评论 / 点赞收藏 全部缺失） -->
+<script>window.RK_SLUG='hidog-esp32c3';</script>
+<script src="/assets/js/prism-bundle.min.js?v=20260926"></script>
+<script src="/assets/js/rk-toc.js?v=20260929v1"></script>
+<script src="/assets/js/rk-code.js?v=20260927v10?v=20260926"></script>
+<script src="/assets/js/rk-post-widgets.js"></script>
+<script src="/assets/js/rk-comments.js?v=20260926v1"></script>
+<script src="/assets/js/rk-likes.js?v=20260927v2"></script>
 </body></html>
