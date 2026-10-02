@@ -634,3 +634,15 @@ pre.rk-pre{ position:relative; }
 @media (max-width:899.98px){
   body.rk-has-tab #backTopBtn{ bottom: calc(56px + env(safe-area-inset-bottom) + 14px); }
 }
+
+/* ===== TASK-101 继续阅读卡片（#rkContinueReading） ===== */
+#rkContinueReading{ display:none; }
+.rk-read-h3{ font-size:1.05rem; font-weight:700; color:var(--rk-text-soft); margin-bottom:.8rem; display:flex; align-items:center; gap:.5rem; }
+.rk-read-h3 i{ color:var(--rk-primary); }
+.rk-read-card{ display:block; background:var(--rk-card); border:1px solid var(--rk-border); border-radius:.75rem; padding:.75rem .9rem; transition:border-color .2s, transform .15s; }
+.rk-read-card:hover{ border-color:var(--rk-primary); transform:translateY(-1px); }
+.rk-read-row{ display:flex; justify-content:space-between; align-items:baseline; gap:.75rem; margin-bottom:.5rem; }
+.rk-read-title{ font-size:.85rem; color:var(--rk-text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rk-read-pct{ font-size:.75rem; color:var(--rk-primary-hi); font-variant-numeric:tabular-nums; flex-shrink:0; }
+.rk-read-bar{ height:4px; border-radius:2px; background:rgb(var(--rk-text-rgb)/.1); overflow:hidden; }
+.rk-read-fill{ height:100%; border-radius:2px; background:var(--rk-primary); transition:width .3s ease; }
