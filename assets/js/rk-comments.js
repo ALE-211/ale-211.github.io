@@ -131,6 +131,12 @@
         }
         body.appendChild(content);
         var foot = el('div', 'rk-c-actions');
+        /* TASK-B2：点赞（登录才可点，显示计数） */
+        var likeBtn = el('button', 'rk-c-btn rk-c-like');
+        likeBtn.innerHTML = '<i class="fa fa-thumbs-up"></i> <span class="rk-c-like-n">' + (c.like_count || 0) + '</span>';
+        if (c.liked) likeBtn.style.color = 'var(--rk-primary-hi)';
+        likeBtn.onclick = function () { toggleLike(c.id, likeBtn); };
+        foot.appendChild(likeBtn);
         if (state.canComment) {
             var rb = el('button', 'rk-c-btn', '回复');
             rb.onclick = function () { focusReply(c, c.display); };
@@ -208,6 +214,22 @@
             ta.focus();
             ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }
+
+    /* ---------- TASK-B2：评论点赞 ---------- */
+    function toggleLike(cid, btn) {
+        getCsrf().then(function (csrf) {
+            return fetch('/blog/api_comment_likes.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+                body: JSON.stringify({ action: 'toggle', comment_id: cid })
+            }).then(function (r) { return r.json().then(function (j) { j.status = r.status; return j; }); });
+        }).then(function (j) {
+            if (j.status === 401) { toast('登录后可点赞', true); return; }
+            if (!j.ok) { toast(j.error || '操作失败', true); return; }
+            btn.querySelector('.rk-c-like-n').textContent = j.count;
+            btn.style.color = j.liked ? 'var(--rk-primary-hi)' : '';
+        });
     }
 
     /* ---------- 提交 / 删除 / 隐藏 ---------- */
