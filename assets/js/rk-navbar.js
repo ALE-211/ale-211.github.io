@@ -125,9 +125,45 @@
 
     function searchBox() {
         return '<form action="' + (MIRROR ? MAIN + '/search.php' : '/search.php') + '" method="get" class="rk-search" role="search">' +
-            '<input type="text" name="q" placeholder="搜索文章…" aria-label="搜索文章">' +
+            '<input type="text" name="q" id="rkSearchInput" placeholder="搜索文章…" aria-label="搜索文章" autocomplete="off">' +
+            '<div id="rkSearchDrop" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:2px;max-height:300px;overflow:auto;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.4)"></div>' +
             '<button type="submit" aria-label="搜索"><i class="fa fa-search"></i></button>' +
             '</form>';
+    }
+    /* TASK-C5：搜索框标题联想（防抖 250ms，只查 published+public） */
+    function initSearchSuggest() {
+        if (window.RK_MIRROR) return;
+        var inp = document.getElementById('rkSearchInput');
+        var drop = document.getElementById('rkSearchDrop');
+        if (!inp || !drop) return;
+        var t = null;
+        inp.addEventListener('input', function () {
+            var q = inp.value.trim();
+            clearTimeout(t);
+            if (q.length < 1) { drop.style.display = 'none'; return; }
+            t = setTimeout(function () {
+                fetch('/api_search_suggest.php?q=' + encodeURIComponent(q))
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        drop.innerHTML = '';
+                        var items = j.items || [];
+                        if (!items.length) { drop.style.display = 'none'; return; }
+                        items.forEach(function (it) {
+                            var a = document.createElement('a');
+                            a.href = it.url;
+                            a.textContent = it.title;
+                            a.style.cssText = 'display:block;padding:8px 12px;font-size:13px;color:#e2e8f0;text-decoration:none';
+                            a.onmouseenter = function () { a.style.background = 'rgba(128,128,128,.2)'; };
+                            a.onmouseleave = function () { a.style.background = 'none'; };
+                            drop.appendChild(a);
+                        });
+                        drop.style.display = 'block';
+                    });
+            }, 250);
+        });
+        document.addEventListener('click', function (e) {
+            if (!drop.contains(e.target) && e.target !== inp) drop.style.display = 'none';
+        });
     }
 
     function headerHtml() {
@@ -441,6 +477,7 @@
         loadAnnounce();
         loadNotify();
         bottomTab();
+        initSearchSuggest();
         return true;
     }
 

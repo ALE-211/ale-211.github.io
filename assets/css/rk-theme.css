@@ -298,7 +298,7 @@ header.rk-header{
 .rk-search{
   display:flex; align-items:stretch; flex:0 0 auto; width:10.5em;
   background:var(--rk-bg); border:1px solid var(--rk-border); border-radius:.5em;
-  overflow:hidden;
+  position:relative;
 }
 .rk-search input{
   flex:1 1 auto; min-width:0; box-sizing:border-box;
