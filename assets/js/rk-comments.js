@@ -179,6 +179,56 @@
         ta.placeholder = '友善评论（支持 Markdown：**粗体** `代码` [链接](https://) · 2000 字以内）';
         ta.rows = 3;
         box.appendChild(ta);
+        /* TASK-C3：@ 自动补全（防抖 250ms，键盘上下+回车） */
+        var atBox = el('div', 'rk-atbox');
+        atBox.style.cssText = 'display:none;position:absolute;z-index:50;background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:2px;max-height:200px;overflow:auto;min-width:180px;box-shadow:0 4px 16px rgba(0,0,0,.4)';
+        ta.parentNode.style.position = 'relative';
+        ta.parentNode.appendChild(atBox);
+        var atItems = [], atIdx = -1, atTimer = null;
+        ta.addEventListener('input', function () {
+            var pos = ta.selectionStart || 0;
+            var before = ta.value.slice(0, pos);
+            var m = before.match(/@(\w*)$/);
+            if (!m) { atBox.style.display = 'none'; return; }
+            var q = m[1];
+            clearTimeout(atTimer);
+            atTimer = setTimeout(function () {
+                fetch('/blog/api_users_search.php?q=' + encodeURIComponent(q))
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        atItems = (j.users || []); atIdx = -1; atBox.innerHTML = '';
+                        if (!atItems.length) { atBox.style.display = 'none'; return; }
+                        atItems.forEach(function (u, i) {
+                            var it = el('div', 'rk-at-item');
+                            it.textContent = u.display_name + ' (@' + u.username + ')';
+                            it.style.cssText = 'padding:6px 10px;cursor:pointer;font-size:13px';
+                            it.onclick = function () { pickAt(u.username); };
+                            atBox.appendChild(it);
+                        });
+                        atBox.style.display = 'block';
+                    });
+            }, 250);
+        });
+        ta.addEventListener('keydown', function (e) {
+            if (atBox.style.display === 'none') return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); atIdx = Math.min(atIdx + 1, atItems.length - 1); paintAt(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); atIdx = Math.max(atIdx - 1, 0); paintAt(); }
+            else if (e.key === 'Enter' && atIdx >= 0) { e.preventDefault(); pickAt(atItems[atIdx].username); }
+        });
+        function paintAt() {
+            Array.prototype.forEach.call(atBox.children, function (el, i) {
+                el.style.background = i === atIdx ? 'rgba(128,128,128,.3)' : 'none';
+            });
+        }
+        function pickAt(username) {
+            var pos = ta.selectionStart || 0;
+            var before = ta.value.slice(0, pos);
+            var after = ta.value.slice(pos);
+            before = before.replace(/@\w*$/, '@' + username + ' ');
+            ta.value = before + after;
+            atBox.style.display = 'none';
+            ta.focus(); ta.selectionStart = ta.selectionEnd = before.length;
+        }
         /* TASK-106：表情面板（固定 emoji，点插入光标位置） */
         var em = el('div', 'rk-c-emoji');
         em.style.cssText = 'display:flex;flex-wrap:wrap;gap:2px;margin-top:.4rem;font-size:1.1rem';
