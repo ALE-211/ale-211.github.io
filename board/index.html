@@ -157,7 +157,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:var(--rk-text) !important;background-color:var(--rk-bg) !important}html.tw-fail a{color:var(--rk-primary-hi)}html.tw-fail .nav-link{color:var(--rk-text) !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:var(--rk-primary-hi) !important;background:rgb(var(--rk-primary-rgb) / .18)}html.tw-fail header{background-color:var(--rk-card) !important;border-bottom:1px solid var(--rk-border)}html.tw-fail .search-box input{background:var(--rk-surface-1) !important;border:1px solid var(--rk-border) !important;color:var(--rk-title) !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v33">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v35">
 <script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/board/index.html">
@@ -213,7 +213,8 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
             <!-- 文章列表 -->
             <div>
                 <h2 class="section-title text-white">项目文章</h2>
-                <div class="grid md:grid-cols-2 gap-4">
+                <!-- TASK-113：加 id 供动态同步（新文章改到「开发」栏后能自动出现；写死卡片作为镜像站/无 JS 的兜底） -->
+                <div id="boardPosts" class="grid md:grid-cols-2 gap-4">
                     <!-- 已有文章 -->
                     <a href="./hidog/index.html" class="bg-cardbg rounded-xl p-6 card-hover block">
                         <div class="rounded-lg overflow-hidden mb-4">
@@ -325,5 +326,46 @@ backTopBtn.addEventListener('click', ()=>{
 /* ===== /RickC-HD-JS ===== */
 </script>
 <script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>
+/* ===== TASK-113（2026-10-03，DeepSeek）：开发板块动态同步 =====
+   站长报「新文章板块改成开发后，开发板块里没有出现这篇文章」。
+   根因：本页「项目文章」是**写死的 3 张卡**，与数据库无关 ⇒ section=dev 的新文章不会出现。
+   改法与首页一致：拉 api_front.php?section=dev，动态卡片插到最前；同 URL 的静态卡片移除（避免重复）。
+   写死的卡片保留，作为**镜像站 / 未启用 JS** 时的兜底（镜像站没有 PHP 后端）。 */
+(function(){
+    if (window.RK_MIRROR) return;
+    var grid = document.getElementById('boardPosts');
+    if (!grid) return;
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    /* 相对/绝对链接统一成 pathname 再比（本页卡片是 ./hidog/... 这种相对路径） */
+    function norm(u){ try { var p = new URL(String(u||''), location.href).pathname; if (/\/$/.test(p)) p += 'index.html'; return p; } catch(e){ return String(u||''); } }
+    fetch('/blog/api_front.php?section=dev&n=12', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+        if (!d || !d.ok || !d.posts || !d.posts.length) return;
+        var staticMap = {};
+        grid.querySelectorAll('a[href]').forEach(function(a){ staticMap[norm(a.getAttribute('href'))] = a; });
+        var frag = document.createDocumentFragment();
+        d.posts.forEach(function(p){
+            var u = p.url || ('/blog/post.php?slug=' + encodeURIComponent(p.slug));
+            var st = staticMap[norm(u)];
+            if (st) { st.remove(); }            /* 同一篇：静态卡让位给动态卡，避免出现两次 */
+            var a = document.createElement('a');
+            a.href = u;
+            a.className = 'bg-cardbg rounded-xl p-6 card-hover block';
+            var pin = p.pinned_home ? '<span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded ml-1"><i class="fa fa-arrow-up mr-1"></i>置顶</span>' : '';
+            a.innerHTML =
+                '<div class="rounded-lg overflow-hidden mb-4 h-40 bg-gray-800 flex items-center justify-center">' +
+                    (p.icon ? '<img src="' + esc(p.icon) + '" alt="" class="w-full h-full object-cover">'
+                            : '<i class="fa fa-file-text-o text-4xl text-primary"></i>') +
+                '</div>' +
+                '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc(p.section === 'dev' ? '开发' : (p.section || '开发')) + '</span>' + pin +
+                '<h3 class="text-lg font-bold text-white mb-2">' + esc(p.title) + '</h3>' +
+                '<p class="text-sm text-gray-400 leading-relaxed mb-3">' + esc(p.excerpt || '（暂无摘要）') + '</p>' +
+                '<p class="text-primary text-sm">阅读全文 <i class="fa fa-arrow-right ml-1"></i></p>';
+            frag.appendChild(a);
+        });
+        grid.insertBefore(frag, grid.firstChild);
+    }).catch(function(){});
+})();
+</script>
 </body>
 </html>

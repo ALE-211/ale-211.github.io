@@ -646,3 +646,23 @@ pre.rk-pre{ position:relative; }
 .rk-read-pct{ font-size:.75rem; color:var(--rk-primary-hi); font-variant-numeric:tabular-nums; flex-shrink:0; }
 .rk-read-bar{ height:4px; border-radius:2px; background:rgb(var(--rk-text-rgb)/.1); overflow:hidden; }
 .rk-read-fill{ height:100%; border-radius:2px; background:var(--rk-primary); transition:width .3s ease; }
+
+/* ===== TASK-113：表格行内图标操作按钮的统一容器 .rk-ops =====
+   站长报「/auth/account.html 已发表文章板块的右侧，文章操作那 4 个按钮布局没搞好，很难看」。
+   根因：每个按钮各自写死 `!py-1.5 !px-2.5 mr-1`（**最后一个"删除"还没有 mr-1**），
+         再叠加 `<a>`(查看) 与 `<button>`(编辑/下架/删除) 默认基线、行高、内边距都不同
+         ⇒ 按钮之间左右间距不匀、上下不齐，看起来"很难看"。
+   修法：由 JS 把按钮统一包进 `.rk-ops`（inline-flex + 等间距），子元素一律等尺寸方形图标按钮；
+         布局交给容器，不再靠逐个 `mr-1` 拼。用 !important 覆盖页面上原有的 Tailwind 工具类。 */
+.rk-ops{ display:inline-flex; align-items:center; justify-content:flex-end; gap:.4rem; vertical-align:middle; }
+.rk-ops > a, .rk-ops > button{ box-sizing:border-box !important; -webkit-appearance:none; appearance:none;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:2rem !important; height:2rem !important; min-width:2rem;
+  padding:0 !important; margin:0 !important;
+  border-width:1px !important; border-style:solid; border-radius:.5rem;
+  font-size:.8rem; line-height:1; flex:0 0 auto; }
+.rk-ops > a i, .rk-ops > button i{ line-height:1; }
+@media (max-width:639px){
+  .rk-ops{ gap:.3rem; }
+  .rk-ops > a, .rk-ops > button{ width:1.75rem !important; height:1.75rem !important; min-width:1.75rem; font-size:.75rem; }
+}
