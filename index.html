@@ -171,7 +171,7 @@ header.sticky, header{ height:68px !important; box-sizing:border-box; }
 header > .container{ height:100% !important; padding-top:0 !important; padding-bottom:0 !important; }
 /* ===== /RickC-HDR ===== */</style>
 <!-- RickC-FALLBACK --><style>html.tw-fail body{color:var(--rk-text) !important;background-color:var(--rk-bg) !important}html.tw-fail a{color:var(--rk-primary-hi)}html.tw-fail .nav-link{color:var(--rk-text) !important}html.tw-fail .nav-link:hover,html.tw-fail .nav-link.active{color:var(--rk-primary-hi) !important;background:rgb(var(--rk-primary-rgb) / .18)}html.tw-fail header{background-color:var(--rk-card) !important;border-bottom:1px solid var(--rk-border)}html.tw-fail .search-box input{background:var(--rk-surface-1) !important;border:1px solid var(--rk-border) !important;color:var(--rk-title) !important}</style><!-- /RickC-FALLBACK -->
-<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v35">
+<link rel="stylesheet" href="/assets/css/rk-theme.css?v=20260929v36">
 <script>try{var t=localStorage.getItem('rk-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>window.RK_MIRROR=true;</script>
 <link rel="canonical" href="https://mirror.ale211.eu.org/">
@@ -386,7 +386,15 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 '<div class="flex items-start gap-4">' +
                     (p.icon ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + p.icon + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
                     '<div>' +
-                        '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">博客 · ' + (sec[p.section] || p.section) + '</span>' + pin +
+                        /* TASK-114：站长「小分类都变成了博客，博客不属于分类项，应该改为 栏目 · 分类，例如开发 · 网络」。
+                           原先这里写死 '博客 · ' + 栏目 —— 但「博客」是站点功能名，不是分类。
+                           现改为「栏目 · 分类」；文章没填分类时只显示栏目（不显示空的分隔符）。 */
+                        (function () {
+                            var lab = sec[p.section] || p.section || '';
+                            var cat = (p.category || '').replace(/^\s+|\s+$/g, '');
+                            var badge = cat ? (lab ? lab + ' · ' + cat : cat) : lab;
+                            return badge ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc2(badge) + '</span>' : '';
+                        })() + pin +
                         '<h3 class="text-lg font-bold text-white mb-2">' + esc2(p.title) + '</h3>' +
                         '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
                     '</div>' +
