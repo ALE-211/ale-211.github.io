@@ -1,14 +1,17 @@
 /* ============================================================
    rk-reading-progress.js —— 阅读进度·继续阅读（TASK-101，唯一来源）
-   建立：MainAgent ｜ 2026-10-02
+   建立：MainAgent ｜ 2026-10-02 ｜ 修订：TASK-115（②⑤⑥，2026-10-03）
    存储：localStorage['rk-read'] = { "<location.pathname>": { t, u, p, a } }
    写入：内容页滚动节流 1.5s 写一次；p>=95 视为读完 → 删除记录；最多保留 20 条
    展示：#rkContinueReading 容器内渲染最近 3 条（首页主栏顶部 / 文章页侧栏顶部）
-   恢复：回到某篇文章时自动滚回上次位置（±100px）
+   恢复：回到某篇文章时立即瞬时滚回上次位置（load/300ms 后校正，不闪开头）
    兜底：隐私模式 localStorage 抛异常 → 整模块静默降级，页面功能不受影响
    ============================================================ */
 (function () {
   'use strict';
+
+  /* ⑥ 尽早关掉浏览器自带滚动恢复，避免「先停开头再跳」 */
+  try { if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } } catch (e) {}
 
   var KEY = 'rk-read';
   var MAX = 20;      /* 最多保留 20 条 */
@@ -16,11 +19,11 @@
   var SAVE_MS = 1500;
   var DONE_PCT = 95; /* >=95 视为读完 */
 
-  /* 内容页清单（DeepSeek 设计稿指定）：文章页 + 4 个静态教程页。
-     列表/入口页（首页、博客列表）不在此列，只展示不记录。 */
-  var READER_RE = /^\/(blog\/post\.php|server\/(minecraft|csgo|csgo-dedicated)\/index\.html|board\/nvidia-tesla-m40\/index\.html|board\/hidog\/index\.html)/;
-
-  function isReader() { return READER_RE.test(location.pathname); }
+  /* ② 结构化判据：文章页 = 有评论区容器 + 正文里有 h1。
+     首页/板块落地页/列表页/下载页都没有 #rkComments ⇒ 天然排除，不再维护路径清单。 */
+  function isReader() {
+    return !!document.getElementById('rkComments') && !!document.querySelector('article h1');
+  }
 
   /* ---- localStorage 隐私模式兜底（Safari 无痕 setItem 会抛） ---- */
   function readStore() {
@@ -69,19 +72,16 @@
     saveTimer = setTimeout(function () { saveTimer = null; save(); }, SAVE_MS);
   }
 
-  /* ---- 恢复上次阅读位置（±100px） ---- */
-  function restore() {
+  /* ---- ⑥ 恢复上次阅读位置：瞬时 scrollTo（不用 smooth），load/300ms 后校正 ---- */
+  function restoreOnce() {
     if (!isReader()) return;
     var data = readStore(); if (!data) return;
     var rec = data[location.pathname];
     if (!rec || !rec.p || rec.p <= 0) return;
-    /* 等图片/字体加载、scrollHeight 稳定后再定位 */
-    setTimeout(function () {
-      var h = document.documentElement;
-      var max = h.scrollHeight - window.innerHeight;
-      if (max <= 0) return;
-      window.scrollTo(0, Math.round(rec.p / 100 * max));
-    }, 600);
+    var h = document.documentElement;
+    var max = h.scrollHeight - window.innerHeight;
+    if (max <= 0) return;
+    window.scrollTo(0, Math.round(rec.p / 100 * max));
   }
 
   /* ---- 渲染「继续阅读」卡片（最近 SHOW 条，排除当前页） ---- */
@@ -89,13 +89,16 @@
     var box = document.getElementById('rkContinueReading');
     if (!box) return;
     var data = readStore();
-    if (!data) { box.style.display = 'none'; return; }
+    /* ⑤ 死代码修复：data 恒为 {}，必须连同 Object.keys 判空 */
+    if (!data || !Object.keys(data).length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     var items = Object.keys(data).map(function (k) { return data[k]; })
       .filter(function (it) { return it && it.u && it.u !== location.pathname && it.p > 0; })
       .sort(function (a, b) { return (b.a || 0) - (a.a || 0); })
       .slice(0, SHOW);
     if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
-    box.style.display = '';
+    /* ⑤ 修复：id 选择器 #rkContinueReading{display:none} 特异性 100，
+       内联 display=''（清除）会被 CSS 重新压成 none ⇒ 卡片永远不显示。改为显式 block。 */
+    box.style.display = 'block';
     var html = '<h3 class="rk-read-h3"><i class="fa fa-history"></i>继续阅读</h3><div class="space-y-3">';
     items.forEach(function (it) {
       var pct = Math.max(0, Math.min(100, Math.round(it.p || 0)));
@@ -118,7 +121,9 @@
   function init() {
     if (readStore() === null) return; /* 存储不可用：静默降级 */
     render();
-    restore();
+    restoreOnce();                                  /* ⑥ 立即恢复，不闪开头 */
+    window.addEventListener('load', restoreOnce);   /* ⑥ 图片加载后校正文档高度 */
+    setTimeout(restoreOnce, 300);                   /* ⑥ 兜底再校正一次 */
     window.addEventListener('scroll', scheduleSave, { passive: true });
     window.addEventListener('beforeunload', function () { /* 卸载前补一次 */
       if (saveTimer) { clearTimeout(saveTimer); save(); }

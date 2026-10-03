@@ -357,7 +357,16 @@ backTopBtn.addEventListener('click', ()=>{
                     (p.icon ? '<img src="' + esc(p.icon) + '" alt="" class="w-full h-full object-cover">'
                             : '<i class="fa fa-file-text-o text-4xl text-primary"></i>') +
                 '</div>' +
-                '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc(p.section === 'dev' ? '开发' : (p.section || '开发')) + '</span>' + pin +
+                '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' +
+                    /* TASK-115 ⑦：与首页 TASK-114 同款「栏目 · 分类」，不再写死「开发」。
+                       category 可能 null/空/带空格，先 trim；没填分类就只显示栏目。 */
+                    (function(){
+                        var SEC = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
+                        var lab = SEC[p.section] || p.section || '';
+                        var cat = String(p.category || '').replace(/^\s+|\s+$/g, '');
+                        var badge = cat ? (lab ? lab + ' · ' + cat : cat) : lab;
+                        return esc(badge);
+                    })() + '</span>' + pin +
                 '<h3 class="text-lg font-bold text-white mb-2">' + esc(p.title) + '</h3>' +
                 '<p class="text-sm text-gray-400 leading-relaxed mb-3">' + esc(p.excerpt || '（暂无摘要）') + '</p>' +
                 '<p class="text-primary text-sm">阅读全文 <i class="fa fa-arrow-right ml-1"></i></p>';
