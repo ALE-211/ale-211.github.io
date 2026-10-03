@@ -123,6 +123,9 @@
         if (c.content === '' && (c.author === '[deleted]' || c.display === '[deleted]')) {
             content.textContent = '原评论已删除';
             content.style.opacity = '.6';
+        } else if (c.html) {
+            /* TASK-106：服务端已 sanitize_html，安全插入渲染后的 Markdown HTML */
+            content.innerHTML = c.html;
         } else {
             content.textContent = c.content;
         }
@@ -167,8 +170,29 @@
             return box;
         }
         var ta = el('textarea', 'rk-c-input');
-        ta.placeholder = '友善评论（支持换行，2000 字以内）';
+        ta.placeholder = '友善评论（支持 Markdown：**粗体** `代码` [链接](https://) · 2000 字以内）';
         ta.rows = 3;
+        box.appendChild(ta);
+        /* TASK-106：表情面板（固定 emoji，点插入光标位置） */
+        var em = el('div', 'rk-c-emoji');
+        em.style.cssText = 'display:flex;flex-wrap:wrap;gap:2px;margin-top:.4rem;font-size:1.1rem';
+        var EMOJIS = '😀 😁 😂 🤣 😊 😍 😘 😎 🤔 😅 😭 😡 😱 😴 🥺 😍 🤗 🙄 😬 🤭 😏 😌 😉 🥳 😎 🤓 😴 👍 👎 👌 🙏 💪 🤝 👏 🙌 👋 ✌️ 🤞 💪 🫶 ❤️ 💔 🔥 ⭐ 🎉 🎊 🎈 🎁 💡 📌 🚀 ✅ ❌ ⚠️ 🍺 ☕ 🌙 ☀️'.split(' ');
+        EMOJIS.forEach(function (e) {
+            var b = el('button');
+            b.type = 'button';
+            b.textContent = e;
+            b.style.cssText = 'background:none;border:0;cursor:pointer;padding:2px 4px;border-radius:4px';
+            b.onmouseenter = function () { b.style.background = 'rgba(128,128,128,.2)'; };
+            b.onmouseleave = function () { b.style.background = 'none'; };
+            b.onclick = function () {
+                var s = ta.selectionStart || 0, en = ta.selectionEnd || 0;
+                ta.value = ta.value.slice(0, s) + e + ta.value.slice(en);
+                ta.focus();
+                ta.selectionStart = ta.selectionEnd = s + e.length;
+            };
+            em.appendChild(b);
+        });
+        box.appendChild(em);
         var btn = el('button', 'rk-c-btn rk-c-btn-primary', '发表评论');
         btn.onclick = function () { submit(ta); };
         box.appendChild(ta);
