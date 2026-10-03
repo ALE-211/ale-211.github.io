@@ -316,6 +316,16 @@
         document.head.appendChild(s);
     }
 
+    /* TASK-103 站内通知铃铛：由导航栏统一注入；镜像站不加载 */
+    function loadNotify() {
+        if (window.RK_MIRROR) { return; }
+        if (document.getElementById('rk-notify-script')) { return; }
+        var s = document.createElement('script');
+        s.id = 'rk-notify-script';
+        s.src = '/assets/js/rk-notify.js?v=20261003v1';
+        document.head.appendChild(s);
+    }
+
     /* 站点公告栏（TASK-084）：读取 blog/api_announce.php，生效期内显示公告条；关闭后 localStorage 记住 */
     /* TASK-111（2026-10-02，DeepSeek）：修站长报的「admin 更新了公告，回主页刷新却不显示；换个没登录的浏览器刷新就显示了」。
        根因：原实现在关闭时写死 localStorage['rk-announce-closed'] = '1'，是个**永久开关** ——
@@ -429,6 +439,7 @@
         loadKeys();
         loadLightbox();
         loadAnnounce();
+        loadNotify();
         bottomTab();
         return true;
     }
