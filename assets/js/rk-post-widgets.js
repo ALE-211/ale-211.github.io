@@ -31,7 +31,18 @@
     }
 
     function renderCard(a, stats) {
-        var box = document.querySelector('aside .bg-cardbg') || document.getElementById('authorCard');
+        /* TASK-119（2026-10-03，DeepSeek）：修站长报的「旧文章左上先显示新版作者卡片、然后才是继续阅读」。
+           根因：本行原为 `querySelector('aside .bg-cardbg')` —— 取 aside 里**第一个**带 bg-cardbg 的元素；
+           而 TASK-118 给静态文章页插入了「继续阅读」容器（同样带 bg-cardbg，且在 aside 最前面），
+           于是新版作者卡被塞进了「继续阅读」卡片里，真正的作者卡反而留在下面（还是旧版）。
+           修法：显式排除 #rkContinueReading；有 #authorCard 时优先用它。 */
+        var box = document.getElementById('authorCard');
+        if (!box) {
+            var _cands = document.querySelectorAll('aside .bg-cardbg');
+            for (var _i = 0; _i < _cands.length; _i++) {
+                if (_cands[_i].id !== 'rkContinueReading') { box = _cands[_i]; break; }
+            }
+        }
         if (!box || !a) { return; }
         var st = stats || a.stats || null;
         var roleCls = a.role === 'admin'  ? 'bg-orange-500/15 text-orange-400'

@@ -421,6 +421,14 @@ header.rk-header{
    响应式：唯一断点 900px（与 rk-navbar.js 保持一致）
    比原来的 768px 更早切换，避免 768~900px 区间把导航挤成竖排。
    ============================================================ */
+/* TASK-118（2026-10-03，DeepSeek）：修站长报的「通知导致卡片有重叠部分」。
+   根因：站点公告条 #rkAnnounceBar 是 position:fixed（高约 32px），
+   rk-navbar.js 用 `body.rk-has-announce header{top:34px}` 把导航栏**下移**让位，
+   但**正文没有任何补偿** ⇒ 导航栏实际绘制在 68~102px，而正文从 68px 就开始，
+   ⇒ 固定导航栏盖住正文顶部约 34px（表现为"卡片被压住/重叠"）。
+   这里给 body 补上同高度的顶部内边距，与上面那条 header{top:34px} 对称。
+   （导航栏是 sticky 在文档流内，所以只需补公告条这 34px，不能补满整个导航栏高度，否则会多出一块空白。） */
+body.rk-has-announce { padding-top: 34px; }
 @media (max-width:899.98px){
   .rk-nav, .rk-search, .rk-actions{ display:none !important; }
   .rk-burger{ display:inline-flex !important; }
@@ -631,6 +639,14 @@ pre.rk-pre{ position:relative; }
    bottom=56+14=70px，**顶进 .rk-fab 里 3.7px**，于是「回到顶部和三个按钮间距不一样」。
    （实测：fab 底边 492.5px、回到顶部顶边 488.8px ⇒ 重叠 -3.69px）
    修法：用与 tab 栏相同的断点把这条限制住；≥900px 时回落基础值 bottom:3.2rem，与 fab 末按钮间距正好 .7rem。 */
+/* TASK-118（2026-10-03，DeepSeek）：修站长报的「通知导致卡片有重叠部分」。
+   根因：站点公告条 #rkAnnounceBar 是 position:fixed（高约 32px），
+   rk-navbar.js 用 `body.rk-has-announce header{top:34px}` 把导航栏**下移**让位，
+   但**正文没有任何补偿** ⇒ 导航栏实际绘制在 68~102px，而正文从 68px 就开始，
+   ⇒ 固定导航栏盖住正文顶部约 34px（表现为"卡片被压住/重叠"）。
+   这里给 body 补上同高度的顶部内边距，与上面那条 header{top:34px} 对称。
+   （导航栏是 sticky 在文档流内，所以只需补公告条这 34px，不能补满整个导航栏高度，否则会多出一块空白。） */
+body.rk-has-announce { padding-top: 34px; }
 @media (max-width:899.98px){
   body.rk-has-tab #backTopBtn{ bottom: calc(56px + env(safe-area-inset-bottom) + 14px); }
 }
