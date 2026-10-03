@@ -45,8 +45,28 @@
     return Math.max(0, Math.min(100, p));
   }
 
+  /* TASK-116②（2026-10-03，DeepSeek）：修「继续阅读卡片显示成 RickC.TechBlog、看不到文章名」。
+     根因：本站各页 <title> 的站点名位置**不统一** ——
+       blog/post.php      -> "文章名 | RickC.TechBlog"   （站点名在后）
+       server/minecraft…  -> "RickC.TechBlog | 文章名"   （站点名在前）
+       board/hidog…       -> "RickC.TechBlog | Hi-Dog"
+     而原实现是 split('|')[0]（取第一段）⇒ 站点名在前时就只剩 "RickC.TechBlog"。
+     修法：① 主来源改为正文里的 <article> h1（文章真名，且 isReader() 已要求它存在）；
+           ② 兜底才是 title，且改成「跳过站点名那一段」。 */
+  var SITE_NAME = 'RickC.TechBlog';
   function cleanTitle(t) {
-    return String(t || '').split('|')[0].split(' - ')[0].split('—')[0].trim();
+    var s = String(t || '');
+    var parts = s.split(/\s*[|·]\s*|\s+-\s+|\s*—\s*/);
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i].trim();
+      if (p && p.indexOf(SITE_NAME) === -1) { return p; }
+    }
+    return s.trim();
+  }
+  function pageTitle() {
+    var h = document.querySelector('article h1');
+    var s = h ? String(h.textContent || '').trim() : '';
+    return s || cleanTitle(document.title);
   }
 
   /* ---- 节流写入 ---- */
@@ -60,7 +80,7 @@
       if (data[key]) { delete data[key]; writeStore(data); render(); }
       return;
     }
-    data[key] = { t: cleanTitle(document.title), u: location.pathname + location.search, p: p, a: Date.now() };
+    data[key] = { t: pageTitle(), u: location.pathname + location.search, p: p, a: Date.now() };
     /* 按 a 倒序裁剪：只留最新 MAX 条 */
     Object.keys(data).sort(function (x, y) { return (data[y].a || 0) - (data[x].a || 0); })
       .slice(MAX).forEach(function (k) { delete data[k]; });
