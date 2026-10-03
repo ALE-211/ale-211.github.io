@@ -384,7 +384,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
             if (_st) { _st.remove(); }   /* 同一篇文章：静态卡片让位给动态卡片，避免出现两次 */
             return '<a href="' + _url + '" class="bg-cardbg rounded-xl p-6 card-hover block">' +
                 '<div class="flex items-start gap-4">' +
-                    (p.icon ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + p.icon + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
+                    ((p.cover || p.icon) ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + (p.cover || p.icon) + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
                     '<div>' +
                         /* TASK-114：站长「小分类都变成了博客，博客不属于分类项，应该改为 栏目 · 分类，例如开发 · 网络」。
                            原先这里写死 '博客 · ' + 栏目 —— 但「博客」是站点功能名，不是分类。
