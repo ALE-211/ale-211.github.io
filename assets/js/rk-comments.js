@@ -119,12 +119,18 @@
         if (c.parent_id) { head.appendChild(el('span', 'rk-c-reply-tag', '回复')); }
         body.appendChild(head);
         var content = el('div', 'rk-c-text');
-        content.textContent = c.content;
+        /* TASK-105：软删评论显示占位 */
+        if (c.content === '' && (c.author === '[deleted]' || c.display === '[deleted]')) {
+            content.textContent = '原评论已删除';
+            content.style.opacity = '.6';
+        } else {
+            content.textContent = c.content;
+        }
         body.appendChild(content);
         var foot = el('div', 'rk-c-actions');
         if (state.canComment) {
             var rb = el('button', 'rk-c-btn', '回复');
-            rb.onclick = function () { focusReply(c.id, c.display); };
+            rb.onclick = function () { focusReply(c, c.display); };
             foot.appendChild(rb);
         }
         if (c.can_delete) {
@@ -169,8 +175,9 @@
         box.appendChild(btn);
         return box;
     }
-    function focusReply(id, display) {
-        state.replyTo = id;
+    function focusReply(c, display) {
+        /* TASK-105：2 层限制——回复"回复"时挂到顶层父评论 */
+        state.replyTo = c.parent_id ? c.parent_id : c.id;
         var ta = root.querySelector('.rk-c-input');
         if (ta) {
             ta.placeholder = '回复 @' + display + '：';
