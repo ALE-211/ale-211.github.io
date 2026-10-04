@@ -706,6 +706,13 @@ body.rk-has-announce { padding-top: 34px; }
   #articleBody h3, #richEditor h3 { font-size:1.1rem !important; margin-top:1.5rem !important; }
 }
 #articleBody p, #richEditor p { color:var(--rk-text-soft); line-height:1.85; margin:0 0 1rem; }
+/* TASK-131（2026-10-04，DeepSeek）：信息行 / 提示行（.text-textlight.text-sm）**以 MC 页为准**。
+   实测 MC：line-height 21.25px（= text-sm 的 1.25rem）、color #cbd5e1（text-textlight）、margin-bottom 0；
+   而上面那条 `#articleBody p`（**id 选择器**）特异性高于 Tailwind 的 .text-sm / .text-textlight
+   ⇒ 动态文章与编辑器里变成 line-height 27.5px、颜色 #d1d5db、还多出 17px 下边距 —— 站长因此报
+   「信息，提示和旧网页不一样」。MC 页对应规则是 `article p`（特异性低于类）所以类能赢，
+   这里按 MC 的实测值把这两个类的组合固定下来，别再被基础 p 规则盖掉。 */
+#articleBody p.text-textlight.text-sm, #richEditor p.text-textlight.text-sm { color:#cbd5e1; line-height:1.25rem; margin:0; }
 /* TASK-118 的装饰块（下载标 / 下载卡 / 胶囊 / 命令块）—— 静态教程页与动态文章同款 */
 #articleBody .dl-btn, #richEditor .dl-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem;
   background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.5); color:#4ade80;
@@ -744,6 +751,8 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody ol li, #richEditor ol li { list-style:decimal; }
 #articleBody blockquote, #richEditor blockquote { border-left:3px solid var(--rk-primary); background:rgb(var(--rk-primary-rgb) / .06); padding:.6em 1em; color:var(--rk-text-dim); margin:1em 0; border-radius:0 .5em .5em 0; }
 #articleBody img, #richEditor img { max-width:100%; border-radius:.7em; margin:1em 0; }
+/* TASK-131：视频（编辑器「视频」按钮插入 <video controls>）—— 与图片同款宽度处理 */
+#articleBody video, #richEditor video { max-width:100%; border-radius:.7em; margin:1em 0; display:block; background:#000; }
 #articleBody table, #richEditor table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow-x:auto; }
 #articleBody th, #articleBody td, #richEditor th, #richEditor td { border:1px solid var(--rk-border); padding:.5em .9em; text-align:left; }
 #articleBody th, #richEditor th { background:var(--rk-code-bg); color:var(--rk-text-soft); }
