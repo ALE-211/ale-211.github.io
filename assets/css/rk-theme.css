@@ -72,6 +72,38 @@
   --rk-veil:rgba(22,23,26,.65);
   --rk-code-bg:#0b1220;
   --rk-code-fg:#4ade80;
+  /* ============================================================
+     TASK-136 代码块语法配色（2026-10-04，DeepSeek）
+     站长：「代码块配色用可以用 vscode 和 intelij idea 的」
+     落地方案（站长亲定）：**java 用 intellij 的、其他用 vscode**；
+                          **深色主题 = VSCode Dark+，浅色主题 = IntelliJ IDEA Light**。
+     ⚠️ 色值来源（不要凭感觉改）：
+        · VSCode Dark+ = 官方主题 extensions/theme-defaults/themes/dark_vs.json（基础）
+          + dark_plus.json（Dark+ 覆盖项），逐条对照抄的。
+        · IntelliJ Darcula / IDEA Light = JetBrains 默认方案（并与 highlight.js 的
+          darcula / intellij-light 主题交叉核对过）。
+     ⚠️ 已知取舍：Prism 把 if/for/return 与 public/class 都归进 .token.keyword，
+        而 Dark+ 里前者是紫 #C586C0、后者是蓝 #569CD6 —— 语法层面分不开，
+        这里统一按 #569CD6 处理。要还原「控制流紫色」得在 rk-code.js 里对 .token.keyword
+        做一次文本后处理（另开任务）。
+     ============================================================ */
+  --rk-code-text:#d4d4d4;                       /* Dark+ 的 editor.foreground */
+  --rk-tk-comment:#6a9955;   --rk-tk-keyword:#569cd6;    --rk-tk-string:#ce9178;
+  --rk-tk-number:#b5cea8;    --rk-tk-function:#dcdcaa;   --rk-tk-typename:#4ec9b0;
+  --rk-tk-variable:#9cdcfe;  --rk-tk-boolean:#569cd6;    --rk-tk-constant:#4fc1ff;
+  --rk-tk-operator:#d4d4d4;  --rk-tk-punctuation:#d4d4d4;
+  --rk-tk-property:#9cdcfe;  --rk-tk-tag:#569cd6;        --rk-tk-selector:#d7ba7d;
+  --rk-tk-attrname:#9cdcfe;  --rk-tk-attrvalue:#ce9178;
+  --rk-tk-regex:#d16969;     --rk-tk-atrule:#c586c0;     --rk-tk-annotation:#dcdcaa;
+  --rk-tk-namespace:#4ec9b0; --rk-tk-important:#569cd6;
+  --rk-tk-inserted:#b5cea8;  --rk-tk-deleted:#ce9178;    --rk-tk-invalid:#f44747;
+  /* Java 专用（IntelliJ Darcula）：深色主题下只作用于 code.language-java。
+     两个浅色块会把下面这批 --rk-jk-* 全部改写成 IDEA Light 的值。 */
+  --rk-jk-comment:#808080;   --rk-jk-keyword:#cc7832;    --rk-jk-string:#6a8759;
+  --rk-jk-number:#6897bb;    --rk-jk-function:#ffc66d;   --rk-jk-typename:#a9b7c6;
+  --rk-jk-variable:#a9b7c6;  --rk-jk-boolean:#cc7832;    --rk-jk-constant:#9876aa;
+  --rk-jk-operator:#a9b7c6;  --rk-jk-punctuation:#a9b7c6;
+  --rk-jk-annotation:#bbb529;--rk-jk-namespace:#a9b7c6;
 }
 
 /* ============================================================
@@ -129,9 +161,29 @@ html[data-theme="light"]{
   --rk-shadow-tint:#101828;
   --rk-shadow-tint-rgb:16 24 40;
   --rk-veil:rgba(248,250,252,.72);
-  /* 代码块保持深色（Prism 配色为深底设计），值不变 */
-  --rk-code-bg:#0b1220;
-  --rk-code-fg:#4ade80;
+  /* TASK-136：浅色主题的代码块**改成浅底**，配色用 IntelliJ IDEA Light（站长：「浅色 ij idea light」）。
+     原先这里写的是「代码块保持深色，值不变」⇒ 浅色主题下代码块是深底 #0b1220 + 绿字 #4ade80，
+     于是同一页里的**行内 code（深底 + --rk-info 深青字）**和**表头（深底 + --rk-text-soft 深字）**
+     全都看不清 —— 这两个是顺带修掉的对比度 bug。
+     底色没用纯白：卡片是 #fbfcfe，纯白会糊在一起，取 slate-100 让代码块边界清楚。 */
+  --rk-code-bg:#f1f5f9;
+  --rk-code-fg:#000000;
+  --rk-code-text:#000000;                       /* IDEA Light 的默认前景色 */
+  --rk-tk-comment:#8c8c8c;   --rk-tk-keyword:#0033b3;    --rk-tk-string:#067d17;
+  --rk-tk-number:#1750eb;    --rk-tk-function:#00627a;   --rk-tk-typename:#000000;
+  --rk-tk-variable:#000000;  --rk-tk-boolean:#0033b3;    --rk-tk-constant:#871094;
+  --rk-tk-operator:#000000;  --rk-tk-punctuation:#000000;
+  --rk-tk-property:#871094;  --rk-tk-tag:#0033b3;        --rk-tk-selector:#0033b3;
+  --rk-tk-attrname:#871094;  --rk-tk-attrvalue:#067d17;
+  --rk-tk-regex:#264eff;     --rk-tk-atrule:#0033b3;     --rk-tk-annotation:#9e880d;
+  --rk-tk-namespace:#000000; --rk-tk-important:#0033b3;
+  --rk-tk-inserted:#067d17;  --rk-tk-deleted:#8c8c8c;    --rk-tk-invalid:#ff0000;
+  /* 浅色主题下 Java 也是 IntelliJ（就是 IDEA Light 本身）⇒ --rk-jk-* 与 --rk-tk-* 同值 */
+  --rk-jk-comment:#8c8c8c;   --rk-jk-keyword:#0033b3;    --rk-jk-string:#067d17;
+  --rk-jk-number:#1750eb;    --rk-jk-function:#00627a;   --rk-jk-typename:#000000;
+  --rk-jk-variable:#000000;  --rk-jk-boolean:#0033b3;    --rk-jk-constant:#871094;
+  --rk-jk-operator:#000000;  --rk-jk-punctuation:#000000;
+  --rk-jk-annotation:#9e880d;--rk-jk-namespace:#000000;
 }
 @media (prefers-color-scheme: light){
   html:not([data-theme]){
@@ -183,8 +235,24 @@ html[data-theme="light"]{
   --rk-shadow-tint:#101828;
   --rk-shadow-tint-rgb:16 24 40;
     --rk-veil:rgba(248,250,252,.72);
-    --rk-code-bg:#0b1220;
-    --rk-code-fg:#4ade80;
+    /* TASK-136：与 html[data-theme="light"] 完全同值（本文件里浅色变量一直是两处并列写的） */
+    --rk-code-bg:#f1f5f9;
+    --rk-code-fg:#000000;
+    --rk-code-text:#000000;
+    --rk-tk-comment:#8c8c8c;   --rk-tk-keyword:#0033b3;    --rk-tk-string:#067d17;
+    --rk-tk-number:#1750eb;    --rk-tk-function:#00627a;   --rk-tk-typename:#000000;
+    --rk-tk-variable:#000000;  --rk-tk-boolean:#0033b3;    --rk-tk-constant:#871094;
+    --rk-tk-operator:#000000;  --rk-tk-punctuation:#000000;
+    --rk-tk-property:#871094;  --rk-tk-tag:#0033b3;        --rk-tk-selector:#0033b3;
+    --rk-tk-attrname:#871094;  --rk-tk-attrvalue:#067d17;
+    --rk-tk-regex:#264eff;     --rk-tk-atrule:#0033b3;     --rk-tk-annotation:#9e880d;
+    --rk-tk-namespace:#000000; --rk-tk-important:#0033b3;
+    --rk-tk-inserted:#067d17;  --rk-tk-deleted:#8c8c8c;    --rk-tk-invalid:#ff0000;
+    --rk-jk-comment:#8c8c8c;   --rk-jk-keyword:#0033b3;    --rk-jk-string:#067d17;
+    --rk-jk-number:#1750eb;    --rk-jk-function:#00627a;   --rk-jk-typename:#000000;
+    --rk-jk-variable:#000000;  --rk-jk-boolean:#0033b3;    --rk-jk-constant:#871094;
+    --rk-jk-operator:#000000;  --rk-jk-punctuation:#000000;
+    --rk-jk-annotation:#9e880d;--rk-jk-namespace:#000000;
   }
 }
 
@@ -477,41 +545,95 @@ html.tw-fail .rk-search input{ color:#fff !important; }
   font-size:.92rem; color:var(--rk-code-fg); overflow-x:auto;
   margin:.75rem 0 1.25rem; white-space:pre; line-height:1.7; position:relative;
 }
+/* TASK-136：.ok 原来写死 #fbbf24（琥珀-400）—— 浅色主题下代码块变成浅底后它就快看不见了。
+   改用主题感知的 --rk-warn（深色 #fbbf24 / 浅色 #d97706），两套主题都清楚。 */
 .cmd-block .cmt{ color:#64748b; }
-.cmd-block .ok{ color:#fbbf24; }
+.cmd-block .ok{ color:var(--rk-warn); }
 @media (max-width:1023px){
   .cmd-block{ font-size:.78rem !important; padding:.7rem .8rem !important; line-height:1.6 !important; }
 }
 
-/* ---- Prism token 配色（对齐 cmd-block 绿色系，覆盖 #articleBody pre 通用块） ---- */
-pre.cmd-block .token.comment, #articleBody pre .token.comment{ color:#64748b; font-style:italic; }
-pre.cmd-block .token.keyword, #articleBody pre .token.keyword{ color:#4ade80; }
-pre.cmd-block .token.string, #articleBody pre .token.string{ color:#86efac; }
-pre.cmd-block .token.function, #articleBody pre .token.function{ color:#60a5fa; }
-pre.cmd-block .token.operator, #articleBody pre .token.operator{ color:#93c5fd; }
-pre.cmd-block .token.number, #articleBody pre .token.number{ color:#fbbf24; }
-pre.cmd-block .token.variable, #articleBody pre .token.variable{ color:#c4b5fd; }
-pre.cmd-block .token.punctuation, #articleBody pre .token.punctuation{ color:#94a3b8; }
-pre.cmd-block .token.builtin, #articleBody pre .token.builtin{ color:#7dd3fc; }
-pre.cmd-block .token.boolean, #articleBody pre .token.boolean{ color:#f472b6; }
-pre.cmd-block .token.property, #articleBody pre .token.property{ color:#93c5fd; }
-pre.cmd-block .token.selector, #articleBody pre .token.selector{ color:#4ade80; }
-pre.cmd-block .token.attr-name, #articleBody pre .token.attr-name{ color:#fbbf24; }
-pre.cmd-block .token.atrule, #articleBody pre .token.atrule{ color:#f472b6; }
+/* ============================================================
+   TASK-136 代码块语法配色 —— 规则本体（色值全部走上面的 --rk-tk-* / --rk-jk-* 变量）
+   ⚠️ 作用域刻意用最朴素的 `pre .token.*`：**一次覆盖所有代码块**
+      （pre.cmd-block 静态教程页 / #articleBody 动态文章 / #richEditor 编辑器 /
+       #previewBox 编辑器预览 / 以及任何裸 <pre>）。
+      旧写法只写了 `pre.cmd-block` 与 `#articleBody pre` 两条，后果是：
+        · 编辑器 Markdown 预览里的 token **一个颜色都没有**（Prism 生成了 span 却没人上色）；
+        · board/hidog 那个裸 <pre>（不属 .cmd-block、也不在 #articleBody 里）同样没颜色。
+      加新代码块容器时不需要再改这里 ✓
+   ⚠️ 顺序有意义：`.token.annotation` 必须排在 `.token.punctuation` **之后**
+      （Prism 的 @Override 同时带 annotation 与 punctuation 两个类，同特异性下后者胜出）。 */
+/* 代码块基色：统一走 IDE 的默认前景色（Dark+ #d4d4d4 / IDEA Light #000）
+   —— 未被 Prism 着色的部分（命令参数、cfg 的键值、中文注释…）也该是 IDE 的观感，
+      所以必须把下面三条旧的基色压过去：
+        · .cmd-block{color:var(--rk-code-fg)}  → 旧绿字 #4ade80（静态教程页的命令块）
+        · #articleBody code{color:var(--rk-info)} → 旧青字（会带歪 pre 里的 <code>）
+      ⚠️ 只压 `pre` / `pre code`；**行内** code 与**行内** .cmd-block 小标签保持原样（那是站点的强调色）。 */
+pre, pre code{ color:var(--rk-code-text); }
+pre.cmd-block{ color:var(--rk-code-text); }
+#articleBody pre code, #richEditor pre code{ color:var(--rk-code-text); }
+pre .token.comment, pre .token.prolog, pre .token.doctype, pre .token.cdata{ color:var(--rk-tk-comment); font-style:italic; }
+pre .token.punctuation{ color:var(--rk-tk-punctuation); }
+pre .token.operator, pre .token.entity, pre .token.url{ color:var(--rk-tk-operator); }
+pre .token.keyword{ color:var(--rk-tk-keyword); }
+pre .token.atrule{ color:var(--rk-tk-atrule); }
+pre .token.string, pre .token.char, pre .token.template-string{ color:var(--rk-tk-string); }
+pre .token.attr-value{ color:var(--rk-tk-attrvalue); }
+pre .token.regex, pre .token.regex-source{ color:var(--rk-tk-regex); }
+pre .token.number{ color:var(--rk-tk-number); }
+pre .token.boolean{ color:var(--rk-tk-boolean); }
+pre .token.constant, pre .token.symbol{ color:var(--rk-tk-constant); }
+pre .token.function, pre .token.function-name, pre .token.method{ color:var(--rk-tk-function); }
+pre .token.builtin, pre .token.builtin-name{ color:var(--rk-tk-function); }
+pre .token.class-name, pre .token.maybe-class-name, pre .token.generics{ color:var(--rk-tk-typename); }
+pre .token.variable, pre .token.parameter{ color:var(--rk-tk-variable); }
+pre .token.property{ color:var(--rk-tk-property); }
+pre .token.tag{ color:var(--rk-tk-tag); }
+pre .token.selector{ color:var(--rk-tk-selector); }
+pre .token.attr-name{ color:var(--rk-tk-attrname); }
+pre .token.namespace{ color:var(--rk-tk-namespace); }
+pre .token.annotation, pre .token.decorator{ color:var(--rk-tk-annotation); }
+pre .token.important{ color:var(--rk-tk-important); font-weight:700; }
+pre .token.bold{ font-weight:700; }
+pre .token.italic{ font-style:italic; }
+pre .token.inserted{ color:var(--rk-tk-inserted); }
+pre .token.deleted{ color:var(--rk-tk-deleted); }
+pre .token.invalid{ color:var(--rk-tk-invalid); }
+
+/* Java 专用：站长「java 用 intellij 的」⇒ 只对 code.language-java 换成 IntelliJ 配色。
+   深色主题取 Darcula、浅色主题取 IDEA Light（两者都已写进对应的 --rk-jk-* 变量）。 */
+pre code[class*="language-java"] .token.comment{ color:var(--rk-jk-comment); }
+pre code[class*="language-java"] .token.keyword{ color:var(--rk-jk-keyword); }
+pre code[class*="language-java"] .token.string, pre code[class*="language-java"] .token.char{ color:var(--rk-jk-string); }
+pre code[class*="language-java"] .token.number{ color:var(--rk-jk-number); }
+pre code[class*="language-java"] .token.function, pre code[class*="language-java"] .token.method{ color:var(--rk-jk-function); }
+pre code[class*="language-java"] .token.class-name, pre code[class*="language-java"] .token.generics{ color:var(--rk-jk-typename); }
+pre code[class*="language-java"] .token.variable, pre code[class*="language-java"] .token.parameter{ color:var(--rk-jk-variable); }
+pre code[class*="language-java"] .token.boolean{ color:var(--rk-jk-boolean); }
+pre code[class*="language-java"] .token.constant{ color:var(--rk-jk-constant); }
+pre code[class*="language-java"] .token.operator{ color:var(--rk-jk-operator); }
+pre code[class*="language-java"] .token.punctuation{ color:var(--rk-jk-punctuation); }
+pre code[class*="language-java"] .token.namespace{ color:var(--rk-jk-namespace); }
+/* annotation 放最后：Prism 的 @Override = annotation + punctuation，需要它胜出 */
+pre code[class*="language-java"] .token.annotation{ color:var(--rk-jk-annotation); }
 
 /* ---- 复制按钮（rk-code.js） ---- */
 /* TASK-045 V2：渲染器生成的普通 <pre><code> 没有相对定位，绝对定位按钮会逃逸到视口 —— 加类兜底 */
 pre.rk-pre{ position:relative; }
+/* TASK-136：复制按钮改走主题变量 —— 原来写死「浅灰字 + 深色底」，
+   浅色主题下代码块变成浅底之后，一个深色按钮压在浅色块上很突兀，
+   而且那个深底在浅色页面里也不协调。现在两套主题各自成立（浅色=蓝字浅底，深色=蓝字深底）。 */
 .rk-copy-btn{
   position:absolute; top:.5rem; right:.6rem; z-index:5;
   display:inline-flex; align-items:center; gap:.35rem;
   padding:.28rem .6rem; font-size:.72rem; font-weight:600;
-  color:#cbd5e1; background:rgba(15,23,42,.85);
-  border:1px solid rgba(59,130,246,.4); border-radius:.5rem;
-  cursor:pointer; opacity:.85; transition:opacity .15s, background .15s;
+  color:var(--rk-primary-hi); background:rgba(59,130,246,.14);
+  border:1px solid rgba(59,130,246,.45); border-radius:.5rem;
+  cursor:pointer; opacity:.9; transition:opacity .15s, background .15s;
   white-space:nowrap; font-family:inherit;
 }
-.rk-copy-btn:hover{ opacity:1; background:rgba(59,130,246,.25); }
+.rk-copy-btn:hover{ opacity:1; background:rgba(59,130,246,.28); }
 .rk-copy-btn.copied{ color:#4ade80; border-color:rgba(74,222,128,.5); }
 
 /* ---- 复制 toast（rk-code.js 自建） ---- */
@@ -778,7 +900,10 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody strong, #richEditor strong { color:var(--rk-title); }
 #articleBody code, #richEditor code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-info); }
 #articleBody pre:not(.cmd-block), #richEditor pre:not(.cmd-block) { background:var(--rk-code-bg); border:1px solid var(--rk-border); border-radius:.7em; padding:1.1em 1.2em; overflow-x:auto; margin:1em 0; line-height:1.6; }
-#articleBody pre:not(.cmd-block) code, #richEditor pre:not(.cmd-block) code { background:none; padding:0; color:var(--rk-text); font-size:.85rem; }
+/* TASK-136：这里的 color 原为 var(--rk-text)。它的特异性 (1,1,2) 高于下面那条
+   `#articleBody pre code`(1,0,2)，是**动态文章代码块基色的真正来源** ⇒
+   要让代码块用 IDE 的默认前景色，必须改这里（改别处都会被它压回去）。 */
+#articleBody pre:not(.cmd-block) code, #richEditor pre:not(.cmd-block) code { background:none; padding:0; color:var(--rk-code-text); font-size:.85rem; }
 #articleBody ul, #articleBody ol, #richEditor ul, #richEditor ol { padding-left:1.5em; margin:.8em 0; }
 #articleBody li, #richEditor li { margin:.3em 0; }
 #articleBody ul li, #richEditor ul li { list-style:disc; }

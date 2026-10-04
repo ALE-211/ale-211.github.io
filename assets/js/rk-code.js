@@ -13,9 +13,14 @@
 (function () {
   'use strict';
 
-  /* ---- TASK-086：语言标签样式（左上角；复制按钮在右上角，互不重叠） ---- */
+  /* ---- TASK-086：语言标签样式（左上角；复制按钮在右上角，互不重叠） ----
+     TASK-136：改为**走站点主题变量**（--rk-text-dim / --rk-surface-2 / --rk-border）。
+     旧版把颜色写死、并单独挂了一个 @media(prefers-color-scheme:light) 分支 ——
+     那个分支**认不出站点自己的主题开关**（html[data-theme]）：系统是深色、
+     站长手动切成浅色时，这个标签仍是深色底，和其它元素对不上。
+     换成变量后，三种情形（:root / data-theme=light / 系统浅色）全部自动正确，分支也就不用要了。 */
   var langStyle = document.createElement('style');
-  langStyle.textContent = 'pre.rk-pre .rk-lang-tag{position:absolute;top:.55rem;left:.6rem;z-index:2;font-size:.68rem;line-height:1;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:rgba(148,163,184,.9);background:rgba(30,41,59,.55);border:1px solid rgba(148,163,184,.25);border-radius:4px;padding:.28rem .5rem;pointer-events:none}@media(prefers-color-scheme:light){pre.rk-pre .rk-lang-tag{color:rgba(71,85,105,.85);background:rgba(226,232,240,.8);border-color:rgba(100,116,139,.3)}}pre.rk-pre{padding-top:2.6rem !important}';
+  langStyle.textContent = 'pre.rk-pre .rk-lang-tag{position:absolute;top:.55rem;left:.6rem;z-index:2;font-size:.68rem;line-height:1;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--rk-text-dim);background:var(--rk-surface-2);border:1px solid var(--rk-border);border-radius:4px;padding:.28rem .5rem;pointer-events:none}pre.rk-pre{padding-top:2.6rem !important}';
   document.head.appendChild(langStyle);
 
   /* ---- 轻量 toast ---- */
