@@ -803,6 +803,19 @@ body.rk-has-announce { padding-top: 34px; }
 .rk-read-pct{ font-size:.75rem; color:var(--rk-primary-hi); font-variant-numeric:tabular-nums; flex-shrink:0; }
 .rk-read-bar{ height:4px; border-radius:2px; background:rgb(var(--rk-text-rgb)/.1); overflow:hidden; }
 .rk-read-fill{ height:100%; border-radius:2px; background:var(--rk-primary); transition:width .3s ease; }
+/* TASK-151：「继续阅读」每条的"移除"按钮（悬停才出现，避免噪声）。
+   站长：「那个继续阅读 12% 还在，已经死在那边了」—— 根因是进度曾卡住（已修），
+   但一条卡住的旧记录会永远挂在卡片上，所以再给一个**立刻清掉**的手动出口。
+   ⚠️ 按钮在 DOM 里是 .rk-read-card(<a>) 的**兄弟节点**（交互元素不能嵌在链接里，
+     TASK-133 的 <a> 套 <a> 就是被 HTML 解析器拆散的）⇒ 靠 .rk-read-item 定位。 */
+.rk-read-item{ position:relative; }
+.rk-read-x{ position:absolute; top:-.4rem; right:-.4rem; width:1.4rem; height:1.4rem; padding:0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  border-radius:9999px; border:1px solid var(--rk-border); background:var(--rk-card);
+  color:var(--rk-text-mute); font-size:.95rem; line-height:1; opacity:0;
+  transition:opacity .15s, background .15s, color .15s, border-color .15s; }
+.rk-read-item:hover .rk-read-x, .rk-read-x:focus-visible{ opacity:1; }
+.rk-read-x:hover{ background:rgb(var(--rk-err-rgb)/.15); border-color:rgb(var(--rk-err-rgb)/.5); color:var(--rk-err); }
 
 /* ===== TASK-113：表格行内图标操作按钮的统一容器 .rk-ops =====
    站长报「/auth/account.html 已发表文章板块的右侧，文章操作那 4 个按钮布局没搞好，很难看」。

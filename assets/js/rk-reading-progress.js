@@ -21,6 +21,10 @@
   var SHOW = 3;      /* 展示最近 3 条 */
   var SAVE_MS = 1500;
   var DONE_PCT = 95; /* >=95 视为读完 */
+  /* TASK-151：超过这么久没动过的记录视为过期、直接丢掉。
+     站长：「那个继续阅读 12% 还在，已经死在那边了」—— 一条卡住的记录（因为进度没能继续
+     更新，见下面 restoreOnce 的修复）会永远挂在卡片上，所以除了修根因，也加一道时间闸门。 */
+  var EXPIRE_MS = 7 * 24 * 3600 * 1000;
 
   /* ② 结构化判据：文章页 = 有评论区容器 + 正文里有 h1。
      首页/板块落地页/列表页/下载页都没有 #rkComments ⇒ 天然排除，不再维护路径清单。 */
@@ -152,7 +156,8 @@
     Object.keys(data).forEach(function (k) {
       if (k !== key && data[k] && isHere(data[k].u)) delete data[k];
     });
-    /* 按 a 倒序裁剪：只留最新 MAX 条 */
+    /* TASK-151：顺手清掉过期记录，再按 a 倒序裁剪（只留最新 MAX 条） */
+    pruneExpired(data);
     Object.keys(data).sort(function (x, y) { return (data[y].a || 0) - (data[x].a || 0); })
       .slice(MAX).forEach(function (k) { delete data[k]; });
     writeStore(data);
@@ -205,16 +210,20 @@
     var data = readStore();
     /* ⑤ 死代码修复：data 恒为 {}，必须连同 Object.keys 判空 */
     if (!data || !Object.keys(data).length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    /* TASK-151：先丢过期记录（>EXPIRE_MS 没动过的），有改动就回写。
+       —— 这是给"卡死在 12%"那条记录的第二道保险：即使它再也不会被更新，也不会永远挂着。 */
+    if (pruneExpired(data)) writeStore(data);
+    if (!Object.keys(data).length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     /* TASK-151：① 排除**当前这篇文章**（按文章身份，不再按 URL 字符串 ——
        旧写法 `it.u !== location.pathname` 在带查询串的页面上永远不相等，
        于是"你正在读的这一篇"会被列成"继续阅读"）；② 按身份去重（历史上同一篇
        可能既存了干净 URL 又存了 post.php URL 两条），保留更新的那条。 */
     var seen = {};
-    var items = Object.keys(data).map(function (k) { return data[k]; })
-      .filter(function (it) { return it && it.u && it.p > 0 && !isHere(it.u); })
-      .sort(function (a, b) { return (b.a || 0) - (a.a || 0); })
-      .filter(function (it) {
-        var id = identOf(it.u);
+    var items = Object.keys(data).map(function (k) { return { k: k, it: data[k] }; })
+      .filter(function (x) { return x.it && x.it.u && x.it.p > 0 && !isHere(x.it.u); })
+      .sort(function (a, b) { return (b.it.a || 0) - (a.it.a || 0); })
+      .filter(function (x) {
+        var id = identOf(x.it.u);
         if (seen[id]) return false;
         seen[id] = 1;
         return true;
@@ -225,16 +234,54 @@
        内联 display=''（清除）会被 CSS 重新压成 none ⇒ 卡片永远不显示。改为显式 block。 */
     box.style.display = 'block';
     var html = '<h3 class="rk-read-h3"><i class="fa fa-history"></i>继续阅读</h3><div class="space-y-3">';
-    items.forEach(function (it) {
+    items.forEach(function (x) {
+      var it = x.it;
       var pct = Math.max(0, Math.min(100, Math.round(it.p || 0)));
-      html += '<a class="rk-read-card" href="' + it.u + '">'
+      html += '<div class="rk-read-item">'
+        + '<a class="rk-read-card" href="' + escapeHtml(it.u) + '">'
         + '<div class="rk-read-row"><span class="rk-read-title">' + escapeHtml(it.t || it.u) + '</span>'
         + '<span class="rk-read-pct">' + pct + '%</span></div>'
         + '<div class="rk-read-bar"><div class="rk-read-fill" style="width:' + pct + '%"></div></div>'
-        + '</a>';
+        + '</a>'
+        /* TASK-151：每条给一个"移除"按钮（悬停才出现）。
+           ⚠️ 必须放在 <a> **外面** —— 交互元素嵌在链接里是非法结构，浏览器会把它搬出去
+             （TASK-133 的 <a> 套 <a> 就是被解析器拆散的），所以用 .rk-read-item 包一层。 */
+        + '<button type="button" class="rk-read-x" data-k="' + escapeHtml(x.k) + '"'
+        + ' title="从「继续阅读」里移除" aria-label="移除">×</button>'
+        + '</div>';
     });
     html += '</div>';
     box.innerHTML = html;
+  }
+
+  /* TASK-151：丢掉过期记录，返回是否有改动 */
+  function pruneExpired(data) {
+    var now = Date.now(), changed = false;
+    Object.keys(data).forEach(function (k) {
+      var it = data[k];
+      if (!it || typeof it !== 'object' || !it.a || (now - it.a) > EXPIRE_MS) { delete data[k]; changed = true; }
+    });
+    return changed;
+  }
+  /* TASK-151：手动移除一条记录（点卡片右上角那个 ×） */
+  function removeEntry(k) {
+    if (!k) return;
+    var data = readStore(); if (!data) return;
+    if (data[k]) { delete data[k]; writeStore(data); }
+    render();
+  }
+  /* 事件委托：绑定一次即可（render() 只换 innerHTML，容器本身不换） */
+  function bindBox() {
+    var box = document.getElementById('rkContinueReading');
+    if (!box || box.__rkBound) return;
+    box.__rkBound = 1;
+    box.addEventListener('click', function (e) {
+      var btn = (e.target && e.target.closest) ? e.target.closest('.rk-read-x') : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      removeEntry(btn.getAttribute('data-k') || '');
+    });
   }
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -245,6 +292,7 @@
   /* ---- 启动 ---- */
   function init() {
     if (readStore() === null) return; /* 存储不可用：静默降级 */
+    bindBox();   /* TASK-151：× 按钮的事件委托，只绑一次 */
     render();
     restoreOnce();                                  /* ⑥ 立即恢复，不闪开头 */
     window.addEventListener('load', restoreOnce);   /* ⑥ 图片加载后校正文档高度 */
