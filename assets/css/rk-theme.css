@@ -715,6 +715,14 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody .dl-card, #richEditor .dl-card { display:block; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25);
   border-radius:.75rem; padding:.9rem 1rem; transition:all .2s; margin:0 0 1rem; }
 #articleBody .dl-card:hover, #richEditor .dl-card:hover { background:rgba(34,197,94,.14); border-color:rgba(34,197,94,.6); transform:translateY(-2px); }
+/* TASK-130：下载卡一行 1~2 张 —— 单张占满整行，两张自动并排（站长：「有两个下载卡就自动排成一行」）。
+   .dl-row 由编辑器插入；窄屏回落成一行一张。 */
+#articleBody .dl-row, #richEditor .dl-row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.7rem; margin:0 0 1rem; }
+#articleBody .dl-row > :only-child, #richEditor .dl-row > :only-child { grid-column:1 / -1; }
+#articleBody .dl-row .dl-card, #richEditor .dl-row .dl-card { margin:0; }
+@media (max-width:639px) {
+  #articleBody .dl-row, #richEditor .dl-row { grid-template-columns:1fr; }
+}
 #articleBody .pill, #richEditor .pill { display:inline-block; padding:.15rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:600; }
 /* TASK-120：标题内的 <span style="font-size:…"> 不得改变标题字号（否则同一篇里标题大小不一） */
 #articleBody h1 span, #articleBody h2 span, #articleBody h3 span, #articleBody h4 span,
