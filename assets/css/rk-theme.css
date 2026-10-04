@@ -88,6 +88,7 @@
         做一次文本后处理（另开任务）。
      ============================================================ */
   --rk-code-text:#d4d4d4;                       /* Dark+ 的 editor.foreground */
+  --rk-code-inline:#38bdf8;                     /* 行内 code 的字色（= 深色主题的 --rk-info，对比度 8.7） */
   --rk-tk-comment:#6a9955;   --rk-tk-keyword:#569cd6;    --rk-tk-string:#ce9178;
   --rk-tk-number:#b5cea8;    --rk-tk-function:#dcdcaa;   --rk-tk-typename:#4ec9b0;
   --rk-tk-variable:#9cdcfe;  --rk-tk-boolean:#569cd6;    --rk-tk-constant:#4fc1ff;
@@ -169,6 +170,9 @@ html[data-theme="light"]{
   --rk-code-bg:#f1f5f9;
   --rk-code-fg:#000000;
   --rk-code-text:#000000;                       /* IDEA Light 的默认前景色 */
+  /* 行内 code 的字色：浅色下 --rk-info #0284c7 配浅底只有 3.74 的对比度（偏低）
+     ⇒ 用 sky-700 #0369a1，对比度约 5.4 ✓。只影响行内 code，不动 --rk-info 本身。 */
+  --rk-code-inline:#0369a1;
   --rk-tk-comment:#8c8c8c;   --rk-tk-keyword:#0033b3;    --rk-tk-string:#067d17;
   --rk-tk-number:#1750eb;    --rk-tk-function:#00627a;   --rk-tk-typename:#000000;
   --rk-tk-variable:#000000;  --rk-tk-boolean:#0033b3;    --rk-tk-constant:#871094;
@@ -239,6 +243,7 @@ html[data-theme="light"]{
     --rk-code-bg:#f1f5f9;
     --rk-code-fg:#000000;
     --rk-code-text:#000000;
+    --rk-code-inline:#0369a1;
     --rk-tk-comment:#8c8c8c;   --rk-tk-keyword:#0033b3;    --rk-tk-string:#067d17;
     --rk-tk-number:#1750eb;    --rk-tk-function:#00627a;   --rk-tk-typename:#000000;
     --rk-tk-variable:#000000;  --rk-tk-boolean:#0033b3;    --rk-tk-constant:#871094;
@@ -570,8 +575,13 @@ html.tw-fail .rk-search input{ color:#fff !important; }
         · .cmd-block{color:var(--rk-code-fg)}  → 旧绿字 #4ade80（静态教程页的命令块）
         · #articleBody code{color:var(--rk-info)} → 旧青字（会带歪 pre 里的 <code>）
       ⚠️ 只压 `pre` / `pre code`；**行内** code 与**行内** .cmd-block 小标签保持原样（那是站点的强调色）。 */
-pre, pre code{ color:var(--rk-code-text); }
-pre.cmd-block{ color:var(--rk-code-text); }
+/* ⚠️ 特异性必须够高：光写 `pre{...}`(0,0,1) 会被**作者粘贴的工具类**压过去 ——
+   实测 post49 的 <pre> 带着 Tailwind 的 text-green-600(#16a34a)、
+   board/hidog 的 <pre> 带着 text-green-400，于是浅色下代码块文字只有 3.01 的对比度。
+   用 :is(容器) 把特异性抬到 (1,0,+) 才能压过那些类（:is() 取参数里最高的那个 #id）。 */
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) pre,
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) pre code,
+pre.cmd-block, pre.cmd-block code, pre.rk-pre{ color:var(--rk-code-text); }
 #articleBody pre code, #richEditor pre code{ color:var(--rk-code-text); }
 pre .token.comment, pre .token.prolog, pre .token.doctype, pre .token.cdata{ color:var(--rk-tk-comment); font-style:italic; }
 pre .token.punctuation{ color:var(--rk-tk-punctuation); }
@@ -898,7 +908,7 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody li, #articleBody td, #articleBody th, #richEditor li, #richEditor td, #richEditor th { line-height:1.85; }
 #articleBody a, #richEditor a { color:var(--rk-primary-hi); text-decoration:underline; }
 #articleBody strong, #richEditor strong { color:var(--rk-title); }
-#articleBody code, #richEditor code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-info); }
+#articleBody code, #richEditor code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-code-inline); }
 #articleBody pre:not(.cmd-block), #richEditor pre:not(.cmd-block) { background:var(--rk-code-bg); border:1px solid var(--rk-border); border-radius:.7em; padding:1.1em 1.2em; overflow-x:auto; margin:1em 0; line-height:1.6; }
 /* TASK-136：这里的 color 原为 var(--rk-text)。它的特异性 (1,1,2) 高于下面那条
    `#articleBody pre code`(1,0,2)，是**动态文章代码块基色的真正来源** ⇒
