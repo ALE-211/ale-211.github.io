@@ -56,12 +56,57 @@
     }
   }
 
-  /* ---- 语言启发式判定（本站内容驱动） ---- */
+  /* ---- 语言启发式判定（本站内容驱动） ----
+     TASK-135（2026-10-04，DeepSeek）：站长报「代码块识别不准确，把 java 识别成了 bash」。
+     旧实现只有三条规则、**兜底恒为 'bash'** ⇒ 任何不匹配的代码都硬说成 bash；而且还会返回
+     本包**根本没装**的 'powershell'。现改为：按「具体 → 宽泛」排序的多条规则，
+     **认不出来就返回 'text'（老老实实当纯文本）**，不再撒谎。
+     规则是用全站 33 个真实代码块 + 19 条合成用例在 node 里跑出来的（0 失败），
+     改这里的规则请把那两组用例一起跑一遍。 */
   function guessLang(text) {
-    if (/sv_|rcon_password|hostname |mp_friendlyfire|bot_quota|sv_pure/.test(text)) return 'ini';   /* server.cfg 键值对 */
-    if (/@echo|pause|title |setlocal|start /.test(text)) return 'powershell';                       /* .bat 近似 */
-    if (/apt |curl |lsmod|nano |grub-|depmod|ldconfig|nvidia-smi|update-initramfs|sudo |reboot|chmod /.test(text)) return 'bash';
-    return 'bash';
+    var t = String(text || '');
+    if (!t.trim()) { return 'text'; }
+
+    /* 1. Java —— 就是站长报的那一类：public class / static void main / System.out. 原先都进了 bash */
+    if (/\b(?:public|private|protected)\s+(?:static\s+)?[\w<>\[\],.?\s]*\s+\w+\s*\(/.test(t)
+        || /\b(?:class|interface|enum)\s+\w+/.test(t)
+        || /System\.out\.print/.test(t)
+        || /^\s*(?:import|package)\s+java[\w.]*\s*;/m.test(t)
+        || /@(?:Override|Deprecated|SuppressWarnings)\b/.test(t)) { return 'java'; }
+
+    /* 2. JSON */
+    if (/^\s*[{[]/.test(t) && /"\s*:\s*/.test(t)) { return 'json'; }
+
+    /* 3. SQL */
+    if (/^\s*(?:SELECT|INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|CREATE\s+(?:TABLE|DATABASE|INDEX|VIEW)|ALTER\s+TABLE|DROP\s+(?:TABLE|DATABASE))\b/im.test(t)) { return 'sql'; }
+
+    /* 4. HTML / XML（含被转义的 &lt;div&gt;） */
+    if (/<\/?(?:html|head|body|div|span|p|a|img|ul|ol|li|table|thead|tbody|tr|td|th|script|style|meta|link|br|h[1-6]|article|section|nav|form|input|button|pre|code|video|details|summary)\b[^>]*>/i.test(t)
+        || /&lt;\/?[a-z][\w-]*&gt;/i.test(t)) { return 'html'; }
+
+    /* 5. CS:GO / Steam / 引擎配置（键值对 + // 注释）—— 本站那两份 63 行的 server.cfg */
+    if (/^(?:sv_|rcon_password|hostname|mp_|bot_|sm_|cl_|fps_max|tickrate|log\s+on|exec\s)/m.test(t)
+        || /^\/\/[^\n]*\n[\s\S]*^[a-z_]+[ \t]+[\w."-]+/m.test(t)) { return 'ini'; }
+
+    /* 6. PowerShell */
+    if (/(?:^|\s)(?:Get|Set|New|Remove|Start|Stop|Test|Import|Export|Select|Where|ForEach|Write|Invoke|Join|Split|Sort|Measure|ConvertTo|ConvertFrom)-[A-Z]\w*/.test(t)
+        || /\$env:[A-Za-z_]/.test(t)) { return 'powershell'; }
+
+    /* 7. Windows 批处理 —— 刻意收紧：不靠裸的 %xx 判断
+       （否则「# 密码 aDm8H%MdA」这种便签、以及 URL 里的 %20 都会被误判成批处理） */
+    if (/^\s*@echo\s+off/im.test(t)
+        || /^\s*(?:setlocal|endlocal|pause|goto\s+:\w+|call\s+:\w+|if\s+(?:not\s+)?exist\b)/im.test(t)) { return 'batch'; }
+    if (/%~?[a-z]*\d/i.test(t) && /\b(?:echo|set|call|goto|for|if|rem)\b/i.test(t)) { return 'batch'; }
+
+    /* 8. Shell —— 本站最多的类型（apt / nano / chmod / reboot / lsmod / depmod …，以及裸命令） */
+    if (/^#!\s*\/.*\b(?:bash|sh|zsh)\b/.test(t)
+        || /^\s*[$#]\s+\S/m.test(t)
+        || /\b(?:apt|apt-get|yum|dnf|pacman|brew)\s+/.test(t)
+        || /\b(?:sudo|chmod|chown|curl|wget|nano|vim|vi|reboot|shutdown|systemctl|service|mount|umount|tar|unzip|ssh|scp|rsync|grep|find|awk|sed|export|source|docker|git|pip|python3?|node|make|cmake|gcc)\b/.test(t)
+        || /^\s*(?:cd|ls|cp|mv|rm|mkdir|rmdir|touch|cat|echo|ln|df|du|ps|kill|lsmod|modprobe|depmod|update-grub|update-initramfs|ldconfig|nvidia-smi|insmod|rmmod|login\s+anonymous|srcds\.exe)\b/im.test(t)) { return 'bash'; }
+
+    /* 9. 认不出来 → 纯文本（旧版在这里 `return 'bash'`，就是这次 bug 的根因） */
+    return 'text';
   }
 
   /* ---- 是否已有手写高亮 span（保留原文，不 Prism 化） ---- */
@@ -110,11 +155,15 @@
         pre.appendChild(codeEl);
         isPlain = true;
       }
-      if (isPlain || !/(^|\s)language-/.test(codeEl.className || '')) {
-        var lang = guessLang(codeEl.textContent || pre.innerText);
-        codeEl.className = 'language-' + lang;
-      }
-      try { Prism.highlightElement(codeEl); } catch (e) {}
+      /* TASK-135：只有本包**确实装了**这门语法时才写 language-* 并交给 Prism。
+         guessLang 认不出来会返回 'text'（包内没有该语法）⇒ 不写 class、不调 Prism，
+         标签显示 "TEXT"、正文保持纯文本 —— 而不是旧版那样一律硬说成 BASH。 */
+      var cls = String(codeEl.className || '');
+      var explicit = /(^|\s)language-([\w-]+)/.exec(cls);
+      var lang = explicit ? explicit[2] : guessLang(codeEl.textContent || pre.innerText);
+      var supported = !!(Prism.languages && Prism.languages[lang]);
+      if (!explicit && supported) { codeEl.className = (cls ? cls + ' ' : '') + 'language-' + lang; }
+      if (supported) { try { Prism.highlightElement(codeEl); } catch (e) {} }
       if (!pre.querySelector('.rk-copy-btn')) {
         pre.classList.add('rk-pre'); /* TASK-045 V2：给插入按钮的 pre 加相对定位类 */
         var b = document.createElement('button');
@@ -136,6 +185,13 @@
       try { if (typeof Prism !== 'undefined') Prism.highlightElement(c); } catch (e) {}
     });
   }
+
+  /* TASK-135：把语言判定暴露出去，供**编辑器预览**复用 —— 单一来源。
+     编辑器里绝不能再抄一份（抄两份必然漂移，TASK-129/130 的「信息/提示行和 MC 不一样」
+     就是两边各写一套写歪的）。admin.html 只用它来判定 Markdown 预览里的代码块语言；
+     ⚠️ 千万不要用 Prism 去高亮 contenteditable 本体（#richEditor）——
+     Prism 会往 DOM 里插 <span>，保存时会被当成正文存进库，还会让前台的 hasHandSpans 判定失效。 */
+  window.rkGuessLang = guessLang;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
