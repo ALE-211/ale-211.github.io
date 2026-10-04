@@ -751,6 +751,8 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody ol li, #richEditor ol li { list-style:decimal; }
 #articleBody blockquote, #richEditor blockquote { border-left:3px solid var(--rk-primary); background:rgb(var(--rk-primary-rgb) / .06); padding:.6em 1em; color:var(--rk-text-dim); margin:1em 0; border-radius:0 .5em .5em 0; }
 #articleBody img, #richEditor img { max-width:100%; border-radius:.7em; margin:1em 0; }
+/* TASK-133：插入组件后的"闪烁高亮"用 class（不再写内联 style，避免被保存进正文） */
+.rk-flash { background: rgb(var(--rk-primary-rgb) / .18) !important; transition: background .3s; }
 /* TASK-131：视频（编辑器「视频」按钮插入 <video controls>）—— 与图片同款宽度处理 */
 #articleBody video, #richEditor video { max-width:100%; border-radius:.7em; margin:1em 0; display:block; background:#000; }
 #articleBody table, #richEditor table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow-x:auto; }
