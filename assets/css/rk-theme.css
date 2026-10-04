@@ -611,22 +611,31 @@ pre .token.inserted{ color:var(--rk-tk-inserted); }
 pre .token.deleted{ color:var(--rk-tk-deleted); }
 pre .token.invalid{ color:var(--rk-tk-invalid); }
 
-/* Java 专用：站长「java 用 intellij 的」⇒ 只对 code.language-java 换成 IntelliJ 配色。
-   深色主题取 Darcula、浅色主题取 IDEA Light（两者都已写进对应的 --rk-jk-* 变量）。 */
-pre code[class*="language-java"] .token.comment{ color:var(--rk-jk-comment); }
-pre code[class*="language-java"] .token.keyword{ color:var(--rk-jk-keyword); }
-pre code[class*="language-java"] .token.string, pre code[class*="language-java"] .token.char{ color:var(--rk-jk-string); }
-pre code[class*="language-java"] .token.number{ color:var(--rk-jk-number); }
-pre code[class*="language-java"] .token.function, pre code[class*="language-java"] .token.method{ color:var(--rk-jk-function); }
-pre code[class*="language-java"] .token.class-name, pre code[class*="language-java"] .token.generics{ color:var(--rk-jk-typename); }
-pre code[class*="language-java"] .token.variable, pre code[class*="language-java"] .token.parameter{ color:var(--rk-jk-variable); }
-pre code[class*="language-java"] .token.boolean{ color:var(--rk-jk-boolean); }
-pre code[class*="language-java"] .token.constant{ color:var(--rk-jk-constant); }
-pre code[class*="language-java"] .token.operator{ color:var(--rk-jk-operator); }
-pre code[class*="language-java"] .token.punctuation{ color:var(--rk-jk-punctuation); }
-pre code[class*="language-java"] .token.namespace{ color:var(--rk-jk-namespace); }
-/* annotation 放最后：Prism 的 @Override = annotation + punctuation，需要它胜出 */
-pre code[class*="language-java"] .token.annotation{ color:var(--rk-jk-annotation); }
+/* ============================================================
+   Java / Kotlin 专用配色（站长：「java 用 intellij 的」+「kotlin 也可以用 intellij idea 的」）
+   ⇒ 这两种语言统一走 IntelliJ：深色 Darcula、浅色 IDEA Light
+      （两者都已写进对应的 --rk-jk-* 变量）。
+
+   ⚠️⚠️ 两个关键点，改这里之前必须先看：
+   **① 必须用 `[class~="..."]`（按空白分词精确匹配），绝不能用 `[class*="language-java"]`。**
+      `*=` 是**子串**匹配 —— `language-javascript` 里就含有 `language-java` ⇒
+      TASK-136 我最初写成 `*=` 时，等于给**所有 JS 代码块**也套上了 Darcula 配色 ✗（TASK-137 修掉）。
+   **② 做法是「在 java/kotlin 的 code 元素上整体替换调色板」，而不是一条条写 .token 规则。**
+      自定义属性会**继承**：在 `code` 上把 `--rk-tk-*` 覆盖成 `--rk-jk-*` 之后，
+      上面那批通用的 `pre .token.X{ color:var(--rk-tk-X) }` 会自动取到 IntelliJ 的值 ⇒
+      一条规则覆盖全部 token 类型，加新语言也只需往这个选择器列表里加一个别名。
+      （旧写法是 13 条 `[class*=...] .token.X`，既踩了 ① 的雷，又要为 kotlin 复制 13 条。）
+   kotlin 的 kt / kts 是 Prism 注册的别名 —— 作者写 ```kt 时 Parsedown 会输出 language-kt。 */
+:is(pre code[class~="language-java"],
+    pre code[class~="language-kotlin"], pre code[class~="language-kt"], pre code[class~="language-kts"]) {
+  --rk-tk-comment:var(--rk-jk-comment);        --rk-tk-keyword:var(--rk-jk-keyword);
+  --rk-tk-string:var(--rk-jk-string);          --rk-tk-number:var(--rk-jk-number);
+  --rk-tk-function:var(--rk-jk-function);      --rk-tk-typename:var(--rk-jk-typename);
+  --rk-tk-variable:var(--rk-jk-variable);      --rk-tk-boolean:var(--rk-jk-boolean);
+  --rk-tk-constant:var(--rk-jk-constant);      --rk-tk-operator:var(--rk-jk-operator);
+  --rk-tk-punctuation:var(--rk-jk-punctuation);
+  --rk-tk-annotation:var(--rk-jk-annotation);  --rk-tk-namespace:var(--rk-jk-namespace);
+}
 
 /* ---- 复制按钮（rk-code.js） ---- */
 /* TASK-045 V2：渲染器生成的普通 <pre><code> 没有相对定位，绝对定位按钮会逃逸到视口 —— 加类兜底 */

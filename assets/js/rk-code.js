@@ -72,12 +72,36 @@
     var t = String(text || '');
     if (!t.trim()) { return 'text'; }
 
+    /* 0. Kotlin —— 必须**排在 Java 前面**（Kotlin 也用 class/interface，站长 TASK-137：
+       「kotlin 也可以用 intellij idea 的配色」，两种语言走同一套 IntelliJ 配色）。
+       只用 Kotlin **独有**的特征，保证不会把 Java 抢过来：
+         · Java 没有 `fun`（注意 `function` 不会误命中：正则要求 fun 后面是空格+标识符+左括号）
+         · Java 没有 `val`（只有 var / let / const 那些是别的语言）
+         · Java 没有 `data class` / `sealed class` / `companion object` / `when (`
+         · `?.` 与 `: Unit` 也是 Kotlin 特征
+       ⚠️ 刻意**不用** `println(` 当依据 —— Java 的 `System.out.println(` 里也有；
+          也刻意不用 `!!`（bash 里 `sudo !!` 是「上一条命令」，会误判）。 */
+    if (/\bfun\s+\w+\s*\(/.test(t) || /\bsuspend\s+fun\s+\w+/.test(t)
+        || /\bval\s+\w+/.test(t) || /\bdata\s+class\s+\w+/.test(t)
+        || /\bsealed\s+class\s+\w+/.test(t) || /\bcompanion\s+object\b/.test(t)
+        || /\bwhen\s*\(/.test(t) || /\?\./.test(t) || /:\s*Unit\b/.test(t)) { return 'kotlin'; }
+
     /* 1. Java —— 就是站长报的那一类：public class / static void main / System.out. 原先都进了 bash */
     if (/\b(?:public|private|protected)\s+(?:static\s+)?[\w<>\[\],.?\s]*\s+\w+\s*\(/.test(t)
         || /\b(?:class|interface|enum)\s+\w+/.test(t)
         || /System\.out\.print/.test(t)
         || /^\s*(?:import|package)\s+java[\w.]*\s*;/m.test(t)
         || /@(?:Override|Deprecated|SuppressWarnings)\b/.test(t)) { return 'java'; }
+
+    /* 1b. JavaScript —— 顺带补上（TASK-137）。原先 JS 会被一路判到 bash，标签就是错的；
+       而 javascript / js 语法本包**已经内置**，所以只需认得出来。
+       ⚠️ 刻意**不用** `function `（bash 的 `function foo() {` 会误命中）；
+          只用 JS 独有的写法：箭头函数、const/let 赋值、console./document.、
+          module.exports / window. / JSON.、require('...')、`===` `!==`。 */
+    if (/=>/.test(t) || /\b(?:const|let)\s+[A-Za-z_$][\w$]*\s*=/.test(t)
+        || /\bconsole\.\w+\(/.test(t) || /\bdocument\.\w+/.test(t)
+        || /\b(?:module\.exports|window\.\w+|JSON\.(?:parse|stringify))\b/.test(t)
+        || /\brequire\s*\(\s*['"]/.test(t) || /[!=]==/.test(t)) { return 'javascript'; }
 
     /* 2. JSON */
     if (/^\s*[{[]/.test(t) && /"\s*:\s*/.test(t)) { return 'json'; }
