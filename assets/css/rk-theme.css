@@ -713,6 +713,40 @@ body.rk-has-announce { padding-top: 34px; }
    「信息，提示和旧网页不一样」。MC 页对应规则是 `article p`（特异性低于类）所以类能赢，
    这里按 MC 的实测值把这两个类的组合固定下来，别再被基础 p 规则盖掉。 */
 #articleBody p.text-textlight.text-sm, #richEditor p.text-textlight.text-sm { color:#cbd5e1; line-height:1.25rem; margin:0; }
+/* TASK-134（2026-10-04，DeepSeek）：**旧文章的信息行 / 提示行兜底 + 框色纠偏**。
+   TASK-134 把编辑器模板改成了 MC 的「带强调框」结构（div.bg-primary/10 / div.bg-yellow-500/10），
+   但**已经存在的正文**有两类旧写法，光靠重插模板治不了：
+     ① **裸行**：p.text-textlight.text-sm 里直接放 icon，外面**没有框**
+        （实测 post 52「测试文章」的两行都是这样；它们还被 <div> 包着，所以不能用直接子选择器）。
+     ② **框色错**：框是对的，但里面放的是**警告图标**却套了**蓝色**框
+        （实测 post 49「Hi-Dog」与静态页 board/hidog/index.html 的
+         「注意事项：打板请选择板厚 1.2mm」—— fa-exclamation-triangle + bg-primary/10
+         ⇒ 一条警告显示成蓝色；而站长要的是黄色）。
+   这里按 MC 的计算值一次性兜住，好处是**不用去改已经发布的正文**，
+   而且站长以后从旧页面复制粘贴进来的同款写法也自动生效。
+   作用域 = 动态文章正文（#articleBody）/ 编辑器（#richEditor）/ 静态教程页正文（article.bg-cardbg）。
+   ⚠️ 关键：用 :not(div[class*="bg-primary/10"] > p) 把**新写法**排除掉 ——
+   新写法的 p 在包装 div 里面，不排除就会套两层框。
+   :has() 不被支持时整段规则被忽略，外观退回今天的样子（无害降级）。
+   基准：MC 的 div.bg-primary/10.border-l-4.border-primary.p-4.rounded.mb-4
+        / div.bg-yellow-500/10.border-l-4.border-yellow-500.p-4.rounded.mb-4 */
+:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-info-circle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
+  background:rgb(var(--rk-primary-rgb) / .1); border-left:4px solid rgb(var(--rk-primary-rgb));
+  border-radius:.25rem; padding:1rem; margin:0 0 1rem; }
+:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-circle.text-yellow-500):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p),
+:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-triangle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
+  background:rgba(234,179,8,.1); border-left:4px solid #eab308;
+  border-radius:.25rem; padding:1rem; margin:0 0 1rem; }
+/* 框色纠偏：蓝框里装的是警告图标 ⇒ 按 MC 语义改成黄框（只动颜色，不动布局） */
+:is(#articleBody, #richEditor, article.bg-cardbg) div[class*="bg-primary/10"]:has(> p > i.fa-exclamation-triangle) {
+  background:rgba(234,179,8,.1); border-left-color:#eab308; }
+/* 旧写法的警告图标是 text-primary（蓝，错色）⇒ 按 MC 的 text-yellow-500 着色。
+   fa-exclamation-triangle 只可能是警告语义，所以无论它在蓝框里还是裸行里都该是黄的。 */
+:is(#articleBody, #richEditor, article.bg-cardbg) i.fa-exclamation-triangle { color:#eab308; }
+/* 标签前缀旧写法是 <strong class="text-white">注意事项：</strong> ⇒ 按 MC 的 text-yellow-400 着色
+   （站长说的「1 个黄色强调框」）。只作用于**带警告图标**的那个 p，不会碰信息行里的白色强调。 */
+:is(#articleBody, #richEditor, article.bg-cardbg) p:has(> i.fa-exclamation-triangle) > strong,
+:is(#articleBody, #richEditor, article.bg-cardbg) p:has(> i.fa-exclamation-circle.text-yellow-500) > strong { color:#facc15; }
 /* TASK-118 的装饰块（下载标 / 下载卡 / 胶囊 / 命令块）—— 静态教程页与动态文章同款 */
 #articleBody .dl-btn, #richEditor .dl-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem;
   background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.5); color:#4ade80;
