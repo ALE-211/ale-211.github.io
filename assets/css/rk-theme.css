@@ -980,30 +980,27 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody details[open] > summary, :is(#richEditor, #previewBox) details[open] > summary { margin-bottom:.5em; }
 /* ===== /TASK-129 ===== */
 /* ==========================================================================
-   TASK-151 / TASK-154（2026-10-04，DeepSeek）：**吸顶侧栏的滚动条 = 细而可见**。
-   （这一段经过站长两轮反馈才定下来，把两轮都记下来，避免以后又来回改。）
+   TASK-155（2026-10-04，DeepSeek）：**左栏最终定案 —— 随页面滚，滚到底自动停住**。
+   （这是站长第三轮反馈，前两轮的结论都留在这里，别再走一遍：）
+     · 「ffb board 前台出现了两个滚动条，应该只有一个」 ⇒ 侧栏不能自己长出第二条滚动条
+     · 「往下滚文章左侧栏全部滚完消失不自动停下来」     ⇒ 但也不能整个滚走
+     · 「都随页面滚，但是左侧栏到底自动停住」           ⇒ **本版**
+   几何事实：侧栏（继续阅读 + 作者卡 + 目录 + 浏览）在长文章上必然比视口高
+   （实测 FFB 那篇整栏 **1300px**、视口 900px）⇒「全都同时看得见」不可能。
 
-   现场（headless 实测）：文章页与静态教程页的侧栏都是
-     `lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto`
-   —— 在长文章上侧栏内容（继续阅读卡 + 作者卡 + 目录 + 浏览）必然比视口高
-   （实测 FFB 那篇整栏 **1300px**，而限高只有 **781px**）⇒ 侧栏自己会滚，下面的框靠它才够得着。
-   静态页当年各自内联写了 `.sidebar-scroll::-webkit-scrollbar{width:4px}` 想把它做细，
-   但 blog/ 下用同一个类的几页（post / archive / tags / dashboard）**都没有那份内联定义**
-   ⇒ 那边一直是**系统粗滚动条**（站长正是在 ffb 这篇动态文章上发现的），
-   于是有了 TASK-151「两个滚动条，应该只有一个」。
+   本版行为（**没有任何内层滚动条**）：
+     · 一开始照常**随页面滚**（先看到 继续阅读 / 作者卡）；
+     · 滚到侧栏**底边**贴住视口底时**自动停住**，之后一直钉在那里（目录 / 浏览 常驻可见）；
+     · 整页只用**页面那一条**滚动条 ⇒ 不会再出现"两个滚动条"。
 
-   ⚠️ 两轮试错（结论都写在这里，别再走一遍）：
-     · **TASK-151 把它整条隐藏**（`scrollbar-width:none`）⇒ 视觉上确实只剩一条，
-       但**连"这里还能滚"的提示也没了** ⇒ 站长以为最下面的「浏览」框**消失了** ✗。
-     · **TASK-153 干脆去掉侧栏的吸顶与内滚**（让它随页面滚）⇒ 站长
-       「往下滚文章左侧栏全部滚完消失不自动停下来了」✗ —— 他要的是**停住跟随**。
-   ⇒ 正确解就是**回到原设计（吸顶 + 限高 + 自己滚）**，但滚动条做成 **6px 细条**：
-     侧栏**停得住**（不会滚走）+ 下面的框**够得着** + 观感上只有一条明显的滚动条
-     （页面那条），不会像系统粗滚动条那样看着像"第二条页面滚动条"。
-   本文件在那些静态页之后加载、特异性相同 ⇒ 这里赢，全站一套口径 ✓
-   （各静态页里那份 4px 内联规则从此失效，属有意保留的历史冗余，不必逐页去删）。 */
-.sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgb(var(--rk-text-rgb) / .3) transparent; }
-.sidebar-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-.sidebar-scroll::-webkit-scrollbar-thumb { background: rgb(var(--rk-text-rgb) / .3); border-radius: 3px; }
-.sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgb(var(--rk-text-rgb) / .5); }
+   实现：`top: var(--rk-aside-top, 6rem)`，由 `assets/js/rk-sidebar.js` 按实测高度写这个变量：
+     侧栏高 h、视口高 vh ⇒ 底边贴底时的 top = vh − 16 − h（**负值** ⇒ 正好"滚到底停住"）；
+     h 塞得下时该值大于兜底值 ⇒ 取 min ⇒ 退化成**普通吸顶**。
+   ⚠️ 为什么这点 JS 省不掉：`top` 里的百分比是相对**包含块**（整篇正文）而不是自身高度，
+      CSS 读不到元素自身高度 ⇒ 纯 CSS 做不出"到了底再停"。
+   ⚠️ 脚本没跑（禁 JS / 加载失败）⇒ 兜底 `6rem` 生效 ⇒ 退化成普通吸顶，不会坏。
+   ⚠️ 历史：`.sidebar-scroll`（TASK-151 隐藏滚动条 / TASK-154 改细条）已随本版一起退役 ——
+      侧栏不再滚动，那条规则已无用，故直接删除而非保留。 */
+@media (min-width: 1024px) {
+  .rk-sidebar { position: sticky; top: var(--rk-aside-top, 6rem); }
+}
