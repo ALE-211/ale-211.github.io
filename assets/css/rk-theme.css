@@ -966,3 +966,21 @@ body.rk-has-announce { padding-top: 34px; }
 #articleBody details > summary, :is(#richEditor, #previewBox) details > summary { cursor:pointer; font-weight:600; color:var(--rk-title); }
 #articleBody details[open] > summary, :is(#richEditor, #previewBox) details[open] > summary { margin-bottom:.5em; }
 /* ===== /TASK-129 ===== */
+/* ==========================================================================
+   TASK-151（2026-10-04，DeepSeek）：**吸顶侧栏自己的滚动条不再显示**
+   站长：「ffb board 前台出现了两个滚动条，应该只有一个」。
+   现场（headless 实测）：文章页与静态教程页的侧栏都是
+     `lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto`
+   —— 在长文章上侧栏内容（继续阅读卡 + 作者卡 + 目录 + 浏览）必然比视口高，
+   于是它自己长出**第二条滚动条**，紧挨着页面那条并排竖着，看着就是"两个滚动条"。
+   静态页当年各自内联写了 `.sidebar-scroll::-webkit-scrollbar{width:4px}` 想把它做细，
+   但 blog/ 下用同一个类的几页（post / archive / tags / dashboard）**都没有那份内联定义**
+   ⇒ 那边一直是系统粗滚动条（站长正是在 ffb 这篇动态文章上发现的）。
+   做法：把 .sidebar-scroll 收进本文件**唯一一处**定义，并且**整条隐藏**（不是做细）。
+   ⚠️ 刻意**保留滚动能力**：侧栏比视口高时若去掉 overflow，吸顶元素的下半截会**永远看不到**
+      （sticky 会把它钉在 top 上）。所以口径是"可见的滚动条只有一条，侧栏仍可用滚轮滚"。
+   各静态页里那份 4px 内联规则从此不再生效（本文件在它们之后加载、特异性相同 ⇒ 后者胜），
+   属有意保留的历史冗余，不必逐页去删。
+   ========================================================================== */
+.sidebar-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.sidebar-scroll::-webkit-scrollbar { width: 0; height: 0; }

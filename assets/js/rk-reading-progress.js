@@ -1,7 +1,10 @@
 /* ============================================================
    rk-reading-progress.js —— 阅读进度·继续阅读（TASK-101，唯一来源）
    建立：MainAgent ｜ 2026-10-02 ｜ 修订：TASK-115（②⑤⑥，2026-10-03）
-   存储：localStorage['rk-read'] = { "<location.pathname>": { t, u, p, a } }
+   存储：localStorage['rk-read'] = { "<规范URL>": { t, u, p, a } }
+        （TASK-151 起用规范 URL 作键 —— <link rel=canonical>，取不到才回落 pathname+search；
+          旧版用 location.pathname，同一篇的干净 URL 与 post.php?slug= 会各存一条，
+          而且 post.php 下所有文章还共用一个键 `/blog/post.php`）
    写入：内容页滚动节流 1.5s 写一次；p>=95 视为读完 → 删除记录；最多保留 20 条
    展示：#rkContinueReading 容器内渲染最近 3 条（首页主栏顶部 / 文章页侧栏顶部）
    恢复：回到某篇文章时立即瞬时滚回上次位置（load/300ms 后校正，不闪开头）
@@ -69,18 +72,86 @@
     return s || cleanTitle(document.title);
   }
 
+  /* ============================================================
+     TASK-151（2026-10-04，DeepSeek）：**同一篇文章的两个 URL 形态被当成两个页面**
+     站长：「我都按回到顶部滑到顶了还提示我阅读了 12% 继续阅读」。
+     实测（headless，种入两条记录）：
+       · 在干净 URL `/board/arduino-ffb-board/` 上，「继续阅读」卡片里列出来的**就是这一篇**
+         —— 只不过用的是旧 `/blog/post.php?slug=arduino-ffb-board` 那条记录（37%）；
+       · 在旧 URL 上更糟：**连当前页自己都被列进去了**，因为过滤写的是
+         `it.u !== location.pathname` —— 拿"带查询串的 URL"去比"纯路径"，永远不相等 ✗。
+     修法两条（都只在下面这几个函数里）：
+       pageUrl() —— 本页的**规范 URL**：优先 `<link rel="canonical">`（post.php 一直有），
+                   否则退回落 pathname+search。于是「干净 URL」与「post.php?slug=」
+                   从此**共用同一条记录**，不再各自攒一条。
+       isHere()  —— "这条记录是不是我正在读的这篇文章"：先比规范 URL；再比**文章身份**
+                   （`?slug=xxx` 与 `/<板块>/<slug>/` 视为同一篇）。
+       另外 render() 会按文章身份**去重**，把历史遗留的重复记录合并显示。
+     ============================================================ */
+  var SECTION_1 = { board: 1, server: 1, download: 1 };
+  function safeDec(s) { try { return decodeURIComponent(s); } catch (e) { return s; } }
+  function normPath(u) {
+    var s = String(u || '');
+    var hash = s.indexOf('#'); if (hash >= 0) s = s.slice(0, hash);
+    try { var x = new URL(s, location.origin); return x.pathname + x.search; } catch (e) { return s; }
+  }
+  /* 能唯一认出"哪一篇文章"时才返回 slug，否则返回 ''（宁可少合并，也不要错合并） */
+  function slugOf(u) {
+    var s = String(u || '');
+    var m = /[?&]slug=([^&#]*)/.exec(s);
+    if (m) return safeDec(m[1]);
+    var p = s.split('#')[0].split('?')[0].replace(/\/+$/, '');
+    var seg = p.split('/').filter(Boolean);
+    if (seg.length === 2 && SECTION_1[seg[0]]) return safeDec(seg[1]);
+    return '';
+  }
+  function pageUrl() {
+    var l = document.querySelector('link[rel="canonical"]');
+    var href = l && l.getAttribute('href');
+    if (href) {
+      try {
+        var u = new URL(href, location.href);
+        if (u.origin === location.origin) return u.pathname + u.search;
+      } catch (e) {}
+    }
+    return location.pathname + location.search;
+  }
+  var HERE_URL = pageUrl();
+  var HERE_SLUG = slugOf(location.pathname + location.search);
+  function isHere(u) {
+    if (!u) return false;
+    if (normPath(u) === HERE_URL) return true;
+    var sl = slugOf(u);
+    return !!(sl && HERE_SLUG && sl === HERE_SLUG);
+  }
+  /* 去重用的身份：优先 slug，其次规范路径 */
+  function identOf(u) { return slugOf(u) || normPath(u); }
+
   /* ---- 节流写入 ---- */
   var saveTimer = null;
   function save() {
     if (!isReader()) return;
     var data = readStore(); if (!data) return;
     var p = calcPct();
-    var key = location.pathname;
+    /* TASK-151：键改用**规范 URL**（不再是 location.pathname ——
+       旧写法还把 post.php 那一堆文章全挤在同一个键 `/blog/post.php` 上，
+       等于互相覆盖）。 */
+    var key = HERE_URL;
     if (p >= DONE_PCT) {
-      if (data[key]) { delete data[key]; writeStore(data); render(); }
+      var dirty = false;
+      Object.keys(data).forEach(function (k) {
+        if (k === key || isHere(data[k] && data[k].u)) { delete data[k]; dirty = true; }
+      });
+      if (dirty) { writeStore(data); render(); }
       return;
     }
-    data[key] = { t: pageTitle(), u: location.pathname + location.search, p: p, a: Date.now() };
+    data[key] = { t: pageTitle(), u: HERE_URL, p: p, a: Date.now() };
+    /* TASK-151：把**同一篇文章**的历史遗留键合并掉（旧版按 location.pathname 存，
+       同一篇的干净 URL 与 post.php?slug= 会各留一条）。render() 也按身份去重，
+       这里顺手清掉，免得同一条记录在存储里越攒越多。 */
+    Object.keys(data).forEach(function (k) {
+      if (k !== key && data[k] && isHere(data[k].u)) delete data[k];
+    });
     /* 按 a 倒序裁剪：只留最新 MAX 条 */
     Object.keys(data).sort(function (x, y) { return (data[y].a || 0) - (data[x].a || 0); })
       .slice(MAX).forEach(function (k) { delete data[k]; });
@@ -93,15 +164,38 @@
   }
 
   /* ---- ⑥ 恢复上次阅读位置：瞬时 scrollTo（不用 smooth），load/300ms 后校正 ---- */
-  function restoreOnce() {
-    if (!isReader()) return;
-    var data = readStore(); if (!data) return;
-    var rec = data[location.pathname];
-    if (!rec || !rec.p || rec.p <= 0) return;
-    var h = document.documentElement;
-    var max = h.scrollHeight - window.innerHeight;
+  /* TASK-151：**用户一旦自己滚过，就绝不再把他拽回去**。
+     原实现只在 init / load / 300ms 各"校正"一次，本意是等图片加载完、文档高度确定后
+     再落到正确位置；但 load 事件在长文里可能很晚（等图片/字体），于是出现
+     「我已经滚到顶了，它又把我拽回上次的位置」—— 实测（headless 种入 12% 记录后
+     滚到 50%）记录里**仍然是 12%**，说明那次延迟校正真的把我拉回去了 ✗。
+     现在用一个标记区分"我自己的 scrollTo"与"用户滚的"：用户滚过之后直接放弃校正。 */
+  var selfScroll = false, userScrolled = false;
+  function jumpToPct(pct) {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
     if (max <= 0) return;
-    window.scrollTo(0, Math.round(rec.p / 100 * max));
+    selfScroll = true;
+    window.scrollTo(0, Math.round(pct / 100 * max));
+    /* scroll 事件是**异步派发**的 ⇒ 用一个宏任务把标记放掉，否则会把自己的滚动误判成用户的 */
+    setTimeout(function () { selfScroll = false; }, 0);
+  }
+  window.addEventListener('scroll', function () { if (!selfScroll) userScrolled = true; }, { passive: true });
+
+  function restoreOnce() {
+    if (!isReader() || userScrolled) return;
+    var data = readStore(); if (!data) return;
+    /* TASK-151：先按规范 URL 取；取不到再按"文章身份"找（兼容历史记录 ——
+       它们的键是旧的 location.pathname、u 是 /blog/post.php?slug=…）。 */
+    var rec = data[HERE_URL];
+    if (!rec) {
+      Object.keys(data).forEach(function (k) {
+        var it = data[k];
+        if (!it || !isHere(it.u)) return;
+        if (!rec || (it.a || 0) > (rec.a || 0)) rec = it;
+      });
+    }
+    if (!rec || !rec.p || rec.p <= 0) return;
+    jumpToPct(rec.p);
   }
 
   /* ---- 渲染「继续阅读」卡片（最近 SHOW 条，排除当前页） ---- */
@@ -111,9 +205,20 @@
     var data = readStore();
     /* ⑤ 死代码修复：data 恒为 {}，必须连同 Object.keys 判空 */
     if (!data || !Object.keys(data).length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    /* TASK-151：① 排除**当前这篇文章**（按文章身份，不再按 URL 字符串 ——
+       旧写法 `it.u !== location.pathname` 在带查询串的页面上永远不相等，
+       于是"你正在读的这一篇"会被列成"继续阅读"）；② 按身份去重（历史上同一篇
+       可能既存了干净 URL 又存了 post.php URL 两条），保留更新的那条。 */
+    var seen = {};
     var items = Object.keys(data).map(function (k) { return data[k]; })
-      .filter(function (it) { return it && it.u && it.u !== location.pathname && it.p > 0; })
+      .filter(function (it) { return it && it.u && it.p > 0 && !isHere(it.u); })
       .sort(function (a, b) { return (b.a || 0) - (a.a || 0); })
+      .filter(function (it) {
+        var id = identOf(it.u);
+        if (seen[id]) return false;
+        seen[id] = 1;
+        return true;
+      })
       .slice(0, SHOW);
     if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     /* ⑤ 修复：id 选择器 #rkContinueReading{display:none} 特异性 100，
