@@ -582,7 +582,7 @@ html.tw-fail .rk-search input{ color:#fff !important; }
 :is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) pre,
 :is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) pre code,
 pre.cmd-block, pre.cmd-block code, pre.rk-pre{ color:var(--rk-code-text); }
-#articleBody pre code, #richEditor pre code{ color:var(--rk-code-text); }
+#articleBody pre code, #richEditor pre code, #previewBox pre code{ color:var(--rk-code-text); }
 pre .token.comment, pre .token.prolog, pre .token.doctype, pre .token.cdata{ color:var(--rk-tk-comment); font-style:italic; }
 pre .token.punctuation{ color:var(--rk-tk-punctuation); }
 pre .token.operator, pre .token.entity, pre .token.url{ color:var(--rk-tk-operator); }
@@ -834,26 +834,42 @@ body.rk-has-announce { padding-top: 34px; }
    现在把前台那套原样搬到这里，选择器同时覆盖 #articleBody 与 #richEditor —— 以后只改这一处。
    ⚠️ 取值与 blog/post.php 的内联块**逐字一致**：那边暂时仍留一份（带 !important，用来压过
       正文里的内联 style），属重复；收敛计划见 _ai_collab/TASKS-129.md。
+
+   ── TASK-147（2026-10-04，DeepSeek）补：站长「markdown 预览框的渲染和前端不一样」。 ──
+   根因：TASK-129 只把 **富文本编辑器（#richEditor）** 拉进来共用，
+   **Markdown 的实时预览框 `#previewBox` 被漏在门外** ✗ —— 它一直是
+   `blog/admin.html` 里自己一套**手写**的样式（h2 1.25rem / h3 1.1rem / p margin .6em、
+   连 .dl-card/.dl-btn/.dl-row/.cmd-block 与信息行/提示行兜底**一条都没有**）⇒
+   同一段正文在预览里和在网页上长得完全是两个样，站长一眼就看出来了。
+   修法：把本段里**所有** `#richEditor` 作用域换成 `:is(#richEditor, #previewBox)`
+   （⚠️ 用 `:is()` 包住而不是简单地往逗号列表里加 —— `#articleBody p, #richEditor p`
+   这种带后缀的规则若写成 `#richEditor, #previewBox p` 会**多出一个裸 #richEditor 选择器**）。
+   `:is()` 的特异性取参数里最高者 = `#id` = (1,0,0)，与原来的 `#richEditor` **完全相同**
+   ⇒ 对已有两个作用域**零改变**，只是多覆盖了预览框 ✓。
+   同时把 `:is(#articleBody, #richEditor, article.bg-cardbg)` 那组（信息行/提示行兜底）
+   补上 `#previewBox`。
+   ⇒ **以后新增/修改正文排版，只要写进本段就三处（前台文章 / 富文本编辑器 / Markdown 预览）同时生效**，
+     `blog/admin.html` 里那份重复的 `#previewBox` 样式已删除（那正是"两边各写一套然后漂移"的老毛病）。
    ========================================================================== */
-#articleBody, #richEditor { font-size:.925rem; line-height:1.85; color:var(--rk-text); overflow-wrap:break-word; }
+#articleBody, :is(#richEditor, #previewBox) { font-size:.925rem; line-height:1.85; color:var(--rk-text); overflow-wrap:break-word; }
 #articleBody h1, #articleBody h2, #articleBody h3, #articleBody h4, #articleBody h5, #articleBody h6,
-#richEditor h1, #richEditor h2, #richEditor h3, #richEditor h4, #richEditor h5, #richEditor h6 { color:var(--rk-title); font-weight:700; }
-#articleBody h1, #richEditor h1 { font-size:1.5rem; }
-#articleBody h2, #richEditor h2 { font-size:1.65rem !important; line-height:1.75rem !important; margin:3rem 0 1.25rem !important; padding:.35rem 0 .35rem .875rem !important; border-left:4px solid #3b82f6; border-bottom:1px solid rgba(55,65,81,.6); letter-spacing:.01em; }
-#articleBody h3, #richEditor h3 { font-size:1.3rem !important; line-height:1.75rem !important; margin:2rem 0 .875rem !important; padding-left:.625rem !important; border-left:3px solid rgba(59,130,246,.55); font-weight:700; color:var(--rk-primary); }
-#articleBody h4, #richEditor h4 { font-size:1rem; }
+:is(#richEditor, #previewBox) h1, :is(#richEditor, #previewBox) h2, :is(#richEditor, #previewBox) h3, :is(#richEditor, #previewBox) h4, :is(#richEditor, #previewBox) h5, :is(#richEditor, #previewBox) h6 { color:var(--rk-title); font-weight:700; }
+#articleBody h1, :is(#richEditor, #previewBox) h1 { font-size:1.5rem; }
+#articleBody h2, :is(#richEditor, #previewBox) h2 { font-size:1.65rem !important; line-height:1.75rem !important; margin:3rem 0 1.25rem !important; padding:.35rem 0 .35rem .875rem !important; border-left:4px solid #3b82f6; border-bottom:1px solid rgba(55,65,81,.6); letter-spacing:.01em; }
+#articleBody h3, :is(#richEditor, #previewBox) h3 { font-size:1.3rem !important; line-height:1.75rem !important; margin:2rem 0 .875rem !important; padding-left:.625rem !important; border-left:3px solid rgba(59,130,246,.55); font-weight:700; color:var(--rk-primary); }
+#articleBody h4, :is(#richEditor, #previewBox) h4 { font-size:1rem; }
 @media (max-width:1023px) {
-  #articleBody h2, #richEditor h2 { font-size:1.3rem !important; margin-top:1.75rem !important; margin-bottom:.9rem !important; padding-left:.6rem !important; }
-  #articleBody h3, #richEditor h3 { font-size:1.1rem !important; margin-top:1.5rem !important; }
+  #articleBody h2, :is(#richEditor, #previewBox) h2 { font-size:1.3rem !important; margin-top:1.75rem !important; margin-bottom:.9rem !important; padding-left:.6rem !important; }
+  #articleBody h3, :is(#richEditor, #previewBox) h3 { font-size:1.1rem !important; margin-top:1.5rem !important; }
 }
-#articleBody p, #richEditor p { color:var(--rk-text-soft); line-height:1.85; margin:0 0 1rem; }
+#articleBody p, :is(#richEditor, #previewBox) p { color:var(--rk-text-soft); line-height:1.85; margin:0 0 1rem; }
 /* TASK-131（2026-10-04，DeepSeek）：信息行 / 提示行（.text-textlight.text-sm）**以 MC 页为准**。
    实测 MC：line-height 21.25px（= text-sm 的 1.25rem）、color #cbd5e1（text-textlight）、margin-bottom 0；
    而上面那条 `#articleBody p`（**id 选择器**）特异性高于 Tailwind 的 .text-sm / .text-textlight
    ⇒ 动态文章与编辑器里变成 line-height 27.5px、颜色 #d1d5db、还多出 17px 下边距 —— 站长因此报
    「信息，提示和旧网页不一样」。MC 页对应规则是 `article p`（特异性低于类）所以类能赢，
    这里按 MC 的实测值把这两个类的组合固定下来，别再被基础 p 规则盖掉。 */
-#articleBody p.text-textlight.text-sm, #richEditor p.text-textlight.text-sm { color:#cbd5e1; line-height:1.25rem; margin:0; }
+#articleBody p.text-textlight.text-sm, :is(#richEditor, #previewBox) p.text-textlight.text-sm { color:#cbd5e1; line-height:1.25rem; margin:0; }
 /* TASK-134（2026-10-04，DeepSeek）：**旧文章的信息行 / 提示行兜底 + 框色纠偏**。
    TASK-134 把编辑器模板改成了 MC 的「带强调框」结构（div.bg-primary/10 / div.bg-yellow-500/10），
    但**已经存在的正文**有两类旧写法，光靠重插模板治不了：
@@ -865,80 +881,81 @@ body.rk-has-announce { padding-top: 34px; }
          ⇒ 一条警告显示成蓝色；而站长要的是黄色）。
    这里按 MC 的计算值一次性兜住，好处是**不用去改已经发布的正文**，
    而且站长以后从旧页面复制粘贴进来的同款写法也自动生效。
-   作用域 = 动态文章正文（#articleBody）/ 编辑器（#richEditor）/ 静态教程页正文（article.bg-cardbg）。
+   作用域 = 动态文章正文（#articleBody）/ 编辑器（#richEditor）/ Markdown 预览（#previewBox）
+            / 静态教程页正文（article.bg-cardbg）。
    ⚠️ 关键：用 :not(div[class*="bg-primary/10"] > p) 把**新写法**排除掉 ——
    新写法的 p 在包装 div 里面，不排除就会套两层框。
    :has() 不被支持时整段规则被忽略，外观退回今天的样子（无害降级）。
    基准：MC 的 div.bg-primary/10.border-l-4.border-primary.p-4.rounded.mb-4
         / div.bg-yellow-500/10.border-l-4.border-yellow-500.p-4.rounded.mb-4 */
-:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-info-circle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-info-circle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
   background:rgb(var(--rk-primary-rgb) / .1); border-left:4px solid rgb(var(--rk-primary-rgb));
   border-radius:.25rem; padding:1rem; margin:0 0 1rem; }
-:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-circle.text-yellow-500):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p),
-:is(#articleBody, #richEditor, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-triangle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-circle.text-yellow-500):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p),
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) p.text-textlight.text-sm:has(> i.fa-exclamation-triangle):not(div[class*="bg-primary/10"] > p):not(div[class*="bg-yellow-500/10"] > p) {
   background:rgba(234,179,8,.1); border-left:4px solid #eab308;
   border-radius:.25rem; padding:1rem; margin:0 0 1rem; }
 /* 框色纠偏：蓝框里装的是警告图标 ⇒ 按 MC 语义改成黄框（只动颜色，不动布局） */
-:is(#articleBody, #richEditor, article.bg-cardbg) div[class*="bg-primary/10"]:has(> p > i.fa-exclamation-triangle) {
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) div[class*="bg-primary/10"]:has(> p > i.fa-exclamation-triangle) {
   background:rgba(234,179,8,.1); border-left-color:#eab308; }
 /* 旧写法的警告图标是 text-primary（蓝，错色）⇒ 按 MC 的 text-yellow-500 着色。
    fa-exclamation-triangle 只可能是警告语义，所以无论它在蓝框里还是裸行里都该是黄的。 */
-:is(#articleBody, #richEditor, article.bg-cardbg) i.fa-exclamation-triangle { color:#eab308; }
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) i.fa-exclamation-triangle { color:#eab308; }
 /* 标签前缀旧写法是 <strong class="text-white">注意事项：</strong> ⇒ 按 MC 的 text-yellow-400 着色
    （站长说的「1 个黄色强调框」）。只作用于**带警告图标**的那个 p，不会碰信息行里的白色强调。 */
-:is(#articleBody, #richEditor, article.bg-cardbg) p:has(> i.fa-exclamation-triangle) > strong,
-:is(#articleBody, #richEditor, article.bg-cardbg) p:has(> i.fa-exclamation-circle.text-yellow-500) > strong { color:#facc15; }
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) p:has(> i.fa-exclamation-triangle) > strong,
+:is(#articleBody, #richEditor, #previewBox, article.bg-cardbg) p:has(> i.fa-exclamation-circle.text-yellow-500) > strong { color:#facc15; }
 /* TASK-118 的装饰块（下载标 / 下载卡 / 胶囊 / 命令块）—— 静态教程页与动态文章同款 */
-#articleBody .dl-btn, #richEditor .dl-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem;
+#articleBody .dl-btn, :is(#richEditor, #previewBox) .dl-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem;
   background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.5); color:#4ade80;
   border-radius:9999px; font-family:Consolas,"Microsoft YaHei",monospace; font-size:.85rem;
   font-weight:600; transition:all .2s; white-space:nowrap; }
-#articleBody .dl-btn:hover, #richEditor .dl-btn:hover { background:#22c55e; color:#fff; border-color:#22c55e; }
-#articleBody .dl-card, #richEditor .dl-card { display:block; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25);
+#articleBody .dl-btn:hover, :is(#richEditor, #previewBox) .dl-btn:hover { background:#22c55e; color:#fff; border-color:#22c55e; }
+#articleBody .dl-card, :is(#richEditor, #previewBox) .dl-card { display:block; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25);
   border-radius:.75rem; padding:.9rem 1rem; transition:all .2s; margin:0 0 1rem; }
-#articleBody .dl-card:hover, #richEditor .dl-card:hover { background:rgba(34,197,94,.14); border-color:rgba(34,197,94,.6); transform:translateY(-2px); }
+#articleBody .dl-card:hover, :is(#richEditor, #previewBox) .dl-card:hover { background:rgba(34,197,94,.14); border-color:rgba(34,197,94,.6); transform:translateY(-2px); }
 /* TASK-130：下载卡一行 1~2 张 —— 单张占满整行，两张自动并排（站长：「有两个下载卡就自动排成一行」）。
    .dl-row 由编辑器插入；窄屏回落成一行一张。 */
-#articleBody .dl-row, #richEditor .dl-row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.7rem; margin:0 0 1rem; }
-#articleBody .dl-row > :only-child, #richEditor .dl-row > :only-child { grid-column:1 / -1; }
-#articleBody .dl-row .dl-card, #richEditor .dl-row .dl-card { margin:0; }
+#articleBody .dl-row, :is(#richEditor, #previewBox) .dl-row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.7rem; margin:0 0 1rem; }
+#articleBody .dl-row > :only-child, :is(#richEditor, #previewBox) .dl-row > :only-child { grid-column:1 / -1; }
+#articleBody .dl-row .dl-card, :is(#richEditor, #previewBox) .dl-row .dl-card { margin:0; }
 @media (max-width:639px) {
-  #articleBody .dl-row, #richEditor .dl-row { grid-template-columns:1fr; }
+  #articleBody .dl-row, :is(#richEditor, #previewBox) .dl-row { grid-template-columns:1fr; }
 }
-#articleBody .pill, #richEditor .pill { display:inline-block; padding:.15rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:600; }
+#articleBody .pill, :is(#richEditor, #previewBox) .pill { display:inline-block; padding:.15rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:600; }
 /* TASK-120：标题内的 <span style="font-size:…"> 不得改变标题字号（否则同一篇里标题大小不一） */
 #articleBody h1 span, #articleBody h2 span, #articleBody h3 span, #articleBody h4 span,
 #articleBody h5 span, #articleBody h6 span,
-#richEditor h1 span, #richEditor h2 span, #richEditor h3 span, #richEditor h4 span,
-#richEditor h5 span, #richEditor h6 span { font-size:inherit !important; }
-#articleBody .rk-cmd, #articleBody .cmd-block, #richEditor .rk-cmd, #richEditor .cmd-block { background:var(--rk-code-bg); border:1px solid var(--rk-border);
+:is(#richEditor, #previewBox) h1 span, :is(#richEditor, #previewBox) h2 span, :is(#richEditor, #previewBox) h3 span, :is(#richEditor, #previewBox) h4 span,
+:is(#richEditor, #previewBox) h5 span, :is(#richEditor, #previewBox) h6 span { font-size:inherit !important; }
+#articleBody .rk-cmd, #articleBody .cmd-block, :is(#richEditor, #previewBox) .rk-cmd, :is(#richEditor, #previewBox) .cmd-block { background:var(--rk-code-bg); border:1px solid var(--rk-border);
   border-radius:.6rem; padding:.8rem 1rem; margin:1rem 0; font-family:Consolas,"Microsoft YaHei",monospace;
   font-size:.85rem; line-height:1.7; overflow-x:auto; }
-#articleBody li, #articleBody td, #articleBody th, #richEditor li, #richEditor td, #richEditor th { line-height:1.85; }
-#articleBody a, #richEditor a { color:var(--rk-primary-hi); text-decoration:underline; }
-#articleBody strong, #richEditor strong { color:var(--rk-title); }
-#articleBody code, #richEditor code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-code-inline); }
-#articleBody pre:not(.cmd-block), #richEditor pre:not(.cmd-block) { background:var(--rk-code-bg); border:1px solid var(--rk-border); border-radius:.7em; padding:1.1em 1.2em; overflow-x:auto; margin:1em 0; line-height:1.6; }
+#articleBody li, #articleBody td, #articleBody th, :is(#richEditor, #previewBox) li, :is(#richEditor, #previewBox) td, :is(#richEditor, #previewBox) th { line-height:1.85; }
+#articleBody a, :is(#richEditor, #previewBox) a { color:var(--rk-primary-hi); text-decoration:underline; }
+#articleBody strong, :is(#richEditor, #previewBox) strong { color:var(--rk-title); }
+#articleBody code, :is(#richEditor, #previewBox) code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-code-inline); }
+#articleBody pre:not(.cmd-block), :is(#richEditor, #previewBox) pre:not(.cmd-block) { background:var(--rk-code-bg); border:1px solid var(--rk-border); border-radius:.7em; padding:1.1em 1.2em; overflow-x:auto; margin:1em 0; line-height:1.6; }
 /* TASK-136：这里的 color 原为 var(--rk-text)。它的特异性 (1,1,2) 高于下面那条
    `#articleBody pre code`(1,0,2)，是**动态文章代码块基色的真正来源** ⇒
    要让代码块用 IDE 的默认前景色，必须改这里（改别处都会被它压回去）。 */
-#articleBody pre:not(.cmd-block) code, #richEditor pre:not(.cmd-block) code { background:none; padding:0; color:var(--rk-code-text); font-size:.85rem; }
-#articleBody ul, #articleBody ol, #richEditor ul, #richEditor ol { padding-left:1.5em; margin:.8em 0; }
-#articleBody li, #richEditor li { margin:.3em 0; }
-#articleBody ul li, #richEditor ul li { list-style:disc; }
-#articleBody ol li, #richEditor ol li { list-style:decimal; }
-#articleBody blockquote, #richEditor blockquote { border-left:3px solid var(--rk-primary); background:rgb(var(--rk-primary-rgb) / .06); padding:.6em 1em; color:var(--rk-text-dim); margin:1em 0; border-radius:0 .5em .5em 0; }
-#articleBody img, #richEditor img { max-width:100%; border-radius:.7em; margin:1em 0; }
+#articleBody pre:not(.cmd-block) code, :is(#richEditor, #previewBox) pre:not(.cmd-block) code { background:none; padding:0; color:var(--rk-code-text); font-size:.85rem; }
+#articleBody ul, #articleBody ol, :is(#richEditor, #previewBox) ul, :is(#richEditor, #previewBox) ol { padding-left:1.5em; margin:.8em 0; }
+#articleBody li, :is(#richEditor, #previewBox) li { margin:.3em 0; }
+#articleBody ul li, :is(#richEditor, #previewBox) ul li { list-style:disc; }
+#articleBody ol li, :is(#richEditor, #previewBox) ol li { list-style:decimal; }
+#articleBody blockquote, :is(#richEditor, #previewBox) blockquote { border-left:3px solid var(--rk-primary); background:rgb(var(--rk-primary-rgb) / .06); padding:.6em 1em; color:var(--rk-text-dim); margin:1em 0; border-radius:0 .5em .5em 0; }
+#articleBody img, :is(#richEditor, #previewBox) img { max-width:100%; border-radius:.7em; margin:1em 0; }
 /* TASK-133：插入组件后的"闪烁高亮"用 class（不再写内联 style，避免被保存进正文） */
 .rk-flash { background: rgb(var(--rk-primary-rgb) / .18) !important; transition: background .3s; }
 /* TASK-131：视频（编辑器「视频」按钮插入 <video controls>）—— 与图片同款宽度处理 */
-#articleBody video, #richEditor video { max-width:100%; border-radius:.7em; margin:1em 0; display:block; background:#000; }
-#articleBody table, #richEditor table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow-x:auto; }
-#articleBody th, #articleBody td, #richEditor th, #richEditor td { border:1px solid var(--rk-border); padding:.5em .9em; text-align:left; }
-#articleBody th, #richEditor th { background:var(--rk-code-bg); color:var(--rk-text-soft); }
-#articleBody hr, #richEditor hr { border-color:var(--rk-border); margin:1.5em 0; }
+#articleBody video, :is(#richEditor, #previewBox) video { max-width:100%; border-radius:.7em; margin:1em 0; display:block; background:#000; }
+#articleBody table, :is(#richEditor, #previewBox) table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow-x:auto; }
+#articleBody th, #articleBody td, :is(#richEditor, #previewBox) th, :is(#richEditor, #previewBox) td { border:1px solid var(--rk-border); padding:.5em .9em; text-align:left; }
+#articleBody th, :is(#richEditor, #previewBox) th { background:var(--rk-code-bg); color:var(--rk-text-soft); }
+#articleBody hr, :is(#richEditor, #previewBox) hr { border-color:var(--rk-border); margin:1.5em 0; }
 /* 折叠面板：前台与编辑器同款 —— 站长「折叠也不知道在折叠什么」，至少让它看得出来是个可展开的块 */
-#articleBody details, #richEditor details { border:1px solid var(--rk-border); border-radius:.6rem; padding:.5rem .8rem; margin:1em 0; background:rgb(var(--rk-text-rgb) / .03); }
-#articleBody details > summary, #richEditor details > summary { cursor:pointer; font-weight:600; color:var(--rk-title); }
-#articleBody details[open] > summary, #richEditor details[open] > summary { margin-bottom:.5em; }
+#articleBody details, :is(#richEditor, #previewBox) details { border:1px solid var(--rk-border); border-radius:.6rem; padding:.5rem .8rem; margin:1em 0; background:rgb(var(--rk-text-rgb) / .03); }
+#articleBody details > summary, :is(#richEditor, #previewBox) details > summary { cursor:pointer; font-weight:600; color:var(--rk-title); }
+#articleBody details[open] > summary, :is(#richEditor, #previewBox) details[open] > summary { margin-bottom:.5em; }
 /* ===== /TASK-129 ===== */
