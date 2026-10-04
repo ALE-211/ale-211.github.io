@@ -682,3 +682,66 @@ body.rk-has-announce { padding-top: 34px; }
   .rk-ops{ gap:.3rem; }
   .rk-ops > a, .rk-ops > button{ width:1.75rem !important; height:1.75rem !important; min-width:1.75rem; font-size:.75rem; }
 }
+
+/* ==========================================================================
+   TASK-129（2026-10-04，DeepSeek）：富文本编辑器与前台文章正文**共用一套排版**
+   站长：「最重要的就是富文本要保证编辑中的样子要和网页渲染出来的样子一样，这样才知道在写什么」。
+   原先 blog/admin.html 的 #richEditor 自带一套「编辑器专用」样式（h2 1.3rem / h3 1.1rem /
+   p margin .5em …），而前台是 blog/post.php 里的 #articleBody（h2 1.65rem + 左蓝边 4px +
+   下边框 + 3rem 外边距 …）⇒ 两边根本不是一套；编辑器里插入的 .dl-btn / .dl-card /
+   .cmd-block 甚至**完全没有样式**，看上去当然"残废"。
+   现在把前台那套原样搬到这里，选择器同时覆盖 #articleBody 与 #richEditor —— 以后只改这一处。
+   ⚠️ 取值与 blog/post.php 的内联块**逐字一致**：那边暂时仍留一份（带 !important，用来压过
+      正文里的内联 style），属重复；收敛计划见 _ai_collab/TASKS-129.md。
+   ========================================================================== */
+#articleBody, #richEditor { font-size:.925rem; line-height:1.85; color:var(--rk-text); overflow-wrap:break-word; }
+#articleBody h1, #articleBody h2, #articleBody h3, #articleBody h4, #articleBody h5, #articleBody h6,
+#richEditor h1, #richEditor h2, #richEditor h3, #richEditor h4, #richEditor h5, #richEditor h6 { color:var(--rk-title); font-weight:700; }
+#articleBody h1, #richEditor h1 { font-size:1.5rem; }
+#articleBody h2, #richEditor h2 { font-size:1.65rem !important; line-height:1.75rem !important; margin:3rem 0 1.25rem !important; padding:.35rem 0 .35rem .875rem !important; border-left:4px solid #3b82f6; border-bottom:1px solid rgba(55,65,81,.6); letter-spacing:.01em; }
+#articleBody h3, #richEditor h3 { font-size:1.3rem !important; line-height:1.75rem !important; margin:2rem 0 .875rem !important; padding-left:.625rem !important; border-left:3px solid rgba(59,130,246,.55); font-weight:700; color:var(--rk-primary); }
+#articleBody h4, #richEditor h4 { font-size:1rem; }
+@media (max-width:1023px) {
+  #articleBody h2, #richEditor h2 { font-size:1.3rem !important; margin-top:1.75rem !important; margin-bottom:.9rem !important; padding-left:.6rem !important; }
+  #articleBody h3, #richEditor h3 { font-size:1.1rem !important; margin-top:1.5rem !important; }
+}
+#articleBody p, #richEditor p { color:var(--rk-text-soft); line-height:1.85; margin:0 0 1rem; }
+/* TASK-118 的装饰块（下载标 / 下载卡 / 胶囊 / 命令块）—— 静态教程页与动态文章同款 */
+#articleBody .dl-btn, #richEditor .dl-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem;
+  background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.5); color:#4ade80;
+  border-radius:9999px; font-family:Consolas,"Microsoft YaHei",monospace; font-size:.85rem;
+  font-weight:600; transition:all .2s; white-space:nowrap; }
+#articleBody .dl-btn:hover, #richEditor .dl-btn:hover { background:#22c55e; color:#fff; border-color:#22c55e; }
+#articleBody .dl-card, #richEditor .dl-card { display:block; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25);
+  border-radius:.75rem; padding:.9rem 1rem; transition:all .2s; margin:0 0 1rem; }
+#articleBody .dl-card:hover, #richEditor .dl-card:hover { background:rgba(34,197,94,.14); border-color:rgba(34,197,94,.6); transform:translateY(-2px); }
+#articleBody .pill, #richEditor .pill { display:inline-block; padding:.15rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:600; }
+/* TASK-120：标题内的 <span style="font-size:…"> 不得改变标题字号（否则同一篇里标题大小不一） */
+#articleBody h1 span, #articleBody h2 span, #articleBody h3 span, #articleBody h4 span,
+#articleBody h5 span, #articleBody h6 span,
+#richEditor h1 span, #richEditor h2 span, #richEditor h3 span, #richEditor h4 span,
+#richEditor h5 span, #richEditor h6 span { font-size:inherit !important; }
+#articleBody .rk-cmd, #articleBody .cmd-block, #richEditor .rk-cmd, #richEditor .cmd-block { background:var(--rk-code-bg); border:1px solid var(--rk-border);
+  border-radius:.6rem; padding:.8rem 1rem; margin:1rem 0; font-family:Consolas,"Microsoft YaHei",monospace;
+  font-size:.85rem; line-height:1.7; overflow-x:auto; }
+#articleBody li, #articleBody td, #articleBody th, #richEditor li, #richEditor td, #richEditor th { line-height:1.85; }
+#articleBody a, #richEditor a { color:var(--rk-primary-hi); text-decoration:underline; }
+#articleBody strong, #richEditor strong { color:var(--rk-title); }
+#articleBody code, #richEditor code { background:var(--rk-code-bg); padding:.15em .4em; border-radius:.35em; font-size:.85em; color:var(--rk-info); }
+#articleBody pre:not(.cmd-block), #richEditor pre:not(.cmd-block) { background:var(--rk-code-bg); border:1px solid var(--rk-border); border-radius:.7em; padding:1.1em 1.2em; overflow-x:auto; margin:1em 0; line-height:1.6; }
+#articleBody pre:not(.cmd-block) code, #richEditor pre:not(.cmd-block) code { background:none; padding:0; color:var(--rk-text); font-size:.85rem; }
+#articleBody ul, #articleBody ol, #richEditor ul, #richEditor ol { padding-left:1.5em; margin:.8em 0; }
+#articleBody li, #richEditor li { margin:.3em 0; }
+#articleBody ul li, #richEditor ul li { list-style:disc; }
+#articleBody ol li, #richEditor ol li { list-style:decimal; }
+#articleBody blockquote, #richEditor blockquote { border-left:3px solid var(--rk-primary); background:rgb(var(--rk-primary-rgb) / .06); padding:.6em 1em; color:var(--rk-text-dim); margin:1em 0; border-radius:0 .5em .5em 0; }
+#articleBody img, #richEditor img { max-width:100%; border-radius:.7em; margin:1em 0; }
+#articleBody table, #richEditor table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow-x:auto; }
+#articleBody th, #articleBody td, #richEditor th, #richEditor td { border:1px solid var(--rk-border); padding:.5em .9em; text-align:left; }
+#articleBody th, #richEditor th { background:var(--rk-code-bg); color:var(--rk-text-soft); }
+#articleBody hr, #richEditor hr { border-color:var(--rk-border); margin:1.5em 0; }
+/* 折叠面板：前台与编辑器同款 —— 站长「折叠也不知道在折叠什么」，至少让它看得出来是个可展开的块 */
+#articleBody details, #richEditor details { border:1px solid var(--rk-border); border-radius:.6rem; padding:.5rem .8rem; margin:1em 0; background:rgb(var(--rk-text-rgb) / .03); }
+#articleBody details > summary, #richEditor details > summary { cursor:pointer; font-weight:600; color:var(--rk-title); }
+#articleBody details[open] > summary, #richEditor details[open] > summary { margin-bottom:.5em; }
+/* ===== /TASK-129 ===== */

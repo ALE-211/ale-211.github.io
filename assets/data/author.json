@@ -17,14 +17,14 @@
                                   "CS:GO"
                               ],
                    "stats":  {
-                                 "articles":  7,
+                                 "articles":  6,
                                  "drafts":  0,
-                                 "views":  224,
-                                 "exp":  364,
+                                 "views":  182,
+                                 "exp":  302,
                                  "level":  3,
                                  "level_name":  "进阶",
                                  "next_exp":  600,
-                                 "progress":  21
+                                 "progress":  1
                              }
                }
 }
