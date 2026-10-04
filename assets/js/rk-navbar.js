@@ -348,7 +348,7 @@
         if (document.getElementById('rk-lightbox-script')) { return; }
         var s = document.createElement('script');
         s.id = 'rk-lightbox-script';
-        s.src = '/assets/js/rk-lightbox.js?v=20260928v1';
+        s.src = '/assets/js/rk-lightbox.js?v=20261004v2';
         document.head.appendChild(s);
     }
 

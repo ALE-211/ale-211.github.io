@@ -167,6 +167,21 @@
 
     /* ③ 标题锚点复制（静态页正文不叫 #articleBody，共享 CSS 已同时覆盖 article 选择器） */
     if (art) {
+        /* TASK-124（2026-10-04，DeepSeek）：先给正文里没写 id 的 h2/h3 自动补 id。
+           与 blog/db.php 的 ensure_heading_ids() 同一套规则（sectionN，跳过已占用的号），
+           这样以后新增的静态文章即使忘了手写 id，也照样有井号锚点。
+           范围限定 <article>：静态页的卡片标题（作者卡、目录卡）都在 <aside> 里，不会被误加。 */
+        (function () {
+            var used = {}, all = document.querySelectorAll('[id]'), i;
+            for (i = 0; i < all.length; i++) { if (all[i].id) { used[all[i].id] = true; } }
+            var n = 0;
+            Array.prototype.forEach.call(art.querySelectorAll('h2, h3'), function (h) {
+                if (h.id) { return; }
+                do { n++; } while (used['section' + n]);
+                h.id = 'section' + n;
+                used[h.id] = true;
+            });
+        })();
         Array.prototype.forEach.call(art.querySelectorAll('h2[id],h3[id]'), function (h) {
             if (h.querySelector('.rk-anchor')) { return; }
             var a = document.createElement('a');

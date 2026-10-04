@@ -20,7 +20,12 @@
     window.__rkLightboxLoaded = true;
 
     /* ---- 正文容器选择器（文章页 + 静态教程页通用） ---- */
-    var BODY_SEL = '#articleBody, .rk-article-body, .post-content, .markdown-body, article .content, .rk-article';
+    /* TASK-124（2026-10-04，DeepSeek）：末尾补上裸 `article`。
+       静态教程页的正文容器是 <article class="bg-cardbg rounded-xl p-6">，原先这 6 个选择器
+       一个都不匹配 ⇒ 静态页点图完全不开灯箱（实测 BODY_SEL 命中 = NONE、open 恒为 false）。
+       安全性：静态页的作者卡/目录卡标题都在 <aside> 里，article 内只有正文，不会误纳。
+       注：走的是「就近命中」，动态文章正文有 #articleBody，仍优先命中它，行为不变。 */
+    var BODY_SEL = '#articleBody, .rk-article-body, .post-content, .markdown-body, article .content, .rk-article, article';
 
     /* ---- 灯箱样式（令牌） ---- */
     var css = '' +

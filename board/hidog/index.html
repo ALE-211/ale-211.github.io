@@ -185,7 +185,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 <body class="bg-darkbg text-textlight min-h-screen transition-colors duration-300" style="">
     <!-- 顶部快捷导航栏 -->
         <div id="rk-navbar"></div>
-<script src="/assets/js/rk-navbar.js?v=20260928v20"></script>
+<script src="/assets/js/rk-navbar.js?v=20261004v21"></script>
 <script src="/assets/js/rk-reading-progress.js?v=20261003v3"></script>
 
     <main class="container mx-auto px-4 py-8 grid lg:grid-cols-4 gap-8 relative">
@@ -296,7 +296,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 
 
                 <h2 id="section4" class="text-xl font-bold text-white mt-10 mb-3">Hi-Dog 底座安装</h2>
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">1) 装入 PCB、锂电池和舵机</h3>
+                <h3 id="section12" class="text-lg font-bold text-primary mt-6 mb-2">1) 装入 PCB、锂电池和舵机</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     将 PCB 板，锂电池和 4 个舵机依次装入底部外壳。舵机接口定义按主控板为正前方从左到右分别为 <strong class="text-white">Signal, VCC, GND</strong>。
                 </p>
@@ -314,7 +314,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     </div>
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">2) 装上前盖板和上盖板</h3>
+                <h3 id="section13" class="text-lg font-bold text-primary mt-6 mb-2">2) 装上前盖板和上盖板</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     装上 Type-C 前盖板和外壳上盖板。
                 </p>
@@ -322,7 +322,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/jpXM1aizbPWNurVDmSIvECxQWcQD0bE1ZANc5Sv6.png" alt="底座盖板装配" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">3) 固定舵臂到 3D 打印腿</h3>
+                <h3 id="section14" class="text-lg font-bold text-primary mt-6 mb-2">3) 固定舵臂到 3D 打印腿</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     将舵机配件包里最小的舵臂用最小的螺丝固定在 3D 打印腿上。
                 </p>
@@ -330,7 +330,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/DWEDVwueD7KvrVjPdHvNeMYW3C1aSQd2yDnO2SBl.png" alt="舵臂固定示意" class="max-w-xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">4) 安装腿部，大功告成！</h3>
+                <h3 id="section15" class="text-lg font-bold text-primary mt-6 mb-2">4) 安装腿部，大功告成！</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     将腿装在舵机上，并用螺丝进行固定。大功告成！
                 </p>
@@ -367,7 +367,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 </div>
 
                 <h2 id="section7" class="text-xl font-bold text-white mt-10 mb-3">3D 模型结构 Constructure</h2>
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 本体</h3>
+                <h3 id="section16" class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 本体</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     Hi-Dog 本体采用层叠式设计，本体由一块 1.2mm 主控板 PCB、两个 3D 打印结构件（一个外壳、一个遮光消噪结构件）、一块正面 1mm 亚克力面板组成。
                 </p>
@@ -375,7 +375,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/rLMWY150YQrv9riN5JP5jLM9G95Cv2iOIvwv5821.png" alt="本体3D爆炸图" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 机器狗底座</h3>
+                <h3 id="section17" class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 机器狗底座</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     Hi-Dog 机器狗底座由一块 PCB 扩展板、4 个 3D 打印零件、一块 702040 500mAh 锂离子电池、4 个 180° SG92R 舵机组成。3D 结构爆炸图如下。
                 </p>
@@ -384,7 +384,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 </div>
 
                 <h2 id="section8" class="text-xl font-bold text-white mt-10 mb-3">硬件电路设计 Electronic Design</h2>
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">本体电路</h3>
+                <h3 id="section18" class="text-lg font-bold text-primary mt-6 mb-2">本体电路</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     Hi-Dog 硬件部分主要包含电源管理、MCU、音频、显示和舵机机械狗五个部分，总体硬件框图如下：
                 </p>
@@ -392,7 +392,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/t7q0nzVPmi4VFdFmDZP1CSMv9Nos2MYa5Pkd0zac.png" alt="总体硬件框图" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">供电方式</h3>
+                <h3 id="section19" class="text-lg font-bold text-primary mt-6 mb-2">供电方式</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     Hi-Dog 使用 USB Type-C 供电，使用 RT9013 将电压降低为 3.3V 电压供 MCU 与音频使用。由于 ESP32-C3 Wi-Fi 发包时瞬态电流较高，可能会影响麦克风音频播放与拾音效果，因此推荐使用负载调整率尽可能低的 LDO 或者 DCDC 芯片。为了防止电源噪声引入麦克风端，需要添加额外低通滤波电路分离麦克风与 MCU 电源轨。
                 </p>
@@ -400,7 +400,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/42SpbP4VDzmzfhvjlXhg4goFDnDoE9jS7vApg8Qb.png" alt="LDO供电电路" class="max-w-xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">音频 — 拾音部分</h3>
+                <h3 id="section20" class="text-lg font-bold text-primary mt-6 mb-2">音频 — 拾音部分</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     拾音部分采用驻极体咪头作为拾音设备，使用跨阻抗放大器将驻极体麦克风的输出电流转换为输出电压，经过电阻偏置后送到 ESP32 的 ADC。由于 ESP32-C3 的电压采集范围约 0~1V，放大倍数请根据所选用咪头实际的灵敏度调整 R18。
                 </p>
@@ -408,7 +408,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/wVnI1fWiY2GLS004VcFPcfgohDj5r5x5jbFKCVZc.png" alt="麦克风拾音电路" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">音频 — 发声部分</h3>
+                <h3 id="section21" class="text-lg font-bold text-primary mt-6 mb-2">音频 — 发声部分</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     发声部分采用 I2S-PDM 信号直出，为了避免 Wi-Fi 传输对输出信号的干扰，采用差分的方式进行传输。经过 RC 滤波后经音频运放 NS4150B 放大输出，输出的放大倍数设定为 7.2 倍。
                 </p>
@@ -416,7 +416,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/GjYqBeetFZxiBSwxd2WGGn4GtddbUmZxW3iowO6Y.png" alt="音频放大电路" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">底座电路</h3>
+                <h3 id="section22" class="text-lg font-bold text-primary mt-6 mb-2">底座电路</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     舵机机械狗底座由四个舵机构成，同时集成了电池管理功能，舵机控制线通过 USB-C 直连到 Hi-Dog 本体。舵机由电池直接供电，底座对本体供电由电池电压泵升到 5V，从而避免了舵机在执行动作时，电池电压波动对系统的影响。底座硬件框图如下：
                 </p>
@@ -424,7 +424,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/0tSAbglpTh0OtTcXvZeXoykQxsOhvxUaLs75dd3a.png" alt="底座硬件框图" class="max-w-xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">电池升压</h3>
+                <h3 id="section23" class="text-lg font-bold text-primary mt-6 mb-2">电池升压</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     由于舵机直接由电池进行供电，为防止舵机工作时电压不稳定影响 Hi-Dog 本体的正常工作，需要将电池电压升压至 5V 后再供给 Hi-Dog 本体，升压电路如下：
                 </p>
@@ -432,7 +432,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <img src="../../assets/images/hidog/2582eea6d3024dc1bfbcc4dab713d81f.png" alt="电池升压电路" class="max-w-2xl mx-auto h-auto rounded-lg">
                 </div>
 
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">电源开关</h3>
+                <h3 id="section24" class="text-lg font-bold text-primary mt-6 mb-2">电源开关</h3>
                 <p class="text-textlight mb-4 leading-relaxed">
                     舵机工作时电流较大，尤其是 4 个同时工作时，而额定工作电流大的拨动开关体积都偏大，无法满足机器狗的结构设计。因此，在本项目中采用小开关和一个 MOS 组合的开关电路，具体电路如下：
                 </p>
@@ -441,13 +441,13 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 </div>
 
                 <h2 id="section9" class="text-xl font-bold text-white mt-10 mb-3">物料清单 BOM</h2>
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 主控板 主要物料清单</h3>
+                <h3 id="section25" class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 主控板 主要物料清单</h3>
                 <ul class="list-disc list-inside text-textlight space-y-2 mb-6 pl-2">
                     <li>8 欧 1 瓦 2014B 方形腔体喇叭</li>
                     <li>4*1.5mm 麦克风</li>
                     <li>0.96 寸 TFT 京东方插接式胶铁一体</li>
                 </ul>
-                <h3 class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 扩展板 主要物料清单</h3>
+                <h3 id="section26" class="text-lg font-bold text-primary mt-6 mb-2">Hi-Dog 扩展板 主要物料清单</h3>
                 <ul class="list-disc list-inside text-textlight space-y-2 mb-6 pl-2">
                     <li>702040 聚合物锂电池</li>
                     <li>180 度 SG92R 舵机</li>
@@ -551,7 +551,7 @@ backTopBtn.addEventListener('click', ()=>{
 <script src="/assets/js/prism-bundle.min.js?v=20260926"></script>
 <script src="/assets/js/rk-toc.js?v=20260929v1"></script>
 <script src="/assets/js/rk-code.js?v=20260927v10?v=20260926"></script>
-<script src="/assets/js/rk-post-widgets.js?v=20261003v1"></script>
+<script src="/assets/js/rk-post-widgets.js?v=20261004v2"></script>
 <script src="/assets/js/rk-comments.js?v=20261003v5"></script>
 <script src="/assets/js/rk-likes.js?v=20260927v2"></script>
 </body></html>
