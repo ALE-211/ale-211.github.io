@@ -103,7 +103,20 @@
     }
 
     function isActive(n) {
-        try { return !!n.test(PATH); } catch (e) { return false; }
+        try {
+            /* TASK-141（2026-10-04，DeepSeek）：文章页会注入 window.RK_SECTION（栏目 id）。
+               有它就**按栏目**决定高亮哪一项 —— 只看路径前缀的话，
+               /blog/post.php?slug=… 打开的文章会一律高亮「博客」，与真实栏目无关
+               （站长：「新建一篇文章又是导航栏博客高亮」，已报过两次）。
+               「首页最新(home)」没有独立板块，归到「博客」（它本来就只在首页/列表出现）。 */
+            var sec = window.RK_SECTION;
+            if (sec) {
+                var HREF_OF = { home: '/blog/', dev: '/board/index.html',
+                                download: '/download/index.html', server: '/server/index.html' };
+                if (HREF_OF[sec]) { return n.href === HREF_OF[sec]; }
+            }
+            return !!n.test(PATH);
+        } catch (e) { return false; }
     }
 
     function esc(s) {
@@ -444,10 +457,21 @@
             return a;
         }
         var p = PATH;
-        tab.appendChild(link('/index.html', 'fa-home', '首页', p === '/' || p === '/index.html'));
-        tab.appendChild(link('/blog/', 'fa-pencil-square-o', '博客', p.indexOf('/blog') === 0 && p !== '/blog/tools.php' && p !== '/blog/dashboard.php' && p !== '/blog/media.php' && p !== '/blog/admin.html'));
-        tab.appendChild(link('/download/index.html', 'fa-download', '下载', p.indexOf('/download/') === 0));
-        tab.appendChild(link('/server/index.html', 'fa-server', '服务器', p.indexOf('/server/') === 0));
+        /* TASK-141（2026-10-04，DeepSeek）：**不要再各自写一套按路径判断的高亮**。
+           这里原先把 NAV 里那几条 test 又抄了一遍，后果是 RK_SECTION（按**栏目**高亮）
+           只对桌面导航生效，而底栏仍按路径判 ⇒ 站长的旧 post.php 链接会
+           「开发 + 博客」**同时高亮两项**（实测复现）。现在统一问 isActive()：
+           按 href 找到 NAV 里对应那一项，规则只有一份。 */
+        function actOf(href) {
+            for (var i = 0; i < NAV.length; i++) {
+                if (NAV[i].href === href) { return isActive(NAV[i]); }
+            }
+            return false;
+        }
+        tab.appendChild(link('/index.html', 'fa-home', '首页', actOf('/index.html')));
+        tab.appendChild(link('/blog/', 'fa-pencil-square-o', '博客', actOf('/blog/')));
+        tab.appendChild(link('/download/index.html', 'fa-download', '下载', actOf('/download/index.html')));
+        tab.appendChild(link('/server/index.html', 'fa-server', '服务器', actOf('/server/index.html')));
         var mineA = link(mine, 'fa-user', '我的', p.indexOf('/auth/account.html') === 0);
         mineA.id = 'rkTabMine';
         tab.appendChild(mineA);
