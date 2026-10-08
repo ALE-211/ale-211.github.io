@@ -343,12 +343,13 @@ header.rk-header{
 @media (min-width:768px){  .rk-bar{ max-width:768px;  } }
 @media (min-width:1024px){ .rk-bar{ max-width:1024px; } }
 @media (min-width:1280px){ .rk-bar{ max-width:1280px; } }
-@media (min-width:1536px){ .rk-bar{ max-width:1720px; } }   /* TASK-160：与 main.container 的 1720 同步，顶栏/正文边框对齐 */
-/* TASK-160（2026-10-08，DeepSeek）：站长「两边卡片太窄了」—— 双栏侧栏 220→280。
-   侧栏加宽必然挤正文 ⇒ 把**整站容器**一并提到 1720（.rk-bar / main 同步加宽，边框依然对齐）：
-   正文 = 1720 − 32(px-4) − 2×34(gap) − 2×280 = 1060px（比 220 时的 994px 更宽）。
+@media (min-width:1536px){ .rk-bar{ max-width:1820px; } }   /* TASK-160/161：与 main.container 的 1820 同步，顶栏/正文边框对齐 */
+/* TASK-160/161（2026-10-08，DeepSeek）：站长「两边卡片太窄了」→「拉长到大致和原来一样宽」。
+   双栏侧栏 220 → 280 → **340**（≈原来单栏时代的 350px），整站容器随之 1536 → 1720 → **1820**
+   （.rk-bar / main 同步加宽，边框依然对齐）：
+   正文 = 1820 − 32(px-4) − 2×34(gap) − 2×340 = **1040px**（与加宽前几乎一致）。
    ⚠️ 只影响 ≥1536px 视口；1024/1280 两档容器不变。 */
-@media (min-width:1536px){ main.container{ max-width:1720px; } }
+@media (min-width:1536px){ main.container{ max-width:1820px; } }
 
 /* logo */
 .rk-logo{
@@ -769,15 +770,15 @@ pre.rk-pre{ position:relative; }
 #backTopBtn{right:max(14px,calc(50vw - 623px));bottom:3.2rem;width:3.6rem;height:3.6rem;display:inline-flex;align-items:center;justify-content:center}
 #backTopBtn i{font-size:1.4rem}
 /* TASK-095d：按钮组贴「正文卡外侧·右下角」。
-   main 是 container（1024/1280/1720 三档——TASK-160 起 ≥1536px 视口为 1720），卡片右边缘 = 50vw + main宽/2 − 17。
+   main 是 container（1024/1280/1820 三档——TASK-160/161 起 ≥1536px 视口为 1820），卡片右边缘 = 50vw + main宽/2 − 17。
    外侧位（按钮整体在卡片右边）：right = 50vw − main宽/2 − 56（含 12px 间隔 + 61px 按钮宽）；
    仅当右侧留白 ≥73px 时用外侧，否则回落卡片内缘，避免按钮溢出屏幕或压在正文上。
-   TASK-160：≥1536px 视口 main=1720，但视口 1536-1719 时 main=视口宽（流体）⇒ 该段内缘是常量 right:17px。 */
+   TASK-160/161：≥1536px 视口 main=1820，但视口 1536-1819 时 main=视口宽（流体）⇒ 该段内缘是常量 right:17px。 */
 @media (min-width:1136px) and (max-width:1279.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 568px); } }   /* main=1024 外侧 */
 @media (min-width:1392px) and (max-width:1535.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 696px); } }   /* main=1280 外侧 */
-@media (min-width:1536px) and (max-width:1719.98px){ .rk-fab, #backTopBtn{ right: 17px; } }                /* main=视口宽(流体) 内缘 */
-@media (min-width:1720px) and (max-width:1831.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 843px); } }   /* main=1720 内缘 */
-@media (min-width:1832px){ .rk-fab, #backTopBtn{ right: calc(50vw - 916px); } }                            /* main=1720 外侧 */
+@media (min-width:1536px) and (max-width:1819.98px){ .rk-fab, #backTopBtn{ right: 17px; } }                /* main=视口宽(流体) 内缘 */
+@media (min-width:1820px) and (max-width:1931.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 893px); } }   /* main=1820 内缘 */
+@media (min-width:1932px){ .rk-fab, #backTopBtn{ right: calc(50vw - 966px); } }                            /* main=1820 外侧 */
 @media (min-width:1024px) and (max-width:1135.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 495px); } }   /* main=1024 内缘 */
 @media (min-width:1280px) and (max-width:1391.98px){ .rk-fab, #backTopBtn{ right: calc(50vw - 623px); } }   /* main=1280 内缘 */
 /* TASK-096：手机端底部 tab 栏（.rk-tabbar，高 56px + 安全区）会盖住回到顶部按钮 ⇒ 手机端把它抬高到 tab 栏之上。
