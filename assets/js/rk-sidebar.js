@@ -32,10 +32,6 @@
 
   function setup(a) {
     var mq = window.matchMedia('(min-width: 1024px)');
-    /* 兜底值只读一次：它来自 CSS 的 `top: var(--rk-aside-top, 6rem)` 里那个 6rem，
-       getComputedStyle 会把 rem 解析成 px。之后再读就会被自己设进去的值污染。 */
-    var base = parseFloat(window.getComputedStyle(a).top);
-    if (!(base > 0)) base = 102;   /* 6rem @ 17px 根字号 */
     var raf = null;
 
     function measure() {
@@ -44,7 +40,22 @@
       var vh = window.innerHeight;
       var h = a.offsetHeight;
       if (!h) return;
-      /* 底边贴住视口底时的 top；比兜底值大就说明侧栏塞得下 ⇒ 用兜底值（普通吸顶） */
+      /* TASK-162（v3）：base = 该栏在文档里的**自然顶部** = main 的 content-box 顶
+         （15 个页面的 aside 都是 main 的第一个子元素，已逐一核对）。
+         原来硬编码 102（6rem），比自然顶部（实测 136）小 34px ⇒ 就算侧栏「上下空间完全够」
+         （内容比视口矮），也会先跟着页面滚 34px 才钉住，于是站长看到
+         「右边空间不足在滚、左边也跟着一起滚」——他要的是**只有空间不足的一边滚**。
+         现在：空间够   ⇒ top = 自然顶 ⇒ **从第一屏起就钉死、一动不动**；
+              空间不够 ⇒ top = vh−16−h（负值）⇒ 滚到自己的底边贴住视口底才停。
+         ⚠️ base **每次测量都现算**：顶栏是 rk-navbar.js **异步注入**的，注入前后 main 的文档顶
+            会从 68 变 102 —— 若只在 init 时量一次，就会把 base 量成 102（差 34px），
+            这正是第一版 v3 在验证里翻车的原因。main 不是 sticky ⇒
+            rect.top + scrollY 恒等于它的文档顶，与当前滚动位置无关，随取随准。 */
+      var main = a.closest('main') || a.parentElement;
+      var pt = parseFloat(window.getComputedStyle(main).paddingTop) || 0;
+      var base = main.getBoundingClientRect().top + (window.scrollY || window.pageYOffset || 0) + pt;
+      if (!(base > 0)) base = 136;   /* 兜底：main 顶 + py-8 的实测值 */
+      /* 底边贴住视口底时的 top；比 base 大就说明侧栏塞得下 ⇒ 用 base（钉死不动） */
       var t = Math.min(base, vh - TOP_GAP - h);
       a.style.setProperty('--rk-aside-top', Math.round(t) + 'px');
     }
@@ -59,6 +70,9 @@
     window.addEventListener('load', upd);
     /* 正文里的图片/字体/代码块懒加载完，侧栏高度可能变（继续阅读卡是异步填的） */
     if (window.ResizeObserver) { try { new ResizeObserver(upd).observe(a); } catch (e) {} }
+    /* 顶栏/公告条是异步注入的，会整体推下 main ⇒ 观察它的尺寸变化，注入瞬间就重算 base */
+    var hdr = document.querySelector('header');
+    if (hdr && window.ResizeObserver) { try { new ResizeObserver(upd).observe(hdr); } catch (e) {} }
     setTimeout(measure, 800);
     setTimeout(measure, 2500);
     /* 说明：不需要额外钩子 —— 继续阅读卡是 rk-reading-progress.js 异步填进 #rkContinueReading 的，

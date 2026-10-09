@@ -40,7 +40,7 @@
                 for (var i = 0; i < j.items.length; i++) {
                     var it = j.items[i];
                     html += '<a href="' + esc(it.url) + '" class="block rounded-lg border border-gray-700/60 p-3 hover:border-primary transition-colors">'
-                         +  '<div class="text-sm font-semibold text-gray-200 line-clamp-2">' + esc(it.title) + '</div>'
+                         +  '<div class="text-sm font-semibold text-white line-clamp-2">' + esc(it.title) + '</div>'
                          +  '<div class="text-[11px] text-gray-600 mt-1">' + esc(it.date) + '</div>'
                          +  '</a>';
                 }
