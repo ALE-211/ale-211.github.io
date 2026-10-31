@@ -63,7 +63,7 @@
     function els() { return Array.prototype.slice.call(document.querySelectorAll(SEL)); }
 
     var SEQ = 110;            /* 一条一条来：每 110ms 放出一条（旧实现是整行同时弹） */
-    var queue = [], seqTimer = null;
+    var queue = [];
     var io = null;
 
     function docTop(el) {
@@ -114,19 +114,18 @@
         pump();
     }
 
+    /* 队列 → 视口内的全部丢进 ready（drain 会按 top 排序逐条放），视口外的交 IO。
+       TASK-169d：以前这里是一张一张挪（每 110ms 才处理一个），滚快了 IO 会先把下面
+       的卡塞进 ready，反而抢在上面的卡前面 —— 现在一次扫完，顺序只由 drain 决定。 */
     function pump() {
-        if (seqTimer) { return; }
-        var el = null;
+        var moved = false;
         while (queue.length) {
-            var cand = queue.shift();
-            if (!cand.isConnected || cand.classList.contains('rk-in')) { continue; }
-            el = cand;
-            break;
+            var el = queue.shift();
+            if (!el || !el.isConnected || el.classList.contains('rk-in')) { continue; }
+            if (inView(el)) { ready.push(el); moved = true; }
+            else { observe(el); }
         }
-        if (!el) { seqTimer = null; if (queue.length) { pump(); } return; }
-        if (inView(el)) { ready.push(el); drain(); }   /* 统一走 drain：全站只有一条显形通道 */
-        else { observe(el); }                          /* 视口外：滚到再显，不占队列节奏 */
-        seqTimer = setTimeout(function () { seqTimer = null; pump(); }, SEQ);
+        if (moved) { drain(); }
     }
 
     function start() {

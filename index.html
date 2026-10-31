@@ -362,34 +362,27 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 <script>
 // 顶栏（含账户区 / 写文章按钮）已由 /assets/js/rk-navbar.js 统一渲染；
 // 原先此处填充 userBadgeDesktop / writeBtnDesktop 的代码已随顶栏迁移失效，故移除。
-// ===== 首页最新文章：发布顺序 + 逐条渐显（TASK-167 / 167b） =====
-/* 站长（第一轮）：「主页上传新文章到一定量就会把老的文章顶掉」→ 改为按发布时间顺序、随滚动加载。
-   站长（第二轮）：「往下滚动会先看到底下的静态文章然后再闪一下加载出新文章」+「应该是漏出一条的空间就渐进加载一条」。
-   所以这一版的关键改动是三条：
-     ① **新文章插在静态兜底卡之前**（哨兵 #dynamicSentinel 就在兜底卡上方），静态卡只在真正到底后才出现，
-        再也不会出现「静态卡先露出来、然后新文章插到它上面把页面顶一下」的闪动；
-     ② **一次只显示一条**：网络请求仍按 6 条一批（省请求），但上屏是**逐条**的 —— 哨兵进入视口下方 400px 才放一条，
-        放完再判一次，直到哨兵被推出视口；所以观感是「滚出一条的空间，动画落下一条」；
-     ③ 首屏仍一次铺 6 条（否则第一次打开只有一张卡），其余全部逐条。
-   排序：置顶优先，其余按 created_at（发布时间）倒序，id 兜底 —— 顺序永远和数据库一致，不会错乱。 */
+// ===== 首页最新文章：数据先到、显形按滚动节奏（TASK-167 / 167b / 169d） =====
 (function(){
-    if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，跳过动态追加；写死的卡片仍会显示 */
+    /* 数据在后台提前抓（一次 24 篇，直接塞进 DOM，视觉上仍是 CSS 隐藏状态），
+       显形节奏完全交给 rk-anim 的队列（进入视口、从上到下、每 110ms 一条）。
+       这样滚快了也不会出现「底下的静态兜底卡先冒出来、上面的动态文章还在慢慢排」。 */
+    if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，保留写死的静态卡 */
     var box = document.getElementById('dynamicPosts');
     if (!box) return;
     var more = document.getElementById('dynamicMore') || box;
     var sentinel = document.getElementById('dynamicSentinel') || more;
     var statusEl = document.getElementById('dynamicStatus');
-    if (statusEl && statusEl.parentNode) box.parentNode.appendChild(statusEl);   /* 状态行永远在最后（静态兜底卡之后） */
-    var BATCH = 6;                    /* 一次请求抓几条 */
-    var FIRST = 6;                    /* 首屏一次铺几条 */
-    var offset = 0, pending = [], hasMore = true, total = 0, placed = 0, busy = false, failed = false;
+    if (statusEl && statusEl.parentNode) box.parentNode.appendChild(statusEl);   /* 状态行永远在最后 */
+    var PAGE = 24;
+    var offset = 0, total = 0, hasMore = true, busy = false, failed = false, rendered = 0;
     var sec = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
     function normUrl(u){ u = String(u||''); if (u.indexOf('./')===0) u = u.slice(1); if (/\/$/.test(u)) u = u + 'index.html'; return u; }
-    /* TASK-113：只把「页面上本来就有、且与某篇动态文章同 URL 的静态卡片移除」（写死的 MC 卡与 p.url 相同，旧实现会把置顶项自己滤掉）。 */
     var staticMap = {};
     box.parentNode.querySelectorAll('div > a[href]').forEach(function(a){ staticMap[normUrl(a.getAttribute('href'))] = a; });
     function setStatus(t){ if (statusEl) statusEl.textContent = t || ''; }
-    function buildCard(p, i){
+    function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function buildCard(p){
         var _url = p.url || '/blog/post.php?slug=' + encodeURIComponent(p.slug);
         var st = staticMap[normUrl(_url)];
         if (st) { st.remove(); }   /* 同一篇文章：静态卡片让位给动态卡片，避免出现两次 */
@@ -403,81 +396,46 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
         el.className = 'bg-cardbg rounded-xl p-6 card-hover block';
         el.innerHTML =
             '<div class="flex items-start gap-4">' +
-                ((p.cover || p.icon) ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + esc2(p.cover || p.icon) + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
+                ((p.cover || p.icon) ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img loading="lazy" src="' + esc(p.cover || p.icon) + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
                 '<div>' +
-                    (badge ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc2(badge) + '</span>' : '') + pin +
-                    '<h3 class="text-lg font-bold text-white mb-2">' + esc2(p.title) + '</h3>' +
-                    '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
+                    (badge ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc(badge) + '</span>' : '') + pin +
+                    '<h3 class="text-lg font-bold text-white mb-2">' + esc(p.title) + '</h3>' +
+                    '<p class="text-sm text-gray-400 leading-relaxed">' + esc(ex) + '</p>' +
                 '</div>' +
             '</div>';
-        /* TASK-169：不再自己跑一套内联动画（和 rk-anim 抢同一个 opacity 会「闪一下」，
-           而且底部的最新文章会抢在上面的板块之前出现）。这里只负责把卡插进 DOM，
-           由 rk-anim 的统一队列按文档从上到下逐条淡入。 */
+        /* TASK-169：不写内联动画，交给 rk-anim 统一排队，避免两套动画抢 opacity 造成闪烁 */
         return el;
     }
-    /* TASK-169：哨兵必须真的进到视口里（底部再收 80px）才放下一张 ——
-       以前是 innerHeight+150，等于哨兵还在屏幕外 150px 就开始灌，站长反馈「太提前」。 */
-    function nearSentinel(){
-        var r = sentinel.getBoundingClientRect();
-        return r.top < (window.innerHeight - 80) && r.bottom > 0;
-    }
-    function fetchBatch(){
-        if (busy || !hasMore) return Promise.resolve(false);
+    function loadMore(){
+        if (busy || !hasMore || failed) return;
         busy = true;
-        var n = (placed === 0) ? FIRST : BATCH;
-        return fetch('/blog/api_front.php?n=' + n + '&offset=' + offset, {cache: 'no-store'})
+        fetch('/blog/api_front.php?n=' + PAGE + '&offset=' + offset, {cache: 'no-store'})
             .then(function(r){ return r.json(); })
             .then(function(d){
                 if (!d || !d.ok) throw new Error('bad');
+                busy = false;
                 var arr = d.posts || [];
                 offset += arr.length;
                 total = d.total || offset;
                 hasMore = !!d.has_more && arr.length > 0;
-                pending = pending.concat(arr);
-                busy = false;
-                return true;
+                arr.forEach(function(p){ more.appendChild(buildCard(p)); rendered++; });
+                setStatus(hasMore ? '' : (rendered ? ('已经到底了 · 共 ' + total + ' 篇') : ''));
+                check();
             })
-            .catch(function(){ busy = false; failed = true; setStatus('加载失败，点击重试'); return false; });
+            .catch(function(){ busy = false; failed = true; setStatus('加载失败，点击重试'); });
     }
-    function renderOne(stagger){
-        var p = pending.shift();
-        if (!p) return false;
-        more.appendChild(buildCard(p, stagger));
-        placed++;
-        return true;
-    }
-    var nextAt = 0;                    /* TASK-169：冷却时间戳，滚动事件不能绕过节奏 */
-    function pump(){
-        if (busy || failed) return;
-        if (Date.now() < nextAt) return;   /* 上一张还在淡入冷却里，滚得再快也不加塞 */
-        /* 队列见底：要么再抓一批，要么宣布到底 */
-        if (!pending.length) {
-            if (!hasMore) { setStatus(placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''); return; }
-            setStatus('正在加载…');
-            fetchBatch().then(function(ok){
-                if (!ok) return;
-                if (placed === 0) {              /* 首屏：一次铺够，避免一打开只有一张卡 */
-                    var i = 0;
-                    while (pending.length) { renderOne(i++); }
-                }
-                pump();
-            });
-            return;
-        }
-        /* 队列有货：只有滚到哨兵附近才放**一条** */
-        if (!nearSentinel()) { if (placed) setStatus(''); return; }
-        renderOne(0);
-        setStatus((pending.length || hasMore) ? '' : (placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''));
-        /* 放完**一条**就停：等它淡完（.9s）再判一次，滚一小段只出一条，节奏才跟得上眼睛 */
-        nextAt = Date.now() + 900;
-        setTimeout(function(){ if (nearSentinel()) pump(); }, 900);
+    /* 提前 800px 就把下一批数据抓进 DOM（只是数据，不是显形），滚到那儿时卡已经在位 */
+    function check(){
+        if (busy || !hasMore || failed) return;
+        var r = sentinel.getBoundingClientRect();
+        if (r.top < window.innerHeight + 800) loadMore();
     }
     if (statusEl) statusEl.addEventListener('click', function(){
-        if (failed) { failed = false; hasMore = true; pump(); }
+        if (failed) { failed = false; busy = false; setStatus('正在加载…'); loadMore(); }
     });
-    window.addEventListener('scroll', pump, {passive: true});
-    window.addEventListener('resize', pump, {passive: true});
-    pump();
+    window.addEventListener('scroll', check, {passive: true});
+    window.addEventListener('resize', check, {passive: true});
+    loadMore();
 })();
 function esc2(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -498,7 +456,7 @@ backTopBtn.addEventListener('click', ()=>{
 })
 </script>
 
-<script src="/assets/js/rk-anim.js?v=20261031v2"></script>
+<script src="/assets/js/rk-anim.js?v=20261031v3"></script>
 
 <script>
 /* ===== RickC-HD 物理视口判定 ===== */
