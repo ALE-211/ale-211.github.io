@@ -265,6 +265,8 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 <h2 class="section-title text-white rk-reveal-target">最新文章</h2>
                 <div id="dynamicPosts" class="space-y-4"></div>
                 <div id="dynamicMore" class="space-y-4"></div>
+                <!-- 哨兵：滚到它附近才放下一篇文章；它永远在静态兜底卡**之前**，所以动态文章不会插到静态卡后面 -->
+                <div id="dynamicSentinel" style="height:1px" aria-hidden="true"></div>
                 <div id="dynamicStatus" class="text-center text-sm text-gray-500 py-3 cursor-pointer select-none"></div>
                 <div class="space-y-4 mt-4">
                     <a href="./server/minecraft/index.html" class="bg-cardbg rounded-xl p-6 card-hover block relative">
@@ -360,25 +362,32 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 <script>
 // 顶栏（含账户区 / 写文章按钮）已由 /assets/js/rk-navbar.js 统一渲染；
 // 原先此处填充 userBadgeDesktop / writeBtnDesktop 的代码已随顶栏迁移失效，故移除。
-// ===== 首页最新文章：发布顺序 + 滚动分页加载（TASK-167） =====
-/* 站长：「主页上传新文章到一定量就会把老的文章顶掉」→「改为按发布时间顺序随页面滚动先后动画加载」。
-   原来只 fetch n=6 一次，第 7 篇起永远不会出现在首页；现在每滚到底部再拉一页（offset 递增），
-   逐张错峰淡入（80ms 一张），到底了显示「已经到底了」。置顶仍排最前，其余按 created_at 倒序。 */
+// ===== 首页最新文章：发布顺序 + 逐条渐显（TASK-167 / 167b） =====
+/* 站长（第一轮）：「主页上传新文章到一定量就会把老的文章顶掉」→ 改为按发布时间顺序、随滚动加载。
+   站长（第二轮）：「往下滚动会先看到底下的静态文章然后再闪一下加载出新文章」+「应该是漏出一条的空间就渐进加载一条」。
+   所以这一版的关键改动是三条：
+     ① **新文章插在静态兜底卡之前**（哨兵 #dynamicSentinel 就在兜底卡上方），静态卡只在真正到底后才出现，
+        再也不会出现「静态卡先露出来、然后新文章插到它上面把页面顶一下」的闪动；
+     ② **一次只显示一条**：网络请求仍按 6 条一批（省请求），但上屏是**逐条**的 —— 哨兵进入视口下方 400px 才放一条，
+        放完再判一次，直到哨兵被推出视口；所以观感是「滚出一条的空间，动画落下一条」；
+     ③ 首屏仍一次铺 6 条（否则第一次打开只有一张卡），其余全部逐条。
+   排序：置顶优先，其余按 created_at（发布时间）倒序，id 兜底 —— 顺序永远和数据库一致，不会错乱。 */
 (function(){
     if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，跳过动态追加；写死的卡片仍会显示 */
     var box = document.getElementById('dynamicPosts');
     if (!box) return;
-    var more = document.getElementById('dynamicMore');
+    var more = document.getElementById('dynamicMore') || box;
+    var sentinel = document.getElementById('dynamicSentinel') || more;
     var statusEl = document.getElementById('dynamicStatus');
-    /* 状态行挪到列表最末（静态兜底卡之后），否则「已经到底了」会夹在文章中间 */
-    var PAGE = 6, offset = 0, loading = false, hasMore = true, retryable = false;
+    if (statusEl && statusEl.parentNode) box.parentNode.appendChild(statusEl);   /* 状态行永远在最后（静态兜底卡之后） */
+    var BATCH = 6;                    /* 一次请求抓几条 */
+    var FIRST = 6;                    /* 首屏一次铺几条 */
+    var offset = 0, pending = [], hasMore = true, total = 0, placed = 0, busy = false, failed = false;
     var sec = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
     function normUrl(u){ u = String(u||''); if (u.indexOf('./')===0) u = u.slice(1); if (/\/$/.test(u)) u = u + 'index.html'; return u; }
-    /* TASK-113：只把「页面上本来就有、且与某篇动态文章同 URL 的静态卡片移除」
-       （写死的 MC 卡链接与 API 的 p.url 相同，旧实现会把置顶项自己滤掉）。 */
+    /* TASK-113：只把「页面上本来就有、且与某篇动态文章同 URL 的静态卡片移除」（写死的 MC 卡与 p.url 相同，旧实现会把置顶项自己滤掉）。 */
     var staticMap = {};
     box.parentNode.querySelectorAll('div > a[href]').forEach(function(a){ staticMap[normUrl(a.getAttribute('href'))] = a; });
-    if (statusEl && statusEl.parentNode) box.parentNode.appendChild(statusEl);
     function setStatus(t){ if (statusEl) statusEl.textContent = t || ''; }
     function buildCard(p, i){
         var _url = p.url || '/blog/post.php?slug=' + encodeURIComponent(p.slug);
@@ -401,50 +410,76 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
                 '</div>' +
             '</div>';
-        /* 逐张错峰淡入：先压到透明，再按序号给 transition-delay，避免 6 张一起闪出来 */
+        /* 逐张错峰淡入：先压到透明再抬起来，首批 6 张按序号错峰 80ms */
         el.style.opacity = '0';
         el.style.transform = 'translateY(14px)';
         el.style.transition = 'opacity .5s cubic-bezier(.25,.6,.3,1), transform .5s cubic-bezier(.25,.6,.3,1)';
-        el.style.transitionDelay = (i * 80) + 'ms';
+        el.style.transitionDelay = ((i || 0) * 80) + 'ms';
         requestAnimationFrame(function(){ requestAnimationFrame(function(){
             el.style.opacity = '1';
             el.style.transform = 'none';
         }); });
         return el;
     }
-    function nearBottom(){
-        return (window.innerHeight + window.pageYOffset) >= (document.body.scrollHeight - 700);
+    /* 哨兵是否已经进入「视口下方 400px」范围 —— 提前一点加载，滚动时不会看到空档 */
+    function nearSentinel(){
+        var r = sentinel.getBoundingClientRect();
+        return r.top < (window.innerHeight + 150);   /* 只提前 150px：滚出一条的空间才放一条 */
     }
-    function load(){
-        if (loading || !hasMore) return;
-        loading = true; retryable = false; setStatus('正在加载…');
-        fetch('/blog/api_front.php?n=' + PAGE + '&offset=' + offset, {cache: 'no-store'})
+    function fetchBatch(){
+        if (busy || !hasMore) return Promise.resolve(false);
+        busy = true;
+        var n = (placed === 0) ? FIRST : BATCH;
+        return fetch('/blog/api_front.php?n=' + n + '&offset=' + offset, {cache: 'no-store'})
             .then(function(r){ return r.json(); })
             .then(function(d){
                 if (!d || !d.ok) throw new Error('bad');
-                var frag = document.createDocumentFragment();
-                d.posts.forEach(function(p, i){ frag.appendChild(buildCard(p, i)); });
-                (offset === 0 ? box : (more || box)).appendChild(frag);
-                offset += d.posts.length;
-                hasMore = !!d.has_more && d.posts.length > 0;
-                setStatus(hasMore ? '' : (offset ? '已经到底了 · 共 ' + (d.total || offset) + ' 篇' : ''));
+                var arr = d.posts || [];
+                offset += arr.length;
+                total = d.total || offset;
+                hasMore = !!d.has_more && arr.length > 0;
+                pending = pending.concat(arr);
+                busy = false;
+                return true;
             })
-            .catch(function(){
-                hasMore = true; retryable = true;
-                setStatus('加载失败，点击重试');
-            })
-            .then(function(){
-                loading = false;
-                /* 首屏没填满（或窗口很高）时自动续拉，否则用户看不到滚动条、也就触发不了下一次 */
-                if (hasMore && !retryable && nearBottom()) setTimeout(load, 120);
+            .catch(function(){ busy = false; failed = true; setStatus('加载失败，点击重试'); return false; });
+    }
+    function renderOne(stagger){
+        var p = pending.shift();
+        if (!p) return false;
+        more.appendChild(buildCard(p, stagger));
+        placed++;
+        return true;
+    }
+    function pump(){
+        if (busy || failed) return;
+        /* 队列见底：要么再抓一批，要么宣布到底 */
+        if (!pending.length) {
+            if (!hasMore) { setStatus(placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''); return; }
+            setStatus('正在加载…');
+            fetchBatch().then(function(ok){
+                if (!ok) return;
+                if (placed === 0) {              /* 首屏：一次铺够，避免一打开只有一张卡 */
+                    var i = 0;
+                    while (pending.length) { renderOne(i++); }
+                }
+                pump();
             });
+            return;
+        }
+        /* 队列有货：只有滚到哨兵附近才放**一条** */
+        if (!nearSentinel()) { if (placed) setStatus(''); return; }
+        renderOne(0);
+        setStatus((pending.length || hasMore) ? '' : (placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''));
+        /* 放完**一条**就停：等它淡入（~500ms）再判一次，避免一帧连塞好几张把顺序和观感搞乱 */
+        setTimeout(function(){ if (nearSentinel()) pump(); }, 300);
     }
     if (statusEl) statusEl.addEventListener('click', function(){
-        if (retryable) { retryable = false; hasMore = true; load(); }
+        if (failed) { failed = false; hasMore = true; pump(); }
     });
-    window.addEventListener('scroll', function(){ if (nearBottom()) load(); }, {passive: true});
-    window.addEventListener('resize', function(){ if (nearBottom()) load(); }, {passive: true});
-    load();
+    window.addEventListener('scroll', pump, {passive: true});
+    window.addEventListener('resize', pump, {passive: true});
+    pump();
 })();
 function esc2(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
