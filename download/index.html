@@ -193,6 +193,7 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     <i class="fa fa-list-ul text-primary"></i>资源分类
                 </h3>
                 <ul class="space-y-2 text-sm">
+                    <li><a href="#downloadPosts" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">下载栏目文章</a></li>
                     <li><a href="#firmware" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">固件镜像</a></li>
                     <li><a href="#java" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">Java 运行环境</a></li>
                     <li><a href="#launcher" class="block px-2 py-1 rounded hover:bg-gray-700 transition-colors text-textlight">MC 启动器</a></li>
@@ -215,6 +216,12 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                 <div class="bg-primary/10 border-l-4 border-primary p-4 rounded mt-4">
                     <p class="text-textlight text-sm"><i class="fa fa-gamepad text-primary mr-2"></i>新玩家一键入门：按 <a class="text-primary hover:underline" href="../server/minecraft/index.html">Minecraft 联机教程</a> 的顺序下载下方 Java → 启动器 → 整合包三件套即可。</p>
                 </div>
+            </div>
+
+            <!-- 下载栏目文章（TASK-167：以前本页是纯手写表格，栏目设为「下载」的文章在这里永远不会出现） -->
+            <div id="downloadPostsWrap" style="display:none">
+                <h2 class="section-title text-white">下载栏目文章</h2>
+                <div id="downloadPosts" class="grid sm:grid-cols-2 gap-4"></div>
             </div>
 
             <!-- 固件镜像 -->
@@ -609,5 +616,33 @@ backTopBtn.addEventListener('click', ()=>{
 /* ===== /RickC-HD-JS ===== */
 </script>
 <script>(function(){function chk(){var ok=false;try{var sts=document.querySelectorAll("style");for(var i=0;i<sts.length;i++){var t=sts[i].textContent||"";if(t.indexOf("--tw-")>=0||t.indexOf(".text-textlight")>=0){ok=true;break;}}}catch(e){}if(ok)document.documentElement.classList.add("tw-ok");else document.documentElement.classList.add("tw-fail");}chk();setTimeout(chk,900);setTimeout(chk,3000);})();</script>
+<script>
+/* TASK-167（2026-10-31，DeepSeek）：站长「把文章设置在下载栏目后看不到文章」。
+   根因：本页是纯手写静态表格（固件/Java/启动器…），与数据库无关 ⇒ section=download 的文章永远不在这里出现。
+   与开发板块（TASK-113）同款做法：拉 api_front.php?section=download，动态卡插到最前；无文章则整块隐藏。
+   镜像站没有 PHP 后端 ⇒ 直接返回，块保持隐藏。 */
+(function(){
+    if (window.RK_MIRROR) return;
+    var wrap = document.getElementById("downloadPostsWrap");
+    var grid = document.getElementById("downloadPosts");
+    if (!wrap || !grid) return;
+    function esc(s){ return String(s==null?"":s).replace(/[&<>"\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
+    fetch("/blog/api_front.php?section=download&n=24", {cache:"no-store"}).then(function(r){ return r.json(); }).then(function(d){
+        if (!d || !d.ok || !d.posts || !d.posts.length) return;
+        grid.innerHTML = d.posts.map(function(p){
+            var u = p.url || ("/blog/post.php?slug=" + encodeURIComponent(p.slug));
+            var cat = String(p.category || "").replace(/^\s+|\s+$/g, "");
+            var date = String(p.created_at || "").slice(0, 10);
+            return '<a href="' + esc(u) + '" class="bg-cardbg rounded-xl p-5 card-hover block border border-gray-700/50">' +
+                (cat ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc(cat) + '</span>' : '') +
+                '<h3 class="text-base font-bold text-white mb-2">' + esc(p.title) + '</h3>' +
+                '<p class="text-sm text-gray-400 leading-relaxed mb-3">' + esc(p.excerpt || "（暂无摘要）") + '</p>' +
+                '<p class="text-xs text-gray-500"><i class="fa fa-clock-o mr-1"></i>' + esc(date) + '</p>' +
+            '</a>';
+        }).join("");
+        wrap.style.display = "";
+    }).catch(function(){});
+})();
+</script>
 </body>
 </html>

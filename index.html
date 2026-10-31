@@ -264,6 +264,8 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
             <div>
                 <h2 class="section-title text-white rk-reveal-target">最新文章</h2>
                 <div id="dynamicPosts" class="space-y-4"></div>
+                <div id="dynamicMore" class="space-y-4"></div>
+                <div id="dynamicStatus" class="text-center text-sm text-gray-500 py-3 cursor-pointer select-none"></div>
                 <div class="space-y-4 mt-4">
                     <a href="./server/minecraft/index.html" class="bg-cardbg rounded-xl p-6 card-hover block relative">
                         <div class="flex items-start gap-4">
@@ -358,51 +360,91 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
 <script>
 // 顶栏（含账户区 / 写文章按钮）已由 /assets/js/rk-navbar.js 统一渲染；
 // 原先此处填充 userBadgeDesktop / writeBtnDesktop 的代码已随顶栏迁移失效，故移除。
-// ===== 首页最新文章：动态同步 =====
+// ===== 首页最新文章：发布顺序 + 滚动分页加载（TASK-167） =====
+/* 站长：「主页上传新文章到一定量就会把老的文章顶掉」→「改为按发布时间顺序随页面滚动先后动画加载」。
+   原来只 fetch n=6 一次，第 7 篇起永远不会出现在首页；现在每滚到底部再拉一页（offset 递增），
+   逐张错峰淡入（80ms 一张），到底了显示「已经到底了」。置顶仍排最前，其余按 created_at 倒序。 */
 (function(){
-    if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，跳过动态追加；写死的 6 张卡仍会显示 */
-    fetch('/blog/api_front.php?n=6', {cache: 'no-store'}).then(r => r.json()).then(d => {
-        if (!d.ok || !d.posts.length) return;
-        const box = document.getElementById('dynamicPosts');
-        if (!box) return;
-        // 归一化链接（去掉 ./ 前缀、补目录尾斜杠）
-        function normUrl(u){ u = String(u||''); if (u.indexOf('./')===0) u = u.slice(1); if (/\/$/.test(u)) u = u + 'index.html'; return u; }
-        /* TASK-113（2026-10-03，DeepSeek）：修站长报的「置顶没生效」。
-           原实现把**全页所有 a[href]** 收进 seen，再对命中的动态文章 `return ''` 跳过 ——
-           而写死的 MC 卡片链接正是 /server/minecraft/index.html，与 API 返回的 p.url 完全相同，
-           于是 **pinned_home=1 的 MC 文章被自己的去重逻辑滤掉了**，置顶项根本没能进列表。
-           改为：只把「页面上本来就有、且与某篇动态文章同 URL 的静态卡片移除」，其余动态文章一律渲染
-           ⇒ API 的「置顶优先 + 更新时间倒序」得以保留；新文章自动出现在最前；
-              写死的卡片退化为「镜像站 / 未启用 JS」时的兜底。 */
-        const staticMap = {};
-        box.parentNode.querySelectorAll('div > a[href]').forEach(a => { staticMap[normUrl(a.getAttribute('href'))] = a; });
-        const sec = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
-        box.innerHTML = d.posts.map(p => {
-            const pin = p.pinned_home ? '<span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded ml-1"><i class="fa fa-arrow-up mr-1"></i>置顶</span>' : '';
-            const ex = p.excerpt ? p.excerpt : '（暂无摘要）';
-            const _url = p.url || '/blog/post.php?slug=' + encodeURIComponent(p.slug);
-            const _st = staticMap[normUrl(_url)];
-            if (_st) { _st.remove(); }   /* 同一篇文章：静态卡片让位给动态卡片，避免出现两次 */
-            return '<a href="' + _url + '" class="bg-cardbg rounded-xl p-6 card-hover block">' +
-                '<div class="flex items-start gap-4">' +
-                    ((p.cover || p.icon) ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + (p.cover || p.icon) + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
-                    '<div>' +
-                        /* TASK-114：站长「小分类都变成了博客，博客不属于分类项，应该改为 栏目 · 分类，例如开发 · 网络」。
-                           原先这里写死 '博客 · ' + 栏目 —— 但「博客」是站点功能名，不是分类。
-                           现改为「栏目 · 分类」；文章没填分类时只显示栏目（不显示空的分隔符）。 */
-                        (function () {
-                            var lab = sec[p.section] || p.section || '';
-                            var cat = (p.category || '').replace(/^\s+|\s+$/g, '');
-                            var badge = cat ? (lab ? lab + ' · ' + cat : cat) : lab;
-                            return badge ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc2(badge) + '</span>' : '';
-                        })() + pin +
-                        '<h3 class="text-lg font-bold text-white mb-2">' + esc2(p.title) + '</h3>' +
-                        '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
-                    '</div>' +
+    if (window.RK_MIRROR) return;   /* 镜像站无 PHP 后端，跳过动态追加；写死的卡片仍会显示 */
+    var box = document.getElementById('dynamicPosts');
+    if (!box) return;
+    var more = document.getElementById('dynamicMore');
+    var statusEl = document.getElementById('dynamicStatus');
+    /* 状态行挪到列表最末（静态兜底卡之后），否则「已经到底了」会夹在文章中间 */
+    var PAGE = 6, offset = 0, loading = false, hasMore = true, retryable = false;
+    var sec = {home:'首页最新', dev:'开发', download:'下载', server:'服务器'};
+    function normUrl(u){ u = String(u||''); if (u.indexOf('./')===0) u = u.slice(1); if (/\/$/.test(u)) u = u + 'index.html'; return u; }
+    /* TASK-113：只把「页面上本来就有、且与某篇动态文章同 URL 的静态卡片移除」
+       （写死的 MC 卡链接与 API 的 p.url 相同，旧实现会把置顶项自己滤掉）。 */
+    var staticMap = {};
+    box.parentNode.querySelectorAll('div > a[href]').forEach(function(a){ staticMap[normUrl(a.getAttribute('href'))] = a; });
+    if (statusEl && statusEl.parentNode) box.parentNode.appendChild(statusEl);
+    function setStatus(t){ if (statusEl) statusEl.textContent = t || ''; }
+    function buildCard(p, i){
+        var _url = p.url || '/blog/post.php?slug=' + encodeURIComponent(p.slug);
+        var st = staticMap[normUrl(_url)];
+        if (st) { st.remove(); }   /* 同一篇文章：静态卡片让位给动态卡片，避免出现两次 */
+        var pin = p.pinned_home ? '<span class="inline-block text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded ml-1"><i class="fa fa-arrow-up mr-1"></i>置顶</span>' : '';
+        var ex = p.excerpt ? p.excerpt : '（暂无摘要）';
+        var lab = sec[p.section] || p.section || '';
+        var cat = String(p.category || '').replace(/^\s+|\s+$/g, '');
+        var badge = cat ? (lab ? lab + ' · ' + cat : cat) : lab;
+        var el = document.createElement('a');
+        el.href = _url;
+        el.className = 'bg-cardbg rounded-xl p-6 card-hover block';
+        el.innerHTML =
+            '<div class="flex items-start gap-4">' +
+                ((p.cover || p.icon) ? '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><img src="' + esc2(p.cover || p.icon) + '" alt="" class="w-full h-full object-contain p-1.5"></div>' : '<div class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden text-3xl text-primary"><i class="fa fa-pencil-square-o"></i></div>') +
+                '<div>' +
+                    (badge ? '<span class="inline-block text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mb-2">' + esc2(badge) + '</span>' : '') + pin +
+                    '<h3 class="text-lg font-bold text-white mb-2">' + esc2(p.title) + '</h3>' +
+                    '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
                 '</div>' +
-            '</a>';
-        }).join('');
-    }).catch(() => {});
+            '</div>';
+        /* 逐张错峰淡入：先压到透明，再按序号给 transition-delay，避免 6 张一起闪出来 */
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(14px)';
+        el.style.transition = 'opacity .5s cubic-bezier(.25,.6,.3,1), transform .5s cubic-bezier(.25,.6,.3,1)';
+        el.style.transitionDelay = (i * 80) + 'ms';
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        }); });
+        return el;
+    }
+    function nearBottom(){
+        return (window.innerHeight + window.pageYOffset) >= (document.body.scrollHeight - 700);
+    }
+    function load(){
+        if (loading || !hasMore) return;
+        loading = true; retryable = false; setStatus('正在加载…');
+        fetch('/blog/api_front.php?n=' + PAGE + '&offset=' + offset, {cache: 'no-store'})
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                if (!d || !d.ok) throw new Error('bad');
+                var frag = document.createDocumentFragment();
+                d.posts.forEach(function(p, i){ frag.appendChild(buildCard(p, i)); });
+                (offset === 0 ? box : (more || box)).appendChild(frag);
+                offset += d.posts.length;
+                hasMore = !!d.has_more && d.posts.length > 0;
+                setStatus(hasMore ? '' : (offset ? '已经到底了 · 共 ' + (d.total || offset) + ' 篇' : ''));
+            })
+            .catch(function(){
+                hasMore = true; retryable = true;
+                setStatus('加载失败，点击重试');
+            })
+            .then(function(){
+                loading = false;
+                /* 首屏没填满（或窗口很高）时自动续拉，否则用户看不到滚动条、也就触发不了下一次 */
+                if (hasMore && !retryable && nearBottom()) setTimeout(load, 120);
+            });
+    }
+    if (statusEl) statusEl.addEventListener('click', function(){
+        if (retryable) { retryable = false; hasMore = true; load(); }
+    });
+    window.addEventListener('scroll', function(){ if (nearBottom()) load(); }, {passive: true});
+    window.addEventListener('resize', function(){ if (nearBottom()) load(); }, {passive: true});
+    load();
 })();
 function esc2(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
