@@ -410,21 +410,16 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
                     '<p class="text-sm text-gray-400 leading-relaxed">' + esc2(ex) + '</p>' +
                 '</div>' +
             '</div>';
-        /* 逐张错峰淡入：先压到透明再抬起来，首批 6 张按序号错峰 80ms */
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(28px)';
-        el.style.transition = 'opacity .9s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1)';
-        el.style.transitionDelay = ((i || 0) * 110) + 'ms';
-        requestAnimationFrame(function(){ requestAnimationFrame(function(){
-            el.style.opacity = '1';
-            el.style.transform = 'none';
-        }); });
+        /* TASK-169：不再自己跑一套内联动画（和 rk-anim 抢同一个 opacity 会「闪一下」，
+           而且底部的最新文章会抢在上面的板块之前出现）。这里只负责把卡插进 DOM，
+           由 rk-anim 的统一队列按文档从上到下逐条淡入。 */
         return el;
     }
-    /* 哨兵是否已经进入「视口下方 400px」范围 —— 提前一点加载，滚动时不会看到空档 */
+    /* TASK-169：哨兵必须真的进到视口里（底部再收 80px）才放下一张 ——
+       以前是 innerHeight+150，等于哨兵还在屏幕外 150px 就开始灌，站长反馈「太提前」。 */
     function nearSentinel(){
         var r = sentinel.getBoundingClientRect();
-        return r.top < (window.innerHeight + 150);   /* 只提前 150px：滚出一条的空间才放一条 */
+        return r.top < (window.innerHeight - 80) && r.bottom > 0;
     }
     function fetchBatch(){
         if (busy || !hasMore) return Promise.resolve(false);
@@ -451,8 +446,10 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
         placed++;
         return true;
     }
+    var nextAt = 0;                    /* TASK-169：冷却时间戳，滚动事件不能绕过节奏 */
     function pump(){
         if (busy || failed) return;
+        if (Date.now() < nextAt) return;   /* 上一张还在淡入冷却里，滚得再快也不加塞 */
         /* 队列见底：要么再抓一批，要么宣布到底 */
         if (!pending.length) {
             if (!hasMore) { setStatus(placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''); return; }
@@ -471,8 +468,9 @@ header > .container{ height:100% !important; padding-top:0 !important; padding-b
         if (!nearSentinel()) { if (placed) setStatus(''); return; }
         renderOne(0);
         setStatus((pending.length || hasMore) ? '' : (placed ? ('已经到底了 · 共 ' + total + ' 篇') : ''));
-        /* 放完**一条**就停：等它淡入（~500ms）再判一次，避免一帧连塞好几张把顺序和观感搞乱 */
-        setTimeout(function(){ if (nearSentinel()) pump(); }, 300);
+        /* 放完**一条**就停：等它淡完（.9s）再判一次，滚一小段只出一条，节奏才跟得上眼睛 */
+        nextAt = Date.now() + 900;
+        setTimeout(function(){ if (nearSentinel()) pump(); }, 900);
     }
     if (statusEl) statusEl.addEventListener('click', function(){
         if (failed) { failed = false; hasMore = true; pump(); }
@@ -500,7 +498,7 @@ backTopBtn.addEventListener('click', ()=>{
 })
 </script>
 
-<script src="/assets/js/rk-anim.js?v=20261031v1"></script>
+<script src="/assets/js/rk-anim.js?v=20261031v2"></script>
 
 <script>
 /* ===== RickC-HD 物理视口判定 ===== */

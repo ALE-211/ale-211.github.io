@@ -1,21 +1,34 @@
 /* ============================================================
-   rk-anim.js —— 全站渐进载入动画（唯一来源，TASK-062）
+   rk-anim.js —— 全站渐进载入动画（唯一来源，TASK-062 建立；TASK-169 重写节奏）
    建立者：豆包（依 DeepSeek 任务单 062）｜ 2026-09-27
+   重写：DeepSeek ｜ 2026-10-31
 
-   用法：页面里保留 RickC-ANIM 的 CSS 预隐藏块
-   （opacity:0 + translateY(14px) + transition .5s），并把原来那份
-   内联动画脚本整段替换为：
-       <script src="/assets/js/rk-anim.js?v=20260927v1"></script>
+   用法：页面里保留 RickC-ANIM 的 CSS 预隐藏块（opacity:0 + translateY），并把
+        原来那份内联动画脚本整段替换为：
+            <script src="/assets/js/rk-anim.js?v=20261031v2"><\/script>
 
-   三条兜底不可删：IntersectionObserver / 5 秒强制全显 / MutationObserver。
+   三条兜底不可删：IntersectionObserver / 25 秒强制全显 / MutationObserver。
    禁止加 prefers-reduced-motion 禁用规则（站长铁律）。
+
+   ---- 2026-10-31 为什么重写 ----
+   站长前后三条反馈：①「动画太快太提前，都看不到」②「小板块会闪烁」
+   ③「最新文章应该最后加载，要按从上到下的顺序」。
+   旧实现按"视觉行"分桶 + 一次性给所有元素排 setTimeout，问题在于：
+     · 分桶依据是**当时的** top，动态插入的卡片（最新文章）自己另跑一套内联动画，
+       于是底部的卡先出现、上面的板块后出现 —— 顺序是反的；
+     · 两套动画（内联 + 本脚本）同时改同一个元素的 opacity/transform ⇒ 视觉上"闪一下"。
+   现在改成**单一队列 + 逐条播放**：
+     · 所有待显元素进同一条队列，按**文档从上到下**排序，每 SEQ 毫秒只放一条；
+     · 新插入的元素（无限滚动的文章、弹窗里的卡）走 MutationObserver 入队，
+       仍然按 top 插到正确位置 ⇒ 顺序永远是上→下，最新文章自然最后出现；
+     · 视口外的元素不入队播放，改交 IntersectionObserver，滚到哪儿显到哪儿。
    ============================================================ */
 (function () {
     'use strict';
     if (window.__rkAnimLoaded) { return; }
     window.__rkAnimLoaded = true;
 
-    /* ---- 动画时长统一覆盖（页面内联是 .5s/14px，这里改成 .9s/28px；同选择器、后插入 ⇒ 生效） ---- */
+    /* ---- 动画时长统一覆盖（页面内联多为 .5s / 14px；这里统一成 .9s / 28px） ---- */
     (function () {
         var ov = document.createElement('style');
         ov.id = 'rkAnimTiming';
@@ -49,68 +62,78 @@
     var SEL = '.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]:not(.rk-reveal)';
     function els() { return Array.prototype.slice.call(document.querySelectorAll(SEL)); }
 
-    /* ---- TASK-062：按"视觉行"分桶，行内同延迟，左右同时渐进 + 提速 ----
-       原实现：150 + idx*120（DOM 顺序排队，左栏先动、左右不同步、最慢 ~1.9s）
-       新实现：BASE 60ms / STEP 70ms / 同行阈值 24px / 视口外仍走 IntersectionObserver */
-    /* TASK-169（2026-10-31）：站长「主页全局动画加载太快太提前了，都看不到」。
-       三个原因一起改：① 触发线原本是 `top < innerHeight`（卡片刚露头就动，等于在屏幕外就演完了）；
-       ② 过渡只有 .5s / 位移 14px，太快看不清；③ 5 秒的强制全显兜底会把**下面还没滚到的**也一起点亮。
-       现改为：触发线收进视口 70px、时长 .9s、位移 28px、兜底从 5s 放宽到 25s（并只对「已经滚过顶部/正在视口内」的元素生效）。 */
-    var BASE = 140, STEP = 100, ROW_GAP = 24;
+    var SEQ = 110;            /* 一条一条来：每 110ms 放出一条（旧实现是整行同时弹） */
+    var queue = [], seqTimer = null;
+    var io = null;
 
-    function reveal() {
-        var list = els();
-        if (!list.length) { return; }
-        var now = list.filter(function (el) { return !el.classList.contains('rk-in'); });
-        if (!now.length) { return; }
-        now.forEach(function (el) { if (!el.classList.contains('rk-reveal')) { el.classList.add('rk-reveal'); } });
-
-        var inView = [], outView = [];
-        now.forEach(function (el) {
-            var r = el.getBoundingClientRect();
-            if (r.top < window.innerHeight - 70 && r.bottom > 0) { inView.push(el); }
-            else { outView.push(el); }
-        });
-
-        /* 视口内：按 top 排序 → 分桶（top 差 < 24px 视为同一行）→ 行内同一延迟 */
-        if (inView.length) {
-            inView.sort(function (a, b) {
-                return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
-            });
-            var row = -1, lastTop = null, rows = [];
-            inView.forEach(function (el) {
-                var top = Math.round(el.getBoundingClientRect().top);
-                if (lastTop === null || Math.abs(top - lastTop) >= ROW_GAP) { row++; lastTop = top; }
-                if (!rows[row]) { rows[row] = []; }
-                rows[row].push(el);
-            });
-            rows.forEach(function (group, r) {
-                setTimeout(function () {
-                    group.forEach(function (el) { el.classList.add('rk-in'); });
-                }, BASE + r * STEP);
-            });
-        }
-
-        /* 视口外：IntersectionObserver 兜底（不能被分桶逻辑破坏） */
-        outView.forEach(function (el) {
-            var io = new IntersectionObserver(function (es) {
-                es.forEach(function (en) {
-                    if (en.isIntersecting) {
-                        en.target.classList.add('rk-in');
-                        io.unobserve(en.target);
-                    }
+    function docTop(el) {
+        var r = el.getBoundingClientRect();
+        return r.top + (window.pageYOffset || document.documentElement.scrollTop || 0);
+    }
+    function inView(el) {
+        var r = el.getBoundingClientRect();
+        return r.top < window.innerHeight - 70 && r.bottom > 0;
+    }
+    /* 视口检测：进入视口不立刻显形，先丢进 ready 队列，仍然一条一条放（否则滚快了会两张一起弹） */
+    var ready = [], drainTimer = null;
+    function drain() {
+        if (drainTimer) { return; }
+        ready = ready.filter(function (el) { return el.isConnected && !el.classList.contains('rk-in'); });
+        if (!ready.length) { drainTimer = null; return; }
+        ready.sort(function (a, b) { return docTop(a) - docTop(b); });
+        var el = ready.shift();
+        if (el) { el.classList.add('rk-in'); }
+        drainTimer = setTimeout(function () { drainTimer = null; drain(); }, SEQ);
+    }
+    function observe(el) {
+        if (!('IntersectionObserver' in window)) { ready.push(el); drain(); return; }
+        if (!io) {
+            io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                    if (en.isIntersecting) { io.unobserve(en.target); ready.push(en.target); drain(); }
                 });
-            }, { rootMargin: '0px 0px -70px 0px', threshold: 0.15 });
-            io.observe(el);
+            }, { rootMargin: '0px 0px -70px 0px', threshold: 0.12 });
+        }
+        io.observe(el);
+    }
+
+    /* 入队：只收还没显形、也没排过队的元素；整条队列按文档顺序（上→下）重排 */
+    function enqueue() {
+        var pend = els().filter(function (el) { return !el.classList.contains('rk-in') && !el.__rkQ; });
+        if (!pend.length) { pump(); return; }
+        pend.forEach(function (el) {
+            el.__rkQ = 1;
+            if (!el.classList.contains('rk-reveal')) { el.classList.add('rk-reveal'); }
         });
+        queue = queue.filter(function (el) { return el.isConnected && !el.classList.contains('rk-in'); }).concat(pend);
+        queue.sort(function (a, b) {
+            var d = docTop(a) - docTop(b);
+            if (d !== 0) { return d; }
+            return a.getBoundingClientRect().left - b.getBoundingClientRect().left;
+        });
+        pump();
+    }
+
+    function pump() {
+        if (seqTimer) { return; }
+        var el = null;
+        while (queue.length) {
+            var cand = queue.shift();
+            if (!cand.isConnected || cand.classList.contains('rk-in')) { continue; }
+            el = cand;
+            break;
+        }
+        if (!el) { seqTimer = null; if (queue.length) { pump(); } return; }
+        if (inView(el)) { ready.push(el); drain(); }   /* 统一走 drain：全站只有一条显形通道 */
+        else { observe(el); }                          /* 视口外：滚到再显，不占队列节奏 */
+        seqTimer = setTimeout(function () { seqTimer = null; pump(); }, SEQ);
     }
 
     function start() {
         if (window.__rkStarted) { return; }
         window.__rkStarted = true;
-        reveal();
-        /* 兜底（不可删）：① 25 秒后强制全显；② 任何时候「已经滚出视口上方」的元素立刻显形，
-           避免长页面里兜底把还没滚到的卡片提前点亮（那正是「都看不到」的元凶）。 */
+        enqueue();
+        /* 兜底：① 25 秒强制全显；② 已经滚出视口上方的立刻显形（防止长页面里漏显） */
         function sweep() {
             els().forEach(function (el) {
                 if (el.classList.contains('rk-in')) { return; }
@@ -120,7 +143,11 @@
         }
         window.addEventListener('scroll', function () { setTimeout(sweep, 120); }, { passive: true });
         setTimeout(function () {
-            els().forEach(function (el) { el.classList.add('rk-in'); });
+            queue.length = 0;
+            els().forEach(function (el) {
+                el.classList.add('rk-reveal');   /* 兜底必须两个类一起加，只加 rk-in 不生效 */
+                el.classList.add('rk-in');
+            });
         }, 25000);
     }
 
@@ -128,18 +155,17 @@
     else { window.addEventListener('load', function () { setTimeout(start, 60); }); }
     setTimeout(function () { start(); }, 3000);
 
-    /* MutationObserver：动态插入的卡片继续渐进（不可删） */
+    /* 滚动到新区域时把露头但还没入队的元素补进队列 */
+    var scrollTimer = null;
+    window.addEventListener('scroll', function () {
+        if (scrollTimer) { return; }
+        scrollTimer = setTimeout(function () { scrollTimer = null; enqueue(); }, 180);
+    }, { passive: true });
+
+    /* MutationObserver：动态插入的卡片继续渐进（按 top 插回队列，顺序不会乱） */
     if ('MutationObserver' in window && !window.__rkMo) {
-        window.__rkMo = new MutationObserver(function (muts) {
-            var need = false;
-            muts.forEach(function (m) {
-                m.addedNodes.forEach(function (n) {
-                    if (n.nodeType !== 1) { return; }
-                    if ((n.matches && n.matches('.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]')) ||
-                        (n.querySelectorAll && n.querySelectorAll('.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]').length)) { need = true; }
-                });
-            });
-            if (need) { reveal(); }
+        window.__rkMo = new MutationObserver(function () {
+            enqueue();
         });
         window.__rkMo.observe(document.body, { childList: true, subtree: true });
     }
