@@ -15,6 +15,14 @@
     if (window.__rkAnimLoaded) { return; }
     window.__rkAnimLoaded = true;
 
+    /* ---- 动画时长统一覆盖（页面内联是 .5s/14px，这里改成 .9s/28px；同选择器、后插入 ⇒ 生效） ---- */
+    (function () {
+        var ov = document.createElement('style');
+        ov.id = 'rkAnimTiming';
+        ov.textContent = '.card, article, .post-card, .card-hover, .rk-reveal-target, [class~=card]{transform:translateY(28px);transition:opacity .9s cubic-bezier(.22,.61,.36,1),transform .9s cubic-bezier(.22,.61,.36,1)}.rk-reveal.rk-in{opacity:1;transform:none}';
+        (document.head || document.documentElement).appendChild(ov);
+    })();
+
     /* ---- 顶部进度条 ---- */
     var bar = document.createElement('div');
     bar.id = 'pageProgress';
@@ -44,7 +52,11 @@
     /* ---- TASK-062：按"视觉行"分桶，行内同延迟，左右同时渐进 + 提速 ----
        原实现：150 + idx*120（DOM 顺序排队，左栏先动、左右不同步、最慢 ~1.9s）
        新实现：BASE 60ms / STEP 70ms / 同行阈值 24px / 视口外仍走 IntersectionObserver */
-    var BASE = 60, STEP = 70, ROW_GAP = 24;
+    /* TASK-169（2026-10-31）：站长「主页全局动画加载太快太提前了，都看不到」。
+       三个原因一起改：① 触发线原本是 `top < innerHeight`（卡片刚露头就动，等于在屏幕外就演完了）；
+       ② 过渡只有 .5s / 位移 14px，太快看不清；③ 5 秒的强制全显兜底会把**下面还没滚到的**也一起点亮。
+       现改为：触发线收进视口 70px、时长 .9s、位移 28px、兜底从 5s 放宽到 25s（并只对「已经滚过顶部/正在视口内」的元素生效）。 */
+    var BASE = 140, STEP = 100, ROW_GAP = 24;
 
     function reveal() {
         var list = els();
@@ -56,7 +68,7 @@
         var inView = [], outView = [];
         now.forEach(function (el) {
             var r = el.getBoundingClientRect();
-            if (r.top < window.innerHeight && r.bottom > 0) { inView.push(el); }
+            if (r.top < window.innerHeight - 70 && r.bottom > 0) { inView.push(el); }
             else { outView.push(el); }
         });
 
@@ -88,7 +100,7 @@
                         io.unobserve(en.target);
                     }
                 });
-            }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+            }, { rootMargin: '0px 0px -70px 0px', threshold: 0.15 });
             io.observe(el);
         });
     }
@@ -97,10 +109,19 @@
         if (window.__rkStarted) { return; }
         window.__rkStarted = true;
         reveal();
-        /* 5 秒兜底：强制全部出现（不可删） */
+        /* 兜底（不可删）：① 25 秒后强制全显；② 任何时候「已经滚出视口上方」的元素立刻显形，
+           避免长页面里兜底把还没滚到的卡片提前点亮（那正是「都看不到」的元凶）。 */
+        function sweep() {
+            els().forEach(function (el) {
+                if (el.classList.contains('rk-in')) { return; }
+                var r = el.getBoundingClientRect();
+                if (r.bottom < 0) { el.classList.add('rk-reveal'); el.classList.add('rk-in'); }
+            });
+        }
+        window.addEventListener('scroll', function () { setTimeout(sweep, 120); }, { passive: true });
         setTimeout(function () {
             els().forEach(function (el) { el.classList.add('rk-in'); });
-        }, 5000);
+        }, 25000);
     }
 
     if (document.readyState === 'complete') { setTimeout(start, 60); }

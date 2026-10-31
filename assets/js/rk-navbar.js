@@ -386,6 +386,9 @@
         while (i) { h = (h * 33) ^ s.charCodeAt(--i); }
         return 'a' + (h >>> 0).toString(36) + '-' + s.length;
     }
+    /* TASK-169（2026-10-31）：站长「公告文字内容改为居中」——
+       原样式 justify-content:center + 关闭按钮 margin-left:auto ⇒ 关闭按钮把剩余空间吃掉，文字整体偏左。
+       现改为：整条 text-align:center，图标与关闭按钮都绝对定位到左右两端，文字独占整行居中。 */
     function loadAnnounce() {
         if (window.RK_MIRROR) { return; }
         fetch('/blog/api_announce.php?action=get', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
@@ -396,7 +399,7 @@
             if (!st) {
                 st = document.createElement('style');
                 st.id = 'rkAnnounceStyle';
-                st.textContent = '#rkAnnounceBar{position:fixed;top:0;left:0;right:0;z-index:9990;background:var(--rk-primary);color:#fff;font-size:.8rem;padding:.4rem 1rem;display:flex;align-items:center;justify-content:center;gap:.6rem;box-shadow:0 2px 10px rgba(0,0,0,.18)}#rkAnnounceBar .rk-announce-text{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#rkAnnounceBar .rk-announce-close{background:none;border:0;color:#fff;cursor:pointer;font-size:.9rem;margin-left:auto;padding:0 .2rem}body.rk-has-announce header{top:34px !important}';
+                st.textContent = '#rkAnnounceBar{position:fixed;top:0;left:0;right:0;z-index:9990;background:var(--rk-primary);color:#fff;font-size:.8rem;padding:.42rem 3.2rem;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.18)}#rkAnnounceBar>i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);opacity:.9}#rkAnnounceBar .rk-announce-text{display:block;width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}#rkAnnounceBar .rk-announce-close{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;cursor:pointer;font-size:.9rem;padding:0 .25rem;opacity:.85;line-height:1}#rkAnnounceBar .rk-announce-close:hover{opacity:1}body.rk-has-announce header{top:34px !important}';
                 document.head.appendChild(st);
             }
             var bar = document.createElement('div');
